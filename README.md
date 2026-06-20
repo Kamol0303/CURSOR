@@ -41,29 +41,46 @@ Services:
 
 The backend automatically runs migrations and seeds demo users on first start.
 
-### Manual Setup
+### Manual Setup (WSL / Linux)
 
 ```bash
-# Backend
 cd backend
-pip install -e ".[dev]"
 
-# Option A: PostgreSQL (recommended)
-# Ensure PostgreSQL is running, then:
-export DATABASE_URL_SYNC=postgresql://tamor:tamor_dev_password@localhost:5432/tamor
-export DATABASE_URL=postgresql+asyncpg://tamor:tamor_dev_password@localhost:5432/tamor
-alembic -c alembic.ini upgrade head
+# 1. Python 3.12 virtual environment
+python3.12 -m venv .venv
+source .venv/bin/activate
+pip install --upgrade pip
 
-# Option B: SQLite (local dev, no PostgreSQL required)
+# 2. Install dependencies (choose one)
+pip install -r requirements.txt          # simple
+# OR
+pip install -e ".[dev]"                  # editable install
+
+# 3. Database — SQLite (no PostgreSQL required)
 export DATABASE_URL_SYNC=sqlite:///./tamor.db
 export DATABASE_URL=sqlite+aiosqlite:///./tamor.db
-alembic -c alembic.ini upgrade head
+export PYTHONPATH=$(pwd)
 
+# 4. Migrate + seed
+python -m alembic -c alembic.ini upgrade head
 python -m scripts.seed_demo_users
+
+# 5. Run API
 uvicorn app.main:app --reload --port 8000
 ```
 
-> **Note:** Alembic uses a **synchronous** driver (`psycopg2` for PostgreSQL, built-in `sqlite3` for SQLite). Do not use `asyncpg` in `DATABASE_URL_SYNC`.
+Or use the setup script:
+
+```bash
+cd backend
+chmod +x setup.sh
+./setup.sh
+```
+
+> **Note:** Alembic uses a **synchronous** driver (`sqlite3` or `psycopg2`).  
+> `DATABASE_URL_SYNC` must be `sqlite:///...` or `postgresql://...` — never `+asyncpg` or `+aiosqlite`.
+
+### Manual Setup — PostgreSQL
 
 # Frontend (separate terminal)
 cd frontend

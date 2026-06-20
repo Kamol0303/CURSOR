@@ -39,6 +39,11 @@ dev = [
 requires = ["setuptools>=75.0"]
 build-backend = "setuptools.build_meta"
 
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["app*"]
+exclude = ["tests*", "scripts*", "alembic*", "data*", "keys*"]
+
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
 testpaths = ["tests"]

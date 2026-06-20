@@ -1,1 +1,3 @@
-backend/tamor_test.db
+*.db
+tamor.db
+tamor_test.db

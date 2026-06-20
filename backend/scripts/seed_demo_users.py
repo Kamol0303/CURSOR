@@ -262,6 +262,13 @@ async def seed():
                     user.password_changed_at = datetime.now(UTC)
                     action = "fixed" if was_invalid else "refreshed"
                     print(f"  [{action}] {label} — demo password hash")
+                    if demo.get("mfa"):
+                        secret = pyotp.random_base32()
+                        user.mfa_enabled = True
+                        user.mfa_method = "totp"
+                        user.mfa_secret_encrypted = encrypt_totp_secret(secret)
+                        totp_secrets[demo["username"]] = secret
+                        print(f"  [mfa-reset] {label} — new TOTP secret generated")
                 else:
                     print(f"  [skip] {label} already exists")
                 continue

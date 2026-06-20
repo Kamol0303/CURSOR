@@ -1,0 +1,25 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #f3f2ee;
+  --foreground: #16231d;
+  --color-naqsh-primary: #1b4d3e;
+  --color-naqsh-accent: #c8932a;
+  --color-naqsh-terracotta: #a6552e;
+  --color-naqsh-line: rgba(27, 77, 62, 0.12);
+  --color-naqsh-line-dark: rgba(200, 147, 42, 0.18);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Inter, Roboto, system-ui, sans-serif;
+}
+
+.dark {
+  --background: #08110e;
+  --foreground: #f6f7f4;
+  --color-naqsh-line: var(--color-naqsh-line-dark);
+}

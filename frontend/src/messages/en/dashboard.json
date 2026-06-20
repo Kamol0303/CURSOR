@@ -1,0 +1,9 @@
+{
+  "welcome": "District metrics",
+  "students": "{count, number} students",
+  "centers": "{count, number} centers",
+  "teachers": "{count, number} teachers",
+  "certificates": "{count, number} certificates",
+  "lastUpdated": "Last updated: {date, date, medium}",
+  "kpiTitle": "Phase 0 demo KPI cards"
+}

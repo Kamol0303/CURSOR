@@ -1,0 +1,11 @@
+{
+  "appName": "TaMoR",
+  "language": "Язык",
+  "login": "Вход",
+  "dashboard": "Панель управления",
+  "localeLabel": "RU",
+  "governmentSubtitle": "Платформа мониторинга образования Тойлокского района",
+  "theme": "Тема",
+  "light": "Светлая",
+  "dark": "Тёмная"
+}

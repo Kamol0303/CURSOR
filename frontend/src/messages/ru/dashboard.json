@@ -1,0 +1,9 @@
+{
+  "welcome": "Районные показатели",
+  "students": "{count, number} учащихся",
+  "centers": "{count, number} центров",
+  "teachers": "{count, number} преподавателей",
+  "certificates": "{count, number} сертификатов",
+  "lastUpdated": "Последнее обновление: {date, date, medium}",
+  "kpiTitle": "Демо KPI-карточки Phase 0"
+}

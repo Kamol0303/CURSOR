@@ -1,0 +1,9 @@
+{
+  "welcome": "Tuman ko'rsatkichlari",
+  "students": "{count, number} o'quvchi",
+  "centers": "{count, number} markaz",
+  "teachers": "{count, number} o'qituvchi",
+  "certificates": "{count, number} sertifikat",
+  "lastUpdated": "Oxirgi yangilanish: {date, date, medium}",
+  "kpiTitle": "Phase 0 demo KPI kartalari"
+}

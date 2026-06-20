@@ -10,6 +10,8 @@ __pycache__/
 .ruff_cache/
 .coverage
 htmlcov/
+*.egg-info/
+*.tsbuildinfo
 dist/
 build/
 .next/

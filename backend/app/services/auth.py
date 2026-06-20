@@ -11,6 +11,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.config import get_settings
 from app.core.security import (
     create_access_token,
+    ensure_utc,
     generate_family_id,
     generate_opaque_token,
     hash_secret,
@@ -222,7 +223,8 @@ async def authenticate_password_login(
     if not user.is_active:
         raise AuthError("USER_INACTIVE")
 
-    if user.locked_until and user.locked_until > now_utc():
+    locked_until = ensure_utc(user.locked_until)
+    if locked_until and locked_until > now_utc():
         await _write_login_audit(
             db,
             user=user,
@@ -346,7 +348,7 @@ async def refresh_session(
     if token.revoked_at or token.used_at:
         await revoke_refresh_family(db, token.family_id)
         raise AuthError("REFRESH_TOKEN_REPLAY_DETECTED")
-    if token.expires_at <= now_utc():
+    if ensure_utc(token.expires_at) <= now_utc():
         token.revoked_at = now_utc()
         raise AuthError("REFRESH_TOKEN_EXPIRED")
 
@@ -413,7 +415,7 @@ async def verify_parent_otp(
         .order_by(OTPChallenge.created_at.desc())
     )
     challenge = challenge_result.scalars().first()
-    if challenge is None or challenge.expires_at <= now_utc():
+    if challenge is None or ensure_utc(challenge.expires_at) <= now_utc():
         raise AuthError("OTP_EXPIRED", "code")
 
     if challenge.code_hash != hash_secret(code):

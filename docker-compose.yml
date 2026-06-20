@@ -9,6 +9,7 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - ./infra/postgres/init-analytics-role.sql:/docker-entrypoint-initdb.d/02-analytics-role.sql
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U tamor"]
       interval: 5s
@@ -39,6 +40,8 @@ services:
       TOTP_ENCRYPTION_KEY: dev-only-change-in-production-32bytes!!
       PINFL_ENCRYPTION_KEY: dev-pinfl-key-change-in-prod!!
       CORS_ORIGINS: '["http://localhost:3000"]'
+      AI_ANALYTICS_URL: http://ai-analytics:8001
+      SMS_WEBHOOK_SECRET: dev-sms-webhook-secret
     volumes:
       - jwt_secrets:/secrets
       - ./backend:/app
@@ -64,6 +67,22 @@ services:
       - /app/node_modules
     depends_on:
       - backend
+
+  ai-analytics:
+    build: ./ai-analytics-service
+    ports:
+      - "8001:8001"
+    environment:
+      ENVIRONMENT: development
+      DATABASE_URL: postgresql+asyncpg://tamor_analytics:tamor_dev@postgres:5432/tamor
+      JWT_PUBLIC_KEY_PATH: /secrets/jwt_public.pem
+    volumes:
+      - jwt_secrets:/secrets
+    depends_on:
+      postgres:
+        condition: service_healthy
+      backend:
+        condition: service_started
 
 volumes:
   postgres_data:

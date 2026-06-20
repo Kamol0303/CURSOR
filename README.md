@@ -24,13 +24,22 @@ Phase 0 delivers the security foundation:
 - Dashboard KPIs, PINFL encryption/masking
 - Trilingual frontend (UZ/RU/EN)
 
-## Phase 2 Status (Current)
+## Phase 2 Status (Complete)
 
 - **Rating engine** — configurable weights, daily compute, tamper-evident `inputs_hash`
 - **Certificates** — issue with QR code + integrity hash, idempotency key support
 - **Public verification** — `/api/v1/public/verify/{number}` (10 req/min/IP)
 - **Reports** — PDF and Excel rating exports
 - **Frontend** — ratings table, certificates gallery, public `/verify` page
+
+## Phase 3 Status (Current)
+
+- **AI analytics microservice** — fastest-growing center, declining centers, high-demand subjects, education gap index
+- **RS256 JWT verification** — public key only; read-only DB role without PINFL access
+- **Notifications** — in-app, SMS (eskiz.uz stub), email stub; locale-aware templates
+- **Integrations** — SSRF-safe HTTP client, SMS webhook signature validation
+- **Frontend** — `/dashboard/analytics`, notification bell with unread count
+- **Scheduler** — APScheduler daily cron in ai-analytics-service
 
 ## Quick Start
 
@@ -49,6 +58,7 @@ docker compose up --build
 Services:
 - Frontend: http://localhost:3000
 - Backend API: http://localhost:8000
+- AI Analytics: http://localhost:8001
 - API Docs (dev): http://localhost:8000/docs
 
 ### Seed Demo Users
@@ -115,14 +125,13 @@ infra/            Nginx, deployment configs
 
 ## Production Readiness Checklist
 
-### Done (Phase 0–2)
+### Done (Phase 0–3)
 - [x] Phase 0: Auth, threat model, i18n skeleton
 - [x] Phase 1: CRUD, dashboard, PINFL masking
 - [x] Phase 2: Rating engine, certificates, QR verify, PDF/Excel reports
+- [x] Phase 3: AI analytics, notifications, integration adapters
 
-### Deferred (Phase 3+)
-- [ ] AI analytics microservice
-- [ ] Notifications (SMS/email/Telegram)
+### Deferred (Phase 4+)
 - [ ] PostgreSQL RLS policies
 - [ ] Celery scheduled rating recompute
 - [ ] External penetration test

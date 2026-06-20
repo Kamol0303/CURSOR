@@ -23,6 +23,7 @@
     "teachers": "O'qituvchilar",
     "ratings": "Reyting",
     "certificates": "Sertifikatlar",
+    "analytics": "AI tahlil",
     "logout": "Chiqish"
   },
   "dashboard": {
@@ -99,5 +100,29 @@
     "course": "Kurs",
     "center": "Markaz",
     "date": "Berilgan sana"
+  },
+  "analytics": {
+    "title": "AI tahlil va prognozlar",
+    "subtitle": "Ta'lim sohasidagi trendlar va ta'lim bo'shliqlari",
+    "loading": "Yuklanmoqda...",
+    "empty": "Hozircha tahlil natijalari yo'q",
+    "lastRun": "Oxirgi tahlil",
+    "newStudents": "Yangi o'quvchilar",
+    "rankDrop": "Reyting tushishi",
+    "noDeclining": "Tushayotgan markazlar topilmadi",
+    "teachers": "o'qituvchi",
+    "certRate": "Sertifikatlashtirish",
+    "studentTeacherRatio": "O'quvchi/o'qituvchi nisbati",
+    "types": {
+      "fastest_growing_center": "Eng tez o'sayotgan markaz",
+      "declining_centers": "Tushayotgan markazlar",
+      "high_demand_subjects": "Yuqori talab fanlar",
+      "education_gap_index": "Ta'lim bo'shliqlari indeksi"
+    }
+  },
+  "notifications": {
+    "title": "Bildirishnomalar",
+    "empty": "Bildirishnomalar yo'q",
+    "markAllRead": "Hammasini o'qilgan deb belgilash"
   }
 }

@@ -59,3 +59,14 @@ export async function listStudents(page = 1) {
 export async function listTeachers(page = 1) {
   return apiFetch<Record<string, unknown>[]>("/teachers?page=" + page);
 }
+
+export async function getAnalyticsInsights() {
+  return apiFetch<{
+    predictions: Record<string, unknown>[];
+    last_run: Record<string, unknown> | null;
+  }>("/analytics/insights");
+}
+
+export async function getNotifications(limit = 10) {
+  return apiFetch<Record<string, unknown>[]>("/notifications?limit=" + limit);
+}

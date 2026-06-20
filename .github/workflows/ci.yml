@@ -62,6 +62,7 @@ jobs:
           JWT_PRIVATE_KEY_PATH: /tmp/secrets/jwt_private.pem
           JWT_PUBLIC_KEY_PATH: /tmp/secrets/jwt_public.pem
           TOTP_ENCRYPTION_KEY: ci-test-key-32-characters-long!!
+          AI_ANALYTICS_URL: http://localhost:8001
         run: alembic upgrade head
 
       - name: Run backend tests
@@ -72,6 +73,7 @@ jobs:
           JWT_PRIVATE_KEY_PATH: /tmp/secrets/jwt_private.pem
           JWT_PUBLIC_KEY_PATH: /tmp/secrets/jwt_public.pem
           TOTP_ENCRYPTION_KEY: ci-test-key-32-characters-long!!
+          AI_ANALYTICS_URL: http://localhost:8001
           PINFL_ENCRYPTION_KEY: ci-pinfl-key-32-characters-long!!
           ENVIRONMENT: test
         run: pytest tests/ -v

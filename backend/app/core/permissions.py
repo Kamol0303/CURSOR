@@ -19,6 +19,7 @@ ROLE_PERMISSIONS: dict[str, list[str]] = {
         "system.settings",
         "audit.read",
         "dashboard.view",
+        "analytics.view",
     ],
     "hokimiyat_operator": [
         "centers.read",
@@ -28,6 +29,7 @@ ROLE_PERMISSIONS: dict[str, list[str]] = {
         "reports.generate",
         "audit.read",
         "dashboard.view",
+        "analytics.view",
     ],
     "center_director": [
         "centers.read",
@@ -41,6 +43,7 @@ ROLE_PERMISSIONS: dict[str, list[str]] = {
         "ratings.view",
         "reports.generate",
         "dashboard.view",
+        "analytics.view",
     ],
     "center_admin": [
         "centers.read",
@@ -65,6 +68,7 @@ ROLE_PERMISSIONS: dict[str, list[str]] = {
         "audit.read",
         "pinfl.reveal",
         "dashboard.view",
+        "analytics.view",
     ],
     "parent": [
         "students.read",

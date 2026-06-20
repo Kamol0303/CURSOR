@@ -23,6 +23,7 @@
     "teachers": "Учителя",
     "ratings": "Рейтинг",
     "certificates": "Сертификаты",
+    "analytics": "AI аналитика",
     "logout": "Выйти"
   },
   "dashboard": {
@@ -99,5 +100,29 @@
     "course": "Курс",
     "center": "Центр",
     "date": "Дата выдачи"
+  },
+  "analytics": {
+    "title": "AI аналитика и прогнозы",
+    "subtitle": "Тренды образования и индекс пробелов",
+    "loading": "Загрузка...",
+    "empty": "Результаты анализа пока отсутствуют",
+    "lastRun": "Последний анализ",
+    "newStudents": "Новые учащиеся",
+    "rankDrop": "Падение рейтинга",
+    "noDeclining": "Снижающиеся центры не найдены",
+    "teachers": "учителей",
+    "certRate": "Сертификация",
+    "studentTeacherRatio": "Соотношение ученик/учитель",
+    "types": {
+      "fastest_growing_center": "Самый быстрорастущий центр",
+      "declining_centers": "Снижающиеся центры",
+      "high_demand_subjects": "Востребованные предметы",
+      "education_gap_index": "Индекс образовательных пробелов"
+    }
+  },
+  "notifications": {
+    "title": "Уведомления",
+    "empty": "Нет уведомлений",
+    "markAllRead": "Отметить все прочитанными"
   }
 }

@@ -31,5 +31,10 @@ class Settings(BaseSettings):
 
     SEED_NON_DEMO_USER_THRESHOLD: int = 5
 
+    AI_ANALYTICS_URL: str = "http://ai-analytics:8001"
+    SMS_WEBHOOK_SECRET: str = "dev-sms-webhook-secret-change-me"
+    ESKIZ_API_TOKEN: str = ""
+    SMTP_HOST: str = ""
+
 
 settings = Settings()

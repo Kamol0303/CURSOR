@@ -23,6 +23,7 @@
     "teachers": "Teachers",
     "ratings": "Ratings",
     "certificates": "Certificates",
+    "analytics": "AI analytics",
     "logout": "Sign out"
   },
   "dashboard": {
@@ -99,5 +100,29 @@
     "course": "Course",
     "center": "Center",
     "date": "Issue date"
+  },
+  "analytics": {
+    "title": "AI analytics & insights",
+    "subtitle": "Education trends and gap analysis",
+    "loading": "Loading...",
+    "empty": "No analysis results yet",
+    "lastRun": "Last analysis run",
+    "newStudents": "New students",
+    "rankDrop": "Rank drop",
+    "noDeclining": "No declining centers found",
+    "teachers": "teachers",
+    "certRate": "Certification rate",
+    "studentTeacherRatio": "Student/teacher ratio",
+    "types": {
+      "fastest_growing_center": "Fastest growing center",
+      "declining_centers": "Declining centers",
+      "high_demand_subjects": "High-demand subjects",
+      "education_gap_index": "Education gap index"
+    }
+  },
+  "notifications": {
+    "title": "Notifications",
+    "empty": "No notifications",
+    "markAllRead": "Mark all as read"
   }
 }

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import uuid
 from datetime import date, datetime
 from typing import TYPE_CHECKING
@@ -44,7 +46,7 @@ class RatingHistory(Base):
     flagged_anomaly: Mapped[bool] = mapped_column(Boolean, default=False)
     computed_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
-    center: Mapped[TrainingCenter] = relationship("TrainingCenter", back_populates="rating_history")
+    center: Mapped["TrainingCenter"] = relationship("TrainingCenter", back_populates="rating_history")
     formula_version: Mapped["RatingFormulaVersion"] = relationship(back_populates="rating_history")
 
 
@@ -68,8 +70,8 @@ class Certificate(Base, TimestampMixin):
     locale: Mapped[str] = mapped_column(String(5), default="uz")
     is_demo_data: Mapped[bool] = mapped_column(Boolean, default=False)
 
-    student: Mapped[Student] = relationship("Student", back_populates="certificates")
-    center: Mapped[TrainingCenter] = relationship("TrainingCenter", back_populates="certificates")
+    student: Mapped["Student"] = relationship("Student", back_populates="certificates")
+    center: Mapped["TrainingCenter"] = relationship("TrainingCenter", back_populates="certificates")
     verifications: Mapped[list["CertificateVerification"]] = relationship(back_populates="certificate")
 
 

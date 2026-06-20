@@ -1,3 +1,11 @@
+from app.models.analytics_notifications import (
+    AiAnalysisLog,
+    AiPrediction,
+    Notification,
+    NotificationLog,
+    NotificationPreference,
+    SmsLog,
+)
 from app.models.education import (
     Enrollment,
     Group,
@@ -38,6 +46,12 @@ from app.models.ratings_certs import (
 )
 
 __all__ = [
+    "AiPrediction",
+    "AiAnalysisLog",
+    "Notification",
+    "NotificationLog",
+    "NotificationPreference",
+    "SmsLog",
     "Region",
     "Mahalla",
     "Subject",

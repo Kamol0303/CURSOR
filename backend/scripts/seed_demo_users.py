@@ -11,7 +11,7 @@ import argparse
 import asyncio
 import secrets
 import sys
-from datetime import UTC, datetime
+from datetime import UTC, date, datetime, timedelta
 
 import pyotp
 from sqlalchemy import func, select
@@ -336,6 +336,85 @@ async def seed() -> None:
 
         await rating_service.compute_ratings(session)
         print("Demo ratings computed.")
+
+        from app.models.analytics_notifications import AiAnalysisLog, AiPrediction
+        from app.services import notification_service
+
+        admin_user = (
+            await session.execute(select(User).where(User.username == "admin.tamor"))
+        ).scalar_one_or_none()
+        operator_user = (
+            await session.execute(select(User).where(User.username == "operator.hokimiyat"))
+        ).scalar_one_or_none()
+
+        existing_preds = (await session.execute(select(AiPrediction).limit(1))).scalar_one_or_none()
+        if not existing_preds:
+            today = date.today()
+            period_start = date.today() - timedelta(days=30)
+            session.add(
+                AiPrediction(
+                    prediction_type="fastest_growing_center",
+                    payload={
+                        "center_id": str(center.id),
+                        "center_name": center.name,
+                        "new_students": 1,
+                        "total_students": 1,
+                        "growth_rate_pct": 100.0,
+                    },
+                    confidence_score=0.85,
+                    period_start=period_start,
+                    period_end=today,
+                )
+            )
+            session.add(
+                AiPrediction(
+                    prediction_type="education_gap_index",
+                    payload={
+                        "gap_index": 0.42,
+                        "interpretation": "lower_is_better",
+                        "total_centers": 2,
+                        "total_students": 2,
+                        "certification_rate_pct": 50.0,
+                        "student_teacher_ratio": 1.0,
+                    },
+                    confidence_score=0.88,
+                    period_start=period_start,
+                    period_end=today,
+                )
+            )
+            session.add(
+                AiAnalysisLog(
+                    run_id=__import__("uuid").uuid4(),
+                    status="completed",
+                    metrics_count=2,
+                    duration_ms=120,
+                    triggered_by="seed",
+                )
+            )
+            print("Demo AI predictions seeded.")
+
+        if admin_user:
+            await notification_service.create_notification(
+                session,
+                user_id=admin_user.id,
+                event_type="rating_change",
+                context={
+                    "center_name": center.name,
+                    "rank": 1,
+                    "direction": "o'rnini saqladi",
+                    "change": "0",
+                },
+                channels=["in_app"],
+            )
+        if operator_user:
+            await notification_service.create_notification(
+                session,
+                user_id=operator_user.id,
+                event_type="license_expiry",
+                context={"center_name": center.name, "days": 30},
+                channels=["in_app"],
+            )
+            print("Demo notifications created.")
 
         print("\n" + "=" * 60 + "\n")
 

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { NotificationBell } from "@/components/NotificationBell";
 
 const NAV = [
   { href: "/dashboard", key: "dashboard" },
@@ -12,6 +13,7 @@ const NAV = [
   { href: "/dashboard/teachers", key: "teachers" },
   { href: "/dashboard/ratings", key: "ratings" },
   { href: "/dashboard/certificates", key: "certificates" },
+  { href: "/dashboard/analytics", key: "analytics" },
 ] as const;
 
 export function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -60,7 +62,10 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
       <div className="flex-1 flex flex-col min-w-0">
         <header className="bg-white border-b px-6 py-3 flex justify-between items-center">
           <h1 className="text-lg font-semibold text-naqsh-primary">{t("platform")}</h1>
-          <LanguageSwitcher />
+          <div className="flex items-center gap-2">
+            <NotificationBell />
+            <LanguageSwitcher />
+          </div>
         </header>
         <main className="flex-1 p-6 overflow-auto">{children}</main>
       </div>

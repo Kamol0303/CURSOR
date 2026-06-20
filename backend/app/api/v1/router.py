@@ -7,6 +7,7 @@ from app.api.v1.certificates import router as certificates_router
 from app.api.v1.dashboard import router as dashboard_router
 from app.api.v1.integrations import router as integrations_router
 from app.api.v1.notifications import router as notifications_router
+from app.api.v1.parent import router as parent_router
 from app.api.v1.public import router as public_router
 from app.api.v1.ratings import router as ratings_router
 from app.api.v1.reports import router as reports_router
@@ -24,5 +25,6 @@ api_router.include_router(certificates_router)
 api_router.include_router(reports_router)
 api_router.include_router(analytics_router)
 api_router.include_router(notifications_router)
+api_router.include_router(parent_router)
 api_router.include_router(integrations_router)
 api_router.include_router(public_router)

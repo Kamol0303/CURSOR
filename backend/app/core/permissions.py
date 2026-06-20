@@ -73,6 +73,7 @@ ROLE_PERMISSIONS: dict[str, list[str]] = {
     "parent": [
         "students.read",
         "ratings.view",
+        "certificates.read",
     ],
     "external_api": [
         "aggregate_stats.read",

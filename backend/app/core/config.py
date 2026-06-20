@@ -35,6 +35,10 @@ class Settings(BaseSettings):
     SMS_WEBHOOK_SECRET: str = "dev-sms-webhook-secret-change-me"
     ESKIZ_API_TOKEN: str = ""
     SMTP_HOST: str = ""
+    TELEGRAM_BOT_TOKEN: str = ""
+    TELEGRAM_WEBHOOK_SECRET: str = "dev-telegram-webhook-secret"
+    PARENT_OTP_EXPIRE_SECONDS: int = 300
+    PARENT_OTP_MAX_ATTEMPTS: int = 5
 
 
 settings = Settings()

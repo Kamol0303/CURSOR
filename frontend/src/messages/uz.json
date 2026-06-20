@@ -124,5 +124,31 @@
     "title": "Bildirishnomalar",
     "empty": "Bildirishnomalar yo'q",
     "markAllRead": "Hammasini o'qilgan deb belgilash"
+  },
+  "parent": {
+    "title": "Ota-ona portali",
+    "subtitle": "Farzandingizning ta'lim ma'lumotlari",
+    "dashboardTitle": "Mening farzandlarim",
+    "phone": "Telefon raqam",
+    "otp": "SMS kod",
+    "sendOtp": "Kod yuborish",
+    "sending": "Yuborilmoqda...",
+    "verify": "Kirish",
+    "verifying": "Tekshirilmoqda...",
+    "changePhone": "Raqamni o'zgartirish",
+    "staffLogin": "Xodimlar uchun kirish",
+    "loading": "Yuklanmoqda...",
+    "logout": "Chiqish",
+    "myChildren": "Farzandlar",
+    "certificates": "Sertifikatlar",
+    "noChildren": "Farzandlar topilmadi",
+    "noCertificates": "Sertifikatlar yo'q",
+    "errors": {
+      "PHONE_NOT_REGISTERED": "Telefon raqam ro'yxatda yo'q",
+      "OTP_INVALID": "Noto'g'ri kod",
+      "OTP_EXPIRED": "Kod muddati tugagan",
+      "RATE_LIMIT_EXCEEDED": "Juda ko'p urinish",
+      "UNKNOWN": "Xatolik yuz berdi"
+    }
   }
 }

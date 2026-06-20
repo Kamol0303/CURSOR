@@ -8,6 +8,8 @@ from app.schemas.auth import (
     ApiResponse,
     LoginRequest,
     MfaVerifyRequest,
+    ParentOtpRequest,
+    ParentOtpVerifyRequest,
     TokenResponse,
     UserMeResponse,
 )
@@ -17,7 +19,9 @@ from app.services.auth_service import (
     login_with_password,
     logout,
     refresh_access_token,
+    request_parent_otp,
     verify_mfa_and_issue_tokens,
+    verify_parent_otp,
 )
 
 router = APIRouter(prefix="/auth", tags=["auth"])
@@ -152,6 +156,52 @@ async def logout_endpoint(
         await logout(db, refresh_token=refresh_token)
     _clear_refresh_cookie(response)
     return ApiResponse(success=True, data={"logged_out": True})
+
+
+@router.post("/parent/request-otp", response_model=ApiResponse)
+async def parent_request_otp(
+    body: ParentOtpRequest,
+    request: Request,
+    db: AsyncSession = Depends(get_db),
+):
+    try:
+        result = await request_parent_otp(
+            db,
+            phone=body.phone,
+            ip=request.client.host if request.client else None,
+        )
+    except AuthError as exc:
+        raise HTTPException(status_code=exc.status, detail={"code": exc.code}) from exc
+    return ApiResponse(success=True, data=result)
+
+
+@router.post("/parent/verify-otp", response_model=ApiResponse)
+async def parent_verify_otp(
+    body: ParentOtpVerifyRequest,
+    request: Request,
+    response: Response,
+    db: AsyncSession = Depends(get_db),
+):
+    try:
+        result = await verify_parent_otp(
+            db,
+            phone=body.phone,
+            otp=body.otp,
+            ip=request.client.host if request.client else None,
+            user_agent=request.headers.get("user-agent"),
+            client_hint=request.headers.get("x-client-hint", ""),
+        )
+    except AuthError as exc:
+        raise HTTPException(status_code=exc.status, detail={"code": exc.code}) from exc
+
+    _set_refresh_cookie(response, result["refresh_token"])
+    return ApiResponse(
+        success=True,
+        data=TokenResponse(
+            access_token=result["access_token"],
+            expires_at=result["expires_at"],
+        ).model_dump(),
+    )
 
 
 @router.get("/me", response_model=ApiResponse)

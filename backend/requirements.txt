@@ -22,3 +22,4 @@ qrcode[pil]==8.0
 reportlab==4.2.5
 openpyxl==3.1.5
 Pillow==11.1.0
+celery[redis]==5.4.0

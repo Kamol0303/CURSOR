@@ -176,6 +176,11 @@ export function LoginForm() {
             </form>
           )}
         </div>
+        <p className="text-center mt-4 text-sm text-gray-600">
+          <a href="/parent/login" className="text-naqsh-accent hover:underline">
+            Ota-ona portali →
+          </a>
+        </p>
       </main>
     </div>
   );

@@ -413,3 +413,121 @@ async def logout(db: AsyncSession, *, refresh_token: str) -> None:
 
 async def get_user_permissions(user: User) -> list[str]:
     return ROLE_PERMISSIONS.get(user.role.code, [])
+
+
+async def request_parent_otp(db: AsyncSession, *, phone: str, ip: str | None) -> dict:
+    from app.core.rls import apply_rls_context, set_rls_role
+    from app.integrations.sms_adapter import send_sms
+    from app.models.education import Guardian
+
+    set_rls_role("system")
+    await apply_rls_context(db)
+
+    ip_key = f"parent:otp:ip:{ip or 'unknown'}"
+    if not await check_rate_limit(ip_key, 10, 300):
+        raise AuthError("RATE_LIMIT_EXCEEDED", 429)
+
+    phone_key = f"parent:otp:phone:{phone}"
+    if not await check_rate_limit(phone_key, 5, 600):
+        raise AuthError("RATE_LIMIT_EXCEEDED", 429)
+
+    guardian = (
+        await db.execute(select(Guardian).where(Guardian.phone == phone, Guardian.deleted_at.is_(None)))
+    ).scalar_one_or_none()
+    user = (
+        await db.execute(
+            select(User).options(selectinload(User.role)).where(User.phone == phone, User.deleted_at.is_(None))
+        )
+    ).scalar_one_or_none()
+
+    if not guardian and (not user or user.role.code != "parent"):
+        raise AuthError("PHONE_NOT_REGISTERED", 404)
+
+    otp = f"{secrets.randbelow(900000) + 100000:06d}"
+    from app.core.redis_client import cache_set
+
+    await cache_set(
+        f"parent:otp:{phone}",
+        {"otp": otp, "attempts": 0},
+        settings.PARENT_OTP_EXPIRE_SECONDS,
+    )
+    await send_sms(phone, f"TaMoR tasdiqlash kodi: {otp}")
+    return {"sent": True, "expires_in": settings.PARENT_OTP_EXPIRE_SECONDS}
+
+
+async def verify_parent_otp(
+    db: AsyncSession,
+    *,
+    phone: str,
+    otp: str,
+    ip: str | None,
+    user_agent: str | None,
+    client_hint: str = "",
+) -> dict:
+    from app.core.redis_client import cache_get, get_redis
+    from app.core.rls import apply_rls_context, set_rls_role
+    from app.models.education import Guardian
+    from app.models.identity import Role
+
+    set_rls_role("system")
+    await apply_rls_context(db)
+
+    cached = await cache_get(f"parent:otp:{phone}")
+    if not cached:
+        raise AuthError("OTP_EXPIRED", 401)
+
+    attempts = int(cached.get("attempts", 0)) + 1
+    if attempts > settings.PARENT_OTP_MAX_ATTEMPTS:
+        r = await get_redis()
+        await r.delete(f"parent:otp:{phone}")
+        raise AuthError("OTP_MAX_ATTEMPTS", 429)
+
+    if cached.get("otp") != otp:
+        from app.core.redis_client import cache_set
+
+        await cache_set(
+            f"parent:otp:{phone}",
+            {"otp": cached["otp"], "attempts": attempts},
+            settings.PARENT_OTP_EXPIRE_SECONDS,
+        )
+        raise AuthError("OTP_INVALID", 401)
+
+    r = await get_redis()
+    await r.delete(f"parent:otp:{phone}")
+
+    result = await db.execute(
+        select(User).options(selectinload(User.role)).where(User.phone == phone, User.deleted_at.is_(None))
+    )
+    user = result.scalar_one_or_none()
+
+    if not user:
+        guardian = (
+            await db.execute(select(Guardian).where(Guardian.phone == phone, Guardian.deleted_at.is_(None)))
+        ).scalar_one_or_none()
+        if not guardian:
+            raise AuthError("PHONE_NOT_REGISTERED", 404)
+
+        role_result = await db.execute(select(Role).where(Role.code == "parent"))
+        parent_role = role_result.scalar_one()
+        user = User(
+            phone=phone,
+            role_id=parent_role.id,
+            is_active=True,
+            locale_preference="uz",
+            mfa_method="sms_otp",
+        )
+        db.add(user)
+        await db.flush()
+        await db.refresh(user, attribute_names=["role"])
+
+    if user.role.code != "parent":
+        raise AuthError("NOT_PARENT_ACCOUNT", 403)
+
+    return await _issue_tokens(
+        db,
+        user=user,
+        ip=ip,
+        user_agent=user_agent,
+        client_hint=client_hint,
+        mfa_used=True,
+    )

@@ -8,6 +8,7 @@ from sqlalchemy.orm import selectinload
 
 from app.core.database import get_db
 from app.core.redis_client import is_jti_denied
+from app.core.rls import apply_rls_context, set_rls_user
 from app.core.security import verify_access_token
 from app.models.identity import User
 
@@ -38,6 +39,9 @@ async def get_current_user(
     user = result.scalar_one_or_none()
     if not user or not user.is_active or user.is_locked:
         raise HTTPException(status_code=401, detail={"code": "ACCOUNT_INACTIVE"})
+
+    set_rls_user(user)
+    await apply_rls_context(db)
 
     request.state.token_payload = payload
     return user

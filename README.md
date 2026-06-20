@@ -32,7 +32,7 @@ Phase 0 delivers the security foundation:
 - **Reports** — PDF and Excel rating exports
 - **Frontend** — ratings table, certificates gallery, public `/verify` page
 
-## Phase 3 Status (Current)
+## Phase 3 Status (Complete)
 
 - **AI analytics microservice** — fastest-growing center, declining centers, high-demand subjects, education gap index
 - **RS256 JWT verification** — public key only; read-only DB role without PINFL access
@@ -40,6 +40,16 @@ Phase 0 delivers the security foundation:
 - **Integrations** — SSRF-safe HTTP client, SMS webhook signature validation
 - **Frontend** — `/dashboard/analytics`, notification bell with unread count
 - **Scheduler** — APScheduler daily cron in ai-analytics-service
+
+## Phase 4 Status (Current)
+
+- **Parent portal** — SMS OTP login, children list, certificates view (`/parent/login`)
+- **PWA** — manifest, service worker, installable mobile shell
+- **PostgreSQL RLS** — FORCE policies on students, enrollments, certificates, guardians
+- **Telegram bot** — webhook with `/verify` and `/status` commands
+- **Celery** — daily rating recompute (03:00 Asia/Samarkand)
+- **Security hardening** — HSTS/CSP in production, Permissions-Policy
+- **Load test** — `scripts/load_test.py`
 
 ## Quick Start
 
@@ -80,6 +90,8 @@ Demo credentials are printed to the console only. **Never run in production.**
 | Teacher | `teacher.dilnoza` | `Teach#Dil2026!` | — |
 | Auditor | `auditor.tuman` | `Audit#Check26!` | — |
 | Parent | phone `+998901234567` | SMS OTP (dev console) | — |
+
+Parent portal: http://localhost:3000/parent/login
 
 ### Local Development (without Docker)
 
@@ -125,15 +137,14 @@ infra/            Nginx, deployment configs
 
 ## Production Readiness Checklist
 
-### Done (Phase 0–3)
+### Done (Phase 0–4)
 - [x] Phase 0: Auth, threat model, i18n skeleton
 - [x] Phase 1: CRUD, dashboard, PINFL masking
 - [x] Phase 2: Rating engine, certificates, QR verify, PDF/Excel reports
 - [x] Phase 3: AI analytics, notifications, integration adapters
+- [x] Phase 4: Parent portal, PWA, RLS, Telegram bot, Celery scheduler
 
-### Deferred (Phase 4+)
-- [ ] PostgreSQL RLS policies
-- [ ] Celery scheduled rating recompute
+### Deferred (Phase 5+)
 - [ ] External penetration test
 - [ ] Vault/KMS integration
 - [ ] SMS gateway (eskiz.uz)

@@ -124,5 +124,31 @@
     "title": "Notifications",
     "empty": "No notifications",
     "markAllRead": "Mark all as read"
+  },
+  "parent": {
+    "title": "Parent portal",
+    "subtitle": "Your child's education information",
+    "dashboardTitle": "My children",
+    "phone": "Phone number",
+    "otp": "SMS code",
+    "sendOtp": "Send code",
+    "sending": "Sending...",
+    "verify": "Sign in",
+    "verifying": "Verifying...",
+    "changePhone": "Change phone number",
+    "staffLogin": "Staff login",
+    "loading": "Loading...",
+    "logout": "Sign out",
+    "myChildren": "Children",
+    "certificates": "Certificates",
+    "noChildren": "No children found",
+    "noCertificates": "No certificates",
+    "errors": {
+      "PHONE_NOT_REGISTERED": "Phone not registered",
+      "OTP_INVALID": "Invalid code",
+      "OTP_EXPIRED": "Code expired",
+      "RATE_LIMIT_EXCEEDED": "Too many attempts",
+      "UNKNOWN": "An error occurred"
+    }
   }
 }

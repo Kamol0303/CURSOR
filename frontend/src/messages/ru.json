@@ -124,5 +124,31 @@
     "title": "Уведомления",
     "empty": "Нет уведомлений",
     "markAllRead": "Отметить все прочитанными"
+  },
+  "parent": {
+    "title": "Портал для родителей",
+    "subtitle": "Информация об обучении вашего ребёнка",
+    "dashboardTitle": "Мои дети",
+    "phone": "Номер телефона",
+    "otp": "SMS-код",
+    "sendOtp": "Отправить код",
+    "sending": "Отправка...",
+    "verify": "Войти",
+    "verifying": "Проверка...",
+    "changePhone": "Изменить номер",
+    "staffLogin": "Вход для сотрудников",
+    "loading": "Загрузка...",
+    "logout": "Выйти",
+    "myChildren": "Дети",
+    "certificates": "Сертификаты",
+    "noChildren": "Дети не найдены",
+    "noCertificates": "Нет сертификатов",
+    "errors": {
+      "PHONE_NOT_REGISTERED": "Телефон не зарегистрирован",
+      "OTP_INVALID": "Неверный код",
+      "OTP_EXPIRED": "Код истёк",
+      "RATE_LIMIT_EXCEEDED": "Слишком много попыток",
+      "UNKNOWN": "Произошла ошибка"
+    }
   }
 }

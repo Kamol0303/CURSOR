@@ -240,6 +240,11 @@ async def seed() -> None:
     Session = async_sessionmaker(engine, expire_on_commit=False)
 
     async with Session() as session:
+        from app.core.rls import apply_rls_context, set_rls_role
+
+        set_rls_role("system")
+        await apply_rls_context(session)
+
         count_result = await session.execute(
             select(func.count()).select_from(User).where(User.is_demo_account.is_(False))
         )

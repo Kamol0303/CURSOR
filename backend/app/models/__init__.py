@@ -37,6 +37,7 @@ from app.models.identity import (
     User,
 )
 
+from app.models.integrations import TelegramSubscription
 from app.models.ratings_certs import (
     Certificate,
     CertificateVerification,
@@ -52,6 +53,7 @@ __all__ = [
     "NotificationLog",
     "NotificationPreference",
     "SmsLog",
+    "TelegramSubscription",
     "Region",
     "Mahalla",
     "Subject",

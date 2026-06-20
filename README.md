@@ -47,9 +47,23 @@ The backend automatically runs migrations and seeds demo users on first start.
 # Backend
 cd backend
 pip install -e ".[dev]"
-alembic upgrade head
+
+# Option A: PostgreSQL (recommended)
+# Ensure PostgreSQL is running, then:
+export DATABASE_URL_SYNC=postgresql://tamor:tamor_dev_password@localhost:5432/tamor
+export DATABASE_URL=postgresql+asyncpg://tamor:tamor_dev_password@localhost:5432/tamor
+alembic -c alembic.ini upgrade head
+
+# Option B: SQLite (local dev, no PostgreSQL required)
+export DATABASE_URL_SYNC=sqlite:///./tamor.db
+export DATABASE_URL=sqlite+aiosqlite:///./tamor.db
+alembic -c alembic.ini upgrade head
+
 python -m scripts.seed_demo_users
 uvicorn app.main:app --reload --port 8000
+```
+
+> **Note:** Alembic uses a **synchronous** driver (`psycopg2` for PostgreSQL, built-in `sqlite3` for SQLite). Do not use `asyncpg` in `DATABASE_URL_SYNC`.
 
 # Frontend (separate terminal)
 cd frontend

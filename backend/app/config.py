@@ -9,10 +9,14 @@ class Settings(BaseSettings):
 
     database_url: str = "postgresql+asyncpg://tamor:tamor_dev_password@localhost:5432/tamor"
     database_url_sync: str = "postgresql://tamor:tamor_dev_password@localhost:5432/tamor"
+    # Set USE_SQLITE=true for local dev without PostgreSQL:
+    # DATABASE_URL=sqlite+aiosqlite:///./tamor.db
+    # DATABASE_URL_SYNC=sqlite:///./tamor.db
+    use_sqlite: bool = False
     redis_url: str = "redis://localhost:6379/0"
 
-    jwt_private_key_path: str = "./backend/keys/jwt_private.pem"
-    jwt_public_key_path: str = "./backend/keys/jwt_public.pem"
+    jwt_private_key_path: str = "./keys/jwt_private.pem"
+    jwt_public_key_path: str = "./keys/jwt_public.pem"
     jwt_access_token_expire_minutes: int = 15
     jwt_refresh_token_expire_days: int = 7
     jwt_algorithm: str = "RS256"

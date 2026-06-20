@@ -1,11 +1,12 @@
 import uuid
-from datetime import UTC, datetime, timedelta
+from datetime import timedelta
 
 from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from app.config import settings
+from app.core.datetime_utils import ensure_utc_aware, utc_now
 from app.core.security import (
     MFA_MANDATORY_ROLES,
     PASSWORD_HISTORY_COUNT,
@@ -37,6 +38,7 @@ from app.models import (
     User,
 )
 from app.schemas.auth import UserResponse
+from app.services.password_policy import password_rotation_required
 
 # In-memory MFA pending tokens for login flow (use Redis in production)
 _mfa_pending: dict[str, dict] = {}
@@ -140,7 +142,7 @@ class AuthService:
             mfa_token = uuid.uuid4().hex
             _mfa_pending[mfa_token] = {
                 "user_id": str(user.id),
-                "expires": datetime.now(UTC) + timedelta(minutes=5),
+                "expires": utc_now() + timedelta(minutes=5),
             }
             await self._log_login(user.id, username, ip, user_agent, True)
             return {
@@ -158,7 +160,7 @@ class AuthService:
         self, mfa_token: str, code: str, ip: str | None, user_agent: str | None
     ) -> dict:
         pending = _mfa_pending.get(mfa_token)
-        if not pending or datetime.now(UTC) > pending["expires"]:
+        if not pending or utc_now() > pending["expires"]:
             _mfa_pending.pop(mfa_token, None)
             return {"error": "MFA_TOKEN_EXPIRED"}
 
@@ -186,7 +188,7 @@ class AuthService:
         )
         for backup in backup_result.scalars():
             if verify_password(code, backup.code_hash):
-                backup.used_at = datetime.now(UTC)
+                backup.used_at = utc_now()
                 _mfa_pending.pop(mfa_token, None)
                 return await self._complete_login(user, ip, user_agent, mfa_used=True)
 
@@ -195,6 +197,11 @@ class AuthService:
     async def _complete_login(
         self, user: User, ip: str | None, user_agent: str | None, mfa_used: bool = False
     ) -> dict:
+        if user.must_change_password or password_rotation_required(
+            user.role.code, user.password_changed_at
+        ):
+            user.must_change_password = True
+
         permissions = [rp.permission.code for rp in user.role.role_permissions]
         access_token = create_access_token(
             str(user.id),
@@ -205,7 +212,7 @@ class AuthService:
         )
         refresh_token = generate_refresh_token()
         family_id = uuid.uuid4()
-        expires_at = datetime.now(UTC) + timedelta(days=settings.jwt_refresh_token_expire_days)
+        expires_at = utc_now() + timedelta(days=settings.jwt_refresh_token_expire_days)
 
         rt = RefreshToken(
             user_id=user.id,
@@ -215,7 +222,7 @@ class AuthService:
         )
         self.db.add(rt)
 
-        user.last_login_at = datetime.now(UTC)
+        user.last_login_at = utc_now()
         await self._log_login(user.id, user.username, ip, user_agent, True, mfa_used=mfa_used)
         await self.db.flush()
 
@@ -247,14 +254,14 @@ class AuthService:
             await self.db.execute(
                 update(RefreshToken)
                 .where(RefreshToken.family_id == stored.family_id)
-                .values(revoked_at=datetime.now(UTC))
+                .values(revoked_at=utc_now())
             )
             return {"error": "REFRESH_TOKEN_REPLAY_DETECTED"}
 
-        if datetime.now(UTC) > stored.expires_at.replace(tzinfo=UTC):
+        if utc_now() > ensure_utc_aware(stored.expires_at):
             return {"error": "REFRESH_TOKEN_EXPIRED"}
 
-        stored.used_at = datetime.now(UTC)
+        stored.used_at = utc_now()
         user = stored.user
 
         permissions = [rp.permission.code for rp in user.role.role_permissions]
@@ -270,7 +277,7 @@ class AuthService:
             user_id=user.id,
             token_hash=hash_token(new_refresh),
             family_id=stored.family_id,
-            expires_at=datetime.now(UTC) + timedelta(days=settings.jwt_refresh_token_expire_days),
+            expires_at=utc_now() + timedelta(days=settings.jwt_refresh_token_expire_days),
         )
         self.db.add(new_rt)
         await self.db.flush()
@@ -282,7 +289,7 @@ class AuthService:
         await self.db.execute(
             update(RefreshToken)
             .where(RefreshToken.token_hash == token_hash)
-            .values(revoked_at=datetime.now(UTC))
+            .values(revoked_at=utc_now())
         )
 
     async def request_otp(self, phone: str) -> dict:
@@ -294,7 +301,7 @@ class AuthService:
         otp = OtpCode(
             phone=phone,
             code_hash=hash_password(code),
-            expires_at=datetime.now(UTC) + timedelta(minutes=5),
+            expires_at=utc_now() + timedelta(minutes=5),
         )
         self.db.add(otp)
         await self.db.flush()
@@ -310,13 +317,13 @@ class AuthService:
             .limit(1)
         )
         otp = result.scalar_one_or_none()
-        if not otp or datetime.now(UTC) > otp.expires_at.replace(tzinfo=UTC):
+        if not otp or utc_now() > ensure_utc_aware(otp.expires_at):
             return {"error": "OTP_EXPIRED"}
 
         if not verify_password(code, otp.code_hash):
             return {"error": "OTP_INVALID"}
 
-        otp.used_at = datetime.now(UTC)
+        otp.used_at = utc_now()
         user = await self._get_user_by_phone(phone)
         if not user:
             return {"error": "USER_NOT_FOUND"}
@@ -361,7 +368,7 @@ class AuthService:
             self.db.add(PasswordHistory(user_id=user.id, password_hash=user.password_hash))
 
         user.password_hash = hash_password(new)
-        user.password_changed_at = datetime.now(UTC)
+        user.password_changed_at = utc_now()
         user.must_change_password = False
         await self.db.flush()
         return {"success": True}

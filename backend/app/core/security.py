@@ -10,6 +10,7 @@ from cryptography.fernet import Fernet
 from jose import JWTError, jwt
 
 from app.config import settings
+from app.core.datetime_utils import ensure_utc_aware, utc_now
 
 MFA_MANDATORY_ROLES = {"super_admin", "hokimiyat_operator", "center_director"}
 PASSWORD_MIN_LENGTH = 12
@@ -186,12 +187,13 @@ def generate_otp_code() -> str:
 
 def is_account_locked(user) -> bool:
     if user.is_locked and user.locked_until:
-        if datetime.now(UTC) < user.locked_until.replace(tzinfo=UTC):
+        locked_until = ensure_utc_aware(user.locked_until)
+        if locked_until and utc_now() < locked_until:
             return True
     return False
 
 
-def calculate_lockout_until(failed_attempts: int) -> datetime:
+def calculate_lockout_until(failed_attempts: int):
     multiplier = 2 ** max(0, (failed_attempts // MAX_FAILED_ATTEMPTS) - 1)
     minutes = LOCKOUT_MINUTES * multiplier
-    return datetime.now(UTC) + timedelta(minutes=minutes)
+    return utc_now() + timedelta(minutes=minutes)

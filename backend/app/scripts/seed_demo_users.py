@@ -77,6 +77,7 @@ DEMO_USERS = [
     ("hokimiyat_operator", "operator.hokimiyat", "operator@tamor.local", None, "Hokim#Op2026!", True),
     ("center_director", "director.aspect", "director@aspect.local", None, "Direktor#2026!", True),
     ("center_admin", "admin.aspect", "admin@aspect.local", None, "CenterAdmin#26!", False),
+    ("center_admin", "hokimyat", "hokimyat@tamor.local", None, "admin2026", False),
     ("teacher", "teacher.dilnoza", "teacher@aspect.local", None, "Teach#Dil2026!", False),
     ("auditor", "auditor.tuman", "auditor@tamor.local", None, "Audit#Check26!", False),
 ]

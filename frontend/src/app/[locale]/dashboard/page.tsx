@@ -9,9 +9,9 @@ export default async function DashboardPage() {
 
   return (
     <main className="mx-auto max-w-7xl px-6 pb-16">
-      <section className="rounded-[2rem] border border-slate-200 bg-white/90 p-8 shadow-card backdrop-blur dark:border-slate-800 dark:bg-slate-950/80">
-        <p className="text-sm uppercase tracking-[0.35em] text-primary">{t('welcome')}</p>
-        <h2 className="mt-3 text-3xl font-semibold text-ink dark:text-white">{t('kpiTitle')}</h2>
+      <section className="rounded-[2rem] border border-slate-200 bg-white/90 p-8 shadow-[0_18px_48px_rgba(15,30,24,0.12)] backdrop-blur dark:border-slate-800 dark:bg-slate-950/80">
+        <p className="text-sm uppercase tracking-[0.35em] text-[var(--color-naqsh-primary)]">{t('welcome')}</p>
+        <h2 className="mt-3 text-3xl font-semibold text-[var(--foreground)] dark:text-white">{t('kpiTitle')}</h2>
         <p className="mt-3 text-sm text-slate-500 dark:text-slate-400">
           {t('lastUpdated', {date: now})}
         </p>

@@ -31,7 +31,7 @@ export default async function LocaleLayout({children, params}: Props) {
           <div className="relative min-h-screen">
             <header className="mx-auto flex max-w-7xl items-center justify-between px-6 py-6">
               <div>
-                <p className="text-xs uppercase tracking-[0.35em] text-primary">TaMoR</p>
+                <p className="text-xs uppercase tracking-[0.35em] text-[var(--color-naqsh-primary)]">TaMoR</p>
                 <h1 className="text-lg font-semibold">District Education Monitoring &amp; Rating</h1>
               </div>
               <LanguageSwitcher />

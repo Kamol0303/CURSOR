@@ -2,9 +2,9 @@
 
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
-import { useRouter } from 'next/navigation';
 import { GirihPattern, TamorLogo } from '@/components/ui/GirihPattern';
 import { LanguageSwitcher } from '@/components/ui/LanguageSwitcher';
+import { useRouter } from '@/i18n/routing';
 import { apiLogin, apiMfaVerify, apiOtpRequest, apiOtpVerify, setAccessToken } from '@/lib/api';
 
 type LoginMode = 'password' | 'otp' | 'mfa';

@@ -1,8 +1,7 @@
 'use client';
 
-import { GirihPattern } from '@/components/ui/GirihPattern';
+import { GirihPattern, TamorLogo } from '@/components/ui/GirihPattern';
 import { LanguageSwitcher } from '@/components/ui/LanguageSwitcher';
-import { TamorLogo } from '@/components/ui/GirihPattern';
 
 export default function VerifyPage() {
   return (

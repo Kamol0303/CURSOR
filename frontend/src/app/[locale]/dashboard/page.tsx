@@ -4,7 +4,7 @@ import { useTranslations, useLocale } from 'next-intl';
 import { TamorLogo } from '@/components/ui/GirihPattern';
 import { LanguageSwitcher } from '@/components/ui/LanguageSwitcher';
 import { apiLogout } from '@/lib/api';
-import { useRouter } from 'next/navigation';
+import { useRouter } from '@/i18n/routing';
 
 const DEMO_KPIS = [
   { key: 'centers' as const, value: 47, change: 3.2 },

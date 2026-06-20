@@ -1,9 +1,9 @@
 'use client';
 
 import { useLocale } from 'next-intl';
-import { useRouter } from 'next/navigation';
 import { useTransition } from 'react';
 import { locales, type Locale } from '@/i18n/config';
+import { usePathname, useRouter } from '@/i18n/routing';
 
 const LOCALE_LABELS: Record<Locale, string> = {
   uz: 'UZ',
@@ -13,13 +13,14 @@ const LOCALE_LABELS: Record<Locale, string> = {
 
 export function LanguageSwitcher() {
   const locale = useLocale() as Locale;
+  const pathname = usePathname();
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
 
   const switchLocale = (newLocale: Locale) => {
     document.cookie = `NEXT_LOCALE=${newLocale};path=/;max-age=31536000;SameSite=Strict`;
     startTransition(() => {
-      router.refresh();
+      router.replace(pathname, { locale: newLocale });
     });
   };
 

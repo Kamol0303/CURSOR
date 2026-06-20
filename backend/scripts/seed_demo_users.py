@@ -203,7 +203,7 @@ async def seed():
             await db.flush()
 
         mahalla_result = await db.execute(
-            select(Mahalla).where(Mahalla.name_uz == "Toyloq")
+            select(Mahalla).where(Mahalla.code == "TOYLOQ")
         )
         mahalla = mahalla_result.scalar_one_or_none()
         if not mahalla:
@@ -212,6 +212,7 @@ async def seed():
                 name_uz="Toyloq",
                 name_ru="Тойлок",
                 name_en="Toyloq",
+                code="TOYLOQ",
             )
             db.add(mahalla)
             await db.flush()

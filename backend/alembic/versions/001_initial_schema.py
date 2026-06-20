@@ -76,6 +76,7 @@ def upgrade() -> None:
         sa.Column("name_uz", sa.String(200), nullable=False),
         sa.Column("name_ru", sa.String(200), nullable=False),
         sa.Column("name_en", sa.String(200), nullable=False),
+        sa.Column("code", sa.String(20), unique=True, nullable=False),
         sa.Column("created_at", sa.DateTime(timezone=True), server_default=sa.func.now()),
         sa.Column("updated_at", sa.DateTime(timezone=True), server_default=sa.func.now()),
         sa.Column("deleted_at", sa.DateTime(timezone=True), nullable=True),

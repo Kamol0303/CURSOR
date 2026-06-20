@@ -249,6 +249,7 @@ class Mahalla(Base, TimestampMixin):
     name_uz: Mapped[str] = mapped_column(String(200), nullable=False)
     name_ru: Mapped[str] = mapped_column(String(200), nullable=False)
     name_en: Mapped[str] = mapped_column(String(200), nullable=False)
+    code: Mapped[str] = mapped_column(String(20), unique=True, nullable=False)
 
     region: Mapped["Region"] = relationship(back_populates="mahallas")
     training_centers: Mapped[list["TrainingCenter"]] = relationship(back_populates="mahalla")

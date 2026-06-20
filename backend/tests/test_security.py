@@ -5,6 +5,7 @@ from app.core.security import (
     generate_refresh_token,
     hash_password,
     hash_token,
+    is_valid_bcrypt_hash,
     validate_password_policy,
     verify_password,
     verify_totp,
@@ -47,6 +48,11 @@ class TestPasswordHashing:
         hashed = hash_password(password)
         assert verify_password(password, hashed)
         assert not verify_password("wrong", hashed)
+
+    def test_invalid_hash_returns_false(self):
+        assert not verify_password("any", "not-a-bcrypt-hash")
+        assert not verify_password("any", None)
+        assert not is_valid_bcrypt_hash("plaintext-password")
 
 
 class TestJWT:

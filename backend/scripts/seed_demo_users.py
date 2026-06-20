@@ -26,7 +26,13 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_asyn
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from app.config import settings
-from app.core.security import encrypt_totp_secret, generate_backup_codes, hash_password, hash_token
+from app.core.security import (
+    encrypt_totp_secret,
+    generate_backup_codes,
+    hash_password,
+    hash_token,
+    is_valid_bcrypt_hash,
+)
 from app.models import ApiKey, ApiKeyScope, Mahalla, Permission, Region, Role, RolePermission, TrainingCenter, User
 
 BANNER = """
@@ -243,8 +249,20 @@ async def seed():
                 existing = await db.execute(select(User).where(User.phone == demo["phone"]))
 
             user = existing.scalar_one_or_none()
+            label = demo.get("username") or demo.get("phone")
+
             if user:
-                print(f"  [skip] {demo.get('username') or demo.get('phone')} already exists")
+                if user.is_demo_account and "password" in demo:
+                    was_invalid = not is_valid_bcrypt_hash(user.password_hash)
+                    user.password_hash = hash_password(demo["password"])
+                    user.failed_login_attempts = 0
+                    user.is_locked = False
+                    user.locked_until = None
+                    user.password_changed_at = datetime.now(UTC)
+                    action = "fixed" if was_invalid else "refreshed"
+                    print(f"  [{action}] {label} — demo password hash")
+                else:
+                    print(f"  [skip] {label} already exists")
                 continue
 
             role = role_map[demo["role"]]

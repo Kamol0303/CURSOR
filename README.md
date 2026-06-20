@@ -84,8 +84,14 @@ chmod +x setup.sh
 
 # Frontend (separate terminal)
 cd frontend
+rm -rf node_modules package-lock.json .next   # clean install if you had Next 16 / Tailwind 4
 npm install
 npm run dev
+# Open http://localhost:3000/login
+```
+
+> **Important:** Use **Next.js 14** + **Tailwind CSS 3** (pinned in `package.json`).  
+> Do not upgrade to Next 16 / Tailwind 4 without migration — it breaks PostCSS config.
 ```
 
 ## Demo Credentials

@@ -2,6 +2,9 @@
   "name": "tamor-frontend",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -10,10 +13,10 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
-    "next": "^14.2.0",
-    "react": "^18.3.0",
-    "react-dom": "^18.3.0",
-    "next-intl": "^3.26.0",
+    "next": "14.2.35",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "next-intl": "3.26.5",
     "@tanstack/react-query": "^5.62.0",
     "react-hook-form": "^7.54.0",
     "@hookform/resolvers": "^3.9.0",
@@ -26,10 +29,13 @@
     "@types/react": "^18.3.0",
     "@types/react-dom": "^18.3.0",
     "typescript": "^5.7.0",
-    "tailwindcss": "^3.4.0",
-    "postcss": "^8.4.0",
-    "autoprefixer": "^10.4.0",
+    "tailwindcss": "3.4.17",
+    "postcss": "8.4.49",
+    "autoprefixer": "10.4.20",
     "eslint": "^8.57.0",
-    "eslint-config-next": "^14.2.0"
+    "eslint-config-next": "14.2.35"
+  },
+  "overrides": {
+    "tailwindcss": "3.4.17"
   }
 }

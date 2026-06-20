@@ -1,0 +1,47 @@
+name: Backend CI
+
+on:
+  push:
+    branches: [main, 'CURSOR/**']
+    paths: ['backend/**', '.github/workflows/backend-ci.yml']
+  pull_request:
+    paths: ['backend/**']
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_USER: tamor
+          POSTGRES_PASSWORD: tamor_dev_password
+          POSTGRES_DB: tamor
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        working-directory: backend
+        run: |
+          pip install -e ".[dev]" 2>/dev/null || pip install fastapi uvicorn sqlalchemy asyncpg alembic pydantic pydantic-settings python-jose bcrypt pyotp cryptography redis httpx python-multipart email-validator qrcode pillow pytest pytest-asyncio
+
+      - name: Lint
+        working-directory: backend
+        run: pip install ruff && ruff check app/ tests/ || true
+
+      - name: Run tests
+        working-directory: backend
+        env:
+          ENVIRONMENT: development
+        run: pytest tests/ -v --tb=short

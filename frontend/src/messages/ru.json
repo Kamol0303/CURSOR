@@ -1,0 +1,55 @@
+{
+  "common": {
+    "appName": "TaMoR",
+    "appSubtitle": "Платформа мониторинга и рейтинга образования",
+    "loading": "Загрузка...",
+    "error": "Произошла ошибка",
+    "save": "Сохранить",
+    "cancel": "Отмена",
+    "search": "Поиск",
+    "logout": "Выйти"
+  },
+  "auth": {
+    "login": "Вход",
+    "username": "Имя пользователя",
+    "password": "Пароль",
+    "phone": "Номер телефона",
+    "loginButton": "Войти в систему",
+    "otpLogin": "Вход по SMS",
+    "otpRequest": "Отправить SMS-код",
+    "otpCode": "SMS-код",
+    "otpVerify": "Подтвердить",
+    "mfaTitle": "Двухфакторная аутентификация",
+    "mfaCode": "TOTP-код",
+    "mfaVerify": "Подтвердить",
+    "errors": {
+      "INVALID_CREDENTIALS": "Неверное имя пользователя или пароль",
+      "ACCOUNT_LOCKED": "Аккаунт временно заблокирован",
+      "ACCOUNT_INACTIVE": "Аккаунт неактивен",
+      "MFA_INVALID_CODE": "Неверный TOTP-код",
+      "MFA_TOKEN_EXPIRED": "Сессия MFA истекла",
+      "OTP_INVALID": "Неверный SMS-код",
+      "OTP_EXPIRED": "Срок действия SMS-кода истёк",
+      "AUTH_REQUIRED": "Требуется авторизация"
+    }
+  },
+  "dashboard": {
+    "title": "Панель управления",
+    "welcome": "Добро пожаловать, {name}",
+    "kpi": {
+      "centers": "{count, plural, one {# центр} few {# центра} many {# центров} other {# центров}}",
+      "students": "{count, plural, one {# ученик} few {# ученика} many {# учеников} other {# учеников}}",
+      "teachers": "{count, plural, one {# учитель} few {# учителя} many {# учителей} other {# учителей}}",
+      "certificates": "{count, plural, one {# сертификат} few {# сертификата} many {# сертификатов} other {# сертификатов}}"
+    }
+  },
+  "nav": {
+    "dashboard": "Панель управления",
+    "centers": "Центры",
+    "students": "Ученики",
+    "teachers": "Учителя",
+    "ratings": "Рейтинги",
+    "reports": "Отчёты",
+    "settings": "Настройки"
+  }
+}

@@ -1,0 +1,55 @@
+{
+  "common": {
+    "appName": "TaMoR",
+    "appSubtitle": "Ta'lim monitoring va reyting platformasi",
+    "loading": "Yuklanmoqda...",
+    "error": "Xatolik yuz berdi",
+    "save": "Saqlash",
+    "cancel": "Bekor qilish",
+    "search": "Qidirish",
+    "logout": "Chiqish"
+  },
+  "auth": {
+    "login": "Kirish",
+    "username": "Foydalanuvchi nomi",
+    "password": "Parol",
+    "phone": "Telefon raqami",
+    "loginButton": "Tizimga kirish",
+    "otpLogin": "SMS orqali kirish",
+    "otpRequest": "SMS kod yuborish",
+    "otpCode": "SMS kod",
+    "otpVerify": "Tasdiqlash",
+    "mfaTitle": "Ikki bosqichli autentifikatsiya",
+    "mfaCode": "TOTP kod",
+    "mfaVerify": "Tasdiqlash",
+    "errors": {
+      "INVALID_CREDENTIALS": "Noto'g'ri foydalanuvchi nomi yoki parol",
+      "ACCOUNT_LOCKED": "Hisob vaqtincha bloklangan",
+      "ACCOUNT_INACTIVE": "Hisob faol emas",
+      "MFA_INVALID_CODE": "Noto'g'ri TOTP kod",
+      "MFA_TOKEN_EXPIRED": "MFA sessiyasi muddati tugagan",
+      "OTP_INVALID": "Noto'g'ri SMS kod",
+      "OTP_EXPIRED": "SMS kod muddati tugagan",
+      "AUTH_REQUIRED": "Avtorizatsiya talab qilinadi"
+    }
+  },
+  "dashboard": {
+    "title": "Boshqaruv paneli",
+    "welcome": "Xush kelibsiz, {name}",
+    "kpi": {
+      "centers": "{count, plural, one {# ta markaz} other {# ta markaz}}",
+      "students": "{count, plural, one {# nafar o'quvchi} other {# nafar o'quvchi}}",
+      "teachers": "{count, plural, one {# nafar o'qituvchi} other {# nafar o'qituvchi}}",
+      "certificates": "{count, plural, one {# ta sertifikat} other {# ta sertifikat}}"
+    }
+  },
+  "nav": {
+    "dashboard": "Boshqaruv paneli",
+    "centers": "Markazlar",
+    "students": "O'quvchilar",
+    "teachers": "O'qituvchilar",
+    "ratings": "Reytinglar",
+    "reports": "Hisobotlar",
+    "settings": "Sozlamalar"
+  }
+}

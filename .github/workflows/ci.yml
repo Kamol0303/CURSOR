@@ -1,0 +1,97 @@
+name: tamor-ci
+
+on:
+  push:
+    branches: [main, "CURSOR/**"]
+  pull_request:
+    branches: [main]
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_USER: tamor
+          POSTGRES_PASSWORD: tamor_dev
+          POSTGRES_DB: tamor
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Generate JWT keys
+        run: |
+          mkdir -p /tmp/secrets
+          openssl genrsa -out /tmp/secrets/jwt_private.pem 2048
+          openssl rsa -in /tmp/secrets/jwt_private.pem -pubout -out /tmp/secrets/jwt_public.pem
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install backend dependencies
+        working-directory: backend
+        run: pip install -r requirements.txt
+
+      - name: Lint backend
+        working-directory: backend
+        run: ruff check app tests
+
+      - name: Run migrations
+        working-directory: backend
+        env:
+          DATABASE_URL: postgresql+asyncpg://tamor:tamor_dev@localhost:5432/tamor
+          REDIS_URL: redis://localhost:6379/0
+          JWT_PRIVATE_KEY_PATH: /tmp/secrets/jwt_private.pem
+          JWT_PUBLIC_KEY_PATH: /tmp/secrets/jwt_public.pem
+          TOTP_ENCRYPTION_KEY: ci-test-key-32-characters-long!!
+        run: alembic upgrade head
+
+      - name: Run backend tests
+        working-directory: backend
+        env:
+          DATABASE_URL: postgresql+asyncpg://tamor:tamor_dev@localhost:5432/tamor
+          REDIS_URL: redis://localhost:6379/0
+          JWT_PRIVATE_KEY_PATH: /tmp/secrets/jwt_private.pem
+          JWT_PUBLIC_KEY_PATH: /tmp/secrets/jwt_public.pem
+          TOTP_ENCRYPTION_KEY: ci-test-key-32-characters-long!!
+          ENVIRONMENT: test
+        run: pytest tests/ -v
+
+  frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install frontend dependencies
+        working-directory: frontend
+        run: npm ci
+
+      - name: Lint and build frontend
+        working-directory: frontend
+        run: |
+          npm run lint
+          npm run build

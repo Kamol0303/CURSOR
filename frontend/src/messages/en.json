@@ -1,0 +1,20 @@
+{
+  "auth": {
+    "title": "TaMoR — Education Monitoring System",
+    "subtitle": "Toyloq District education centers monitoring and rating platform",
+    "username": "Username",
+    "password": "Password",
+    "login": "Sign in",
+    "mfaTitle": "Two-factor authentication",
+    "mfaCode": "TOTP code",
+    "verify": "Verify",
+    "errors": {
+      "INVALID_CREDENTIALS": "Invalid username or password",
+      "MFA_INVALID": "Invalid TOTP code",
+      "RATE_LIMIT_EXCEEDED": "Too many attempts. Please try again later"
+    }
+  },
+  "common": {
+    "language": "Language"
+  }
+}

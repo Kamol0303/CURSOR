@@ -1,0 +1,20 @@
+{
+  "auth": {
+    "title": "TaMoR — Ta'lim monitoring tizimi",
+    "subtitle": "Toyloq tumani ta'lim markazlari monitoring va reyting platformasi",
+    "username": "Foydalanuvchi nomi",
+    "password": "Parol",
+    "login": "Kirish",
+    "mfaTitle": "Ikki bosqichli autentifikatsiya",
+    "mfaCode": "TOTP kodi",
+    "verify": "Tasdiqlash",
+    "errors": {
+      "INVALID_CREDENTIALS": "Noto'g'ri login yoki parol",
+      "MFA_INVALID": "Noto'g'ri TOTP kodi",
+      "RATE_LIMIT_EXCEEDED": "Juda ko'p urinish. Keyinroq qaytadan urinib ko'ring"
+    }
+  },
+  "common": {
+    "language": "Til"
+  }
+}

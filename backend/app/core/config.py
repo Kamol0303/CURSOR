@@ -1,0 +1,34 @@
+from pydantic_settings import BaseSettings, SettingsConfigDict
+
+
+class Settings(BaseSettings):
+    model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
+
+    ENVIRONMENT: str = "development"
+    DEBUG: bool = False
+    APP_NAME: str = "TaMoR API"
+    API_V1_PREFIX: str = "/api/v1"
+
+    DATABASE_URL: str = "postgresql+asyncpg://tamor:tamor_dev@localhost:5432/tamor"
+    REDIS_URL: str = "redis://localhost:6379/0"
+
+    JWT_PRIVATE_KEY_PATH: str = "/secrets/jwt_private.pem"
+    JWT_PUBLIC_KEY_PATH: str = "/secrets/jwt_public.pem"
+    JWT_ALGORITHM: str = "RS256"
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 15
+    REFRESH_TOKEN_EXPIRE_DAYS: int = 7
+
+    TOTP_ENCRYPTION_KEY: str = "dev-only-change-in-production-32bytes!!"
+
+    CORS_ORIGINS: list[str] = ["http://localhost:3000"]
+
+    LOGIN_MIN_RESPONSE_MS: int = 200
+    MAX_FAILED_LOGIN_ATTEMPTS: int = 5
+    LOCKOUT_MINUTES: int = 15
+    MFA_VERIFY_MAX_ATTEMPTS: int = 5
+    MFA_VERIFY_WINDOW_SECONDS: int = 300
+
+    SEED_NON_DEMO_USER_THRESHOLD: int = 5
+
+
+settings = Settings()

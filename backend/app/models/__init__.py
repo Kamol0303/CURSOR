@@ -29,6 +29,14 @@ from app.models.identity import (
     User,
 )
 
+from app.models.ratings_certs import (
+    Certificate,
+    CertificateVerification,
+    RatingFormulaVersion,
+    RatingHistory,
+    Report,
+)
+
 __all__ = [
     "Region",
     "Mahalla",
@@ -39,6 +47,11 @@ __all__ = [
     "Student",
     "Guardian",
     "Enrollment",
+    "Certificate",
+    "CertificateVerification",
+    "RatingFormulaVersion",
+    "RatingHistory",
+    "Report",
     "Role",
     "Permission",
     "RolePermission",

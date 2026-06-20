@@ -10,6 +10,8 @@ const NAV = [
   { href: "/dashboard/centers", key: "centers" },
   { href: "/dashboard/students", key: "students" },
   { href: "/dashboard/teachers", key: "teachers" },
+  { href: "/dashboard/ratings", key: "ratings" },
+  { href: "/dashboard/certificates", key: "certificates" },
 ] as const;
 
 export function DashboardLayout({ children }: { children: React.ReactNode }) {

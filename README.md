@@ -18,16 +18,19 @@ Phase 0 delivers the security foundation:
 - Docker Compose dev environment
 - CI/CD pipeline (GitHub Actions)
 
-## Phase 1 Status (MVP — Current)
+## Phase 1 Status (Complete)
 
-- **Centers CRUD** — `/api/v1/centers` with RBAC + tenant scoping
-- **Students CRUD** — `/api/v1/students` with PINFL encryption/masking
-- **Teachers CRUD** — `/api/v1/teachers` with subject assignments
-- **Dashboard KPIs** — `/api/v1/dashboard/kpis` (7 metrics)
-- **Auditor PINFL reveal** — `/api/v1/students/{id}/reveal-pinfl` with audit log
-- **Frontend dashboard** — KPI cards, centers/students/teachers list pages
-- **Demo seed data** — regions, mahallas, subjects, sample students/teachers
-- **Alembic migration** — `002_phase1_education_entities`
+- Centers/Students/Teachers CRUD with RBAC + tenant scoping
+- Dashboard KPIs, PINFL encryption/masking
+- Trilingual frontend (UZ/RU/EN)
+
+## Phase 2 Status (Current)
+
+- **Rating engine** — configurable weights, daily compute, tamper-evident `inputs_hash`
+- **Certificates** — issue with QR code + integrity hash, idempotency key support
+- **Public verification** — `/api/v1/public/verify/{number}` (10 req/min/IP)
+- **Reports** — PDF and Excel rating exports
+- **Frontend** — ratings table, certificates gallery, public `/verify` page
 
 ## Quick Start
 
@@ -112,23 +115,16 @@ infra/            Nginx, deployment configs
 
 ## Production Readiness Checklist
 
-### Done (Phase 0)
-- [x] Threat model document
-- [x] Incident response runbook
-- [x] Auth system (JWT + MFA + refresh rotation)
-- [x] Database schema (identity/RBAC tables)
-- [x] Demo seed script with safety guards
-- [x] i18n skeleton (3 locales)
-- [x] CI/CD scaffold
-- [x] Docker Compose
+### Done (Phase 0–2)
+- [x] Phase 0: Auth, threat model, i18n skeleton
+- [x] Phase 1: CRUD, dashboard, PINFL masking
+- [x] Phase 2: Rating engine, certificates, QR verify, PDF/Excel reports
 
-### Deferred (Phase 1+)
-- [ ] Centers/Students/Teachers CRUD
-- [ ] Full dashboard KPIs
-- [ ] Rating engine
-- [ ] Certificates + QR verification
+### Deferred (Phase 3+)
 - [ ] AI analytics microservice
+- [ ] Notifications (SMS/email/Telegram)
 - [ ] PostgreSQL RLS policies
+- [ ] Celery scheduled rating recompute
 - [ ] External penetration test
 - [ ] Vault/KMS integration
 - [ ] SMS gateway (eskiz.uz)

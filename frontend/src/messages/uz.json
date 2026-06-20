@@ -21,6 +21,8 @@
     "centers": "Markazlar",
     "students": "O'quvchilar",
     "teachers": "O'qituvchilar",
+    "ratings": "Reyting",
+    "certificates": "Sertifikatlar",
     "logout": "Chiqish"
   },
   "dashboard": {
@@ -70,5 +72,32 @@
   },
   "common": {
     "language": "Til"
+  },
+  "ratings": {
+    "title": "Markazlar reytingi",
+    "loading": "Yuklanmoqda...",
+    "rank": "O'rin",
+    "center": "Markaz",
+    "score": "Ball",
+    "change": "O'zgarish",
+    "flagged": "Anomaliya"
+  },
+  "certificates": {
+    "title": "Sertifikatlar",
+    "loading": "Yuklanmoqda..."
+  },
+  "verify": {
+    "title": "Sertifikatni tekshirish",
+    "subtitle": "Sertifikat raqamini kiriting yoki QR kodni skanerlang",
+    "placeholder": "TAMOR-2026-XXXXXXXX",
+    "check": "Tekshirish",
+    "checking": "Tekshirilmoqda...",
+    "valid": "Sertifikat haqiqiy",
+    "invalid": "Sertifikat haqiqiy emas",
+    "notFound": "Sertifikat topilmadi",
+    "holder": "Egasi",
+    "course": "Kurs",
+    "center": "Markaz",
+    "date": "Berilgan sana"
   }
 }

@@ -21,6 +21,8 @@
     "centers": "Centers",
     "students": "Students",
     "teachers": "Teachers",
+    "ratings": "Ratings",
+    "certificates": "Certificates",
     "logout": "Sign out"
   },
   "dashboard": {
@@ -70,5 +72,32 @@
   },
   "common": {
     "language": "Language"
+  },
+  "ratings": {
+    "title": "Center ratings",
+    "loading": "Loading...",
+    "rank": "Rank",
+    "center": "Center",
+    "score": "Score",
+    "change": "Change",
+    "flagged": "Anomaly"
+  },
+  "certificates": {
+    "title": "Certificates",
+    "loading": "Loading..."
+  },
+  "verify": {
+    "title": "Certificate verification",
+    "subtitle": "Enter certificate number or scan QR code",
+    "placeholder": "TAMOR-2026-XXXXXXXX",
+    "check": "Verify",
+    "checking": "Checking...",
+    "valid": "Certificate is valid",
+    "invalid": "Certificate is not valid",
+    "notFound": "Certificate not found",
+    "holder": "Holder",
+    "course": "Course",
+    "center": "Center",
+    "date": "Issue date"
   }
 }

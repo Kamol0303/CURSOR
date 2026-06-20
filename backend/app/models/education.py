@@ -1,12 +1,20 @@
-import uuid
+from __future__ import annotations
+
 from datetime import date, datetime
+from typing import TYPE_CHECKING
 
 from sqlalchemy import Boolean, Date, DateTime, ForeignKey, Integer, String, Text, func
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.core.database import Base
-from app.models.identity import TimestampMixin, TrainingCenter
+from app.models.identity import TimestampMixin
+
+if TYPE_CHECKING:
+    from app.models.identity import TrainingCenter
+    from app.models.ratings_certs import Certificate
+
+import uuid
 
 
 class Region(Base, TimestampMixin):
@@ -30,7 +38,7 @@ class Mahalla(Base, TimestampMixin):
     name_en: Mapped[str] = mapped_column(String(100), nullable=False)
 
     region: Mapped["Region"] = relationship(back_populates="mahallas")
-    centers: Mapped[list["TrainingCenter"]] = relationship(back_populates="mahalla")
+    centers: Mapped[list[TrainingCenter]] = relationship(back_populates="mahalla")
 
 
 class Subject(Base, TimestampMixin):
@@ -55,7 +63,7 @@ class Group(Base, TimestampMixin):
     name: Mapped[str] = mapped_column(String(100), nullable=False)
     teacher_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), ForeignKey("teachers.id"), nullable=True)
 
-    center: Mapped["TrainingCenter"] = relationship(back_populates="groups")
+    center: Mapped[TrainingCenter] = relationship(back_populates="groups")
     subject: Mapped["Subject"] = relationship(back_populates="groups")
     teacher: Mapped["Teacher | None"] = relationship(back_populates="groups")
     enrollments: Mapped[list["Enrollment"]] = relationship(back_populates="group")
@@ -75,7 +83,7 @@ class Teacher(Base, TimestampMixin):
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
     is_demo_data: Mapped[bool] = mapped_column(Boolean, default=False)
 
-    center: Mapped["TrainingCenter"] = relationship(back_populates="teachers")
+    center: Mapped[TrainingCenter] = relationship(back_populates="teachers")
     groups: Mapped[list["Group"]] = relationship(back_populates="teacher")
     teacher_subjects: Mapped[list["TeacherSubject"]] = relationship(back_populates="teacher")
 
@@ -108,9 +116,10 @@ class Student(Base, TimestampMixin):
     consent_given_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     is_demo_data: Mapped[bool] = mapped_column(Boolean, default=False)
 
-    center: Mapped["TrainingCenter"] = relationship(back_populates="students")
+    center: Mapped[TrainingCenter] = relationship(back_populates="students")
     guardians: Mapped[list["Guardian"]] = relationship(back_populates="student")
     enrollments: Mapped[list["Enrollment"]] = relationship(back_populates="student")
+    certificates: Mapped[list["Certificate"]] = relationship(back_populates="student")
 
 
 class Guardian(Base, TimestampMixin):
@@ -137,4 +146,4 @@ class Enrollment(Base, TimestampMixin):
 
     student: Mapped["Student"] = relationship(back_populates="enrollments")
     group: Mapped["Group"] = relationship(back_populates="enrollments")
-    center: Mapped["TrainingCenter"] = relationship(back_populates="enrollments")
+    center: Mapped[TrainingCenter] = relationship(back_populates="enrollments")

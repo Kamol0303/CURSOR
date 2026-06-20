@@ -21,6 +21,8 @@
     "centers": "Центры",
     "students": "Учащиеся",
     "teachers": "Учителя",
+    "ratings": "Рейтинг",
+    "certificates": "Сертификаты",
     "logout": "Выйти"
   },
   "dashboard": {
@@ -70,5 +72,32 @@
   },
   "common": {
     "language": "Язык"
+  },
+  "ratings": {
+    "title": "Рейтинг центров",
+    "loading": "Загрузка...",
+    "rank": "Место",
+    "center": "Центр",
+    "score": "Балл",
+    "change": "Изменение",
+    "flagged": "Аномалия"
+  },
+  "certificates": {
+    "title": "Сертификаты",
+    "loading": "Загрузка..."
+  },
+  "verify": {
+    "title": "Проверка сертификата",
+    "subtitle": "Введите номер сертификата или отсканируйте QR-код",
+    "placeholder": "TAMOR-2026-XXXXXXXX",
+    "check": "Проверить",
+    "checking": "Проверка...",
+    "valid": "Сертификат действителен",
+    "invalid": "Сертификат недействителен",
+    "notFound": "Сертификат не найден",
+    "holder": "Владелец",
+    "course": "Курс",
+    "center": "Центр",
+    "date": "Дата выдачи"
   }
 }

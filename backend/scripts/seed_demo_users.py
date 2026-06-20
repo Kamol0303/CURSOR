@@ -145,6 +145,43 @@ async def seed_education_data(session: AsyncSession, center: TrainingCenter, rol
             )
         )
 
+    from app.models.ratings_certs import Certificate
+    from app.services.certificate_service import compute_integrity_hash, generate_certificate_number
+
+    student_for_cert = (
+        await session.execute(select(Student).where(Student.full_name == "Aliyev Sardor"))
+    ).scalar_one_or_none()
+    if student_for_cert and subjects:
+        existing_cert = (
+            await session.execute(
+                select(Certificate).where(Certificate.student_id == student_for_cert.id)
+            )
+        ).scalar_one_or_none()
+        if not existing_cert:
+            cert_num = generate_certificate_number()
+            issue_d = datetime.now(UTC).date()
+            cert = Certificate(
+                certificate_number=cert_num,
+                student_id=student_for_cert.id,
+                center_id=center.id,
+                subject_id=subjects[0].id,
+                course_name_uz=subjects[0].name_uz,
+                course_name_ru=subjects[0].name_ru,
+                course_name_en=subjects[0].name_en,
+                issue_date=issue_d,
+                integrity_hash=compute_integrity_hash(
+                    certificate_number=cert_num,
+                    student_name=student_for_cert.full_name,
+                    center_name=center.name,
+                    course_name=subjects[0].name_uz,
+                    issue_date=issue_d,
+                ),
+                is_demo_data=True,
+            )
+            session.add(cert)
+            student_for_cert.graduation_date = issue_d
+            print(f"Demo certificate: {cert_num}")
+
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Seed TaMoR demo users (non-production only)")
@@ -294,6 +331,11 @@ async def seed() -> None:
         print("  OTP: logged to console in dev (no real SMS)")
 
         await seed_education_data(session, center, roles)
+
+        from app.services import rating_service
+
+        await rating_service.compute_ratings(session)
+        print("Demo ratings computed.")
 
         print("\n" + "=" * 60 + "\n")
 

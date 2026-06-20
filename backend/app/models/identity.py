@@ -12,6 +12,7 @@ from app.core.database import Base
 
 if TYPE_CHECKING:
     from app.models.education import Enrollment, Group, Mahalla, Student, Teacher
+    from app.models.ratings_certs import Certificate, RatingHistory
 
 LOCALE_ENUM = Enum("uz", "ru", "en", name="locale_preference")
 MFA_METHOD_ENUM = Enum("totp", "sms_otp", "none", name="mfa_method")
@@ -86,6 +87,8 @@ class TrainingCenter(Base, TimestampMixin):
     students: Mapped[list[Student]] = relationship(back_populates="center")
     groups: Mapped[list[Group]] = relationship(back_populates="center")
     enrollments: Mapped[list[Enrollment]] = relationship(back_populates="center")
+    rating_history: Mapped[list[RatingHistory]] = relationship(back_populates="center")
+    certificates: Mapped[list[Certificate]] = relationship(back_populates="center")
 
 
 class User(Base, TimestampMixin):

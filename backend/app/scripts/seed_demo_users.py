@@ -320,6 +320,7 @@ def main() -> None:
         )
 
         raw_key, raw_secret = seed_api_consumer(session, external_user)
+        parent_user_id = str(parent_user.id)
         session.commit()
 
     print("\nDemo credentials:")
@@ -336,7 +337,7 @@ def main() -> None:
             qr.add_data(uri)
             qr.print_ascii(invert=True)
 
-    print(f"\nParent demo account id: {parent_user.id}")
+    print(f"\nParent demo account id: {parent_user_id}")
 
 
 if __name__ == "__main__":

@@ -40,5 +40,14 @@ class Settings(BaseSettings):
     PARENT_OTP_EXPIRE_SECONDS: int = 300
     PARENT_OTP_MAX_ATTEMPTS: int = 5
 
+    SECRETS_BACKEND: str = "file"
+    VAULT_ADDR: str = ""
+    VAULT_TOKEN: str = ""
+    VAULT_MOUNT: str = "secret"
+    VAULT_SECRET_PREFIX: str = "tamor"
+
+    ESKIZ_EMAIL: str = ""
+    ESKIZ_PASSWORD: str = ""
+
 
 settings = Settings()

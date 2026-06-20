@@ -1,15 +1,30 @@
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from app.api.v1.router import api_router
 from app.core.config import settings
+from app.core.production import validate_production_settings
+from app.core.secrets_provider import bootstrap_secrets
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    await bootstrap_secrets()
+    errors = validate_production_settings()
+    if errors and settings.ENVIRONMENT == "production":
+        raise RuntimeError("Production configuration invalid:\n" + "\n".join(f"  - {e}" for e in errors))
+    yield
+
 
 app = FastAPI(
     title=settings.APP_NAME,
-    version="0.4.0-phase4",
+    version="0.5.0-phase5",
     docs_url="/docs" if settings.DEBUG else None,
     redoc_url="/redoc" if settings.DEBUG else None,
+    lifespan=lifespan,
 )
 
 app.add_middleware(
@@ -29,7 +44,7 @@ async def security_headers(request: Request, call_next):
     response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
     response.headers["Permissions-Policy"] = "camera=(), microphone=(), geolocation=()"
     if settings.ENVIRONMENT == "production":
-        response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
+        response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains; preload"
         response.headers["Content-Security-Policy"] = "default-src 'self'; frame-ancestors 'none'"
     return response
 

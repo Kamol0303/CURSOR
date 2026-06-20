@@ -41,7 +41,7 @@ Phase 0 delivers the security foundation:
 - **Frontend** — `/dashboard/analytics`, notification bell with unread count
 - **Scheduler** — APScheduler daily cron in ai-analytics-service
 
-## Phase 4 Status (Current)
+## Phase 4 Status (Complete)
 
 - **Parent portal** — SMS OTP login, children list, certificates view (`/parent/login`)
 - **PWA** — manifest, service worker, installable mobile shell
@@ -50,6 +50,17 @@ Phase 0 delivers the security foundation:
 - **Celery** — daily rating recompute (03:00 Asia/Samarkand)
 - **Security hardening** — HSTS/CSP in production, Permissions-Policy
 - **Load test** — `scripts/load_test.py`
+
+## Phase 5 Status (Current)
+
+- **Vault secrets** — KV v2 provider, JWT materialization at startup (ADR-008)
+- **Production validation** — fail-fast on dev secrets, DEBUG=true, localhost CORS
+- **Nginx edge** — TLS 1.2+, rate limits, reverse proxy (`infra/nginx/`)
+- **docker-compose.prod.yml** — production stack with internal network
+- **Go-live tooling** — `purge_demo_data.py`, `pre_deploy_check.py`
+- **Eskiz.uz SMS** — production API integration path
+- **CI gates** — production-gate workflow, Cosign image signing skeleton
+- **Docs** — go-live runbook, red-team checklist (Section 24A)
 
 ## Quick Start
 
@@ -137,25 +148,22 @@ infra/            Nginx, deployment configs
 
 ## Production Readiness Checklist
 
-### Done (Phase 0–4)
+### Done (Phase 0–5)
 - [x] Phase 0: Auth, threat model, i18n skeleton
 - [x] Phase 1: CRUD, dashboard, PINFL masking
 - [x] Phase 2: Rating engine, certificates, QR verify, PDF/Excel reports
 - [x] Phase 3: AI analytics, notifications, integration adapters
 - [x] Phase 4: Parent portal, PWA, RLS, Telegram bot, Celery scheduler
+- [x] Phase 5: Vault secrets, Nginx/TLS, go-live runbook, deploy gates
 
-### Deferred (Phase 5+)
-- [ ] External penetration test
-- [ ] Vault/KMS integration
-- [ ] SMS gateway (eskiz.uz)
-- [ ] Signed container images (Cosign)
+### Deferred
+- [ ] External penetration test (use `docs/red-team-checklist.md`)
 
 ### Required Before Go-Live
-- Purge all `is_demo_account=true` rows
-- Configure production secrets in Vault/KMS
-- Run Section 24A red-team checklist
-- Complete security test suite (Section 16) with zero critical/high findings
-- TLS certificates and HSTS
+- Run `scripts/purge_demo_data.py` and `scripts/pre_deploy_check.py`
+- Configure Vault secrets per `docs/go-live-runbook.md`
+- Complete `docs/red-team-checklist.md` with sign-off
+- CA-signed TLS certificates (not `generate-dev-certs.sh`)
 - Data localization on Uzbekistan infrastructure
 
 ## License

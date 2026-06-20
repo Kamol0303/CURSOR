@@ -5,7 +5,7 @@ from functools import lru_cache
 from pathlib import Path
 
 from app.core.config import get_settings
-from app.core.security import verify_password
+from app.core.security import ensure_utc, verify_password
 
 
 settings = get_settings()
@@ -44,9 +44,10 @@ def validate_password_history(password: str, previous_hashes: list[str]) -> list
 
 
 def password_rotation_required(role_code: str, password_changed_at: datetime | None) -> bool:
-    if password_changed_at is None:
+    changed_at = ensure_utc(password_changed_at)
+    if changed_at is None:
         return True
 
     days = 90 if role_code in {"super_admin", "center_director"} else 180
     threshold = datetime.now(timezone.utc) - timedelta(days=days)
-    return password_changed_at < threshold
+    return changed_at < threshold

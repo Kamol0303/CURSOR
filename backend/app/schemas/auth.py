@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from pydantic import BaseModel, ConfigDict, EmailStr, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class LoginRequest(BaseModel):
@@ -42,7 +42,9 @@ class UserSummary(BaseModel):
 
     id: str
     username: str | None
-    email: EmailStr | None = None
+    # Plain string (not EmailStr): internal/demo domains such as ``*.local`` are
+    # valid identifiers here and must not fail serialization of stored data.
+    email: str | None = None
     phone: str | None = None
     role: str
     center_id: str | None

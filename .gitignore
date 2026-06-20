@@ -24,4 +24,3 @@ coverage/
 backend/.venv/
 frontend/.turbo/
 frontend/out/
-alembic.ini

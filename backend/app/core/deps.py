@@ -1,3 +1,4 @@
+import uuid
 from typing import Annotated
 
 from fastapi import Depends, HTTPException, status
@@ -30,7 +31,19 @@ async def get_current_user(
             detail={"code": "TOKEN_INVALID", "field": None},
         )
 
-    user_id = payload.get("sub")
+    user_id_raw = payload.get("sub")
+    if not user_id_raw:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail={"code": "TOKEN_INVALID", "field": None},
+        )
+    try:
+        user_id = uuid.UUID(user_id_raw) if isinstance(user_id_raw, str) else user_id_raw
+    except (ValueError, AttributeError, TypeError):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail={"code": "TOKEN_INVALID", "field": None},
+        )
     result = await db.execute(
         select(User)
         .options(selectinload(User.role).selectinload(Role.role_permissions).selectinload(RolePermission.permission))

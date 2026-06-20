@@ -141,7 +141,7 @@ class AuthService:
         if mfa_required and user.mfa_enabled:
             mfa_token = uuid.uuid4().hex
             _mfa_pending[mfa_token] = {
-                "user_id": str(user.id),
+                "user_id": user.id,
                 "expires": utc_now() + timedelta(minutes=5),
             }
             await self._log_login(user.id, username, ip, user_agent, True)
@@ -164,12 +164,16 @@ class AuthService:
             _mfa_pending.pop(mfa_token, None)
             return {"error": "MFA_TOKEN_EXPIRED"}
 
+        user_id = pending["user_id"]
+        if isinstance(user_id, str):
+            user_id = uuid.UUID(user_id)
+
         result = await self.db.execute(
             select(User)
             .options(
                 selectinload(User.role).selectinload(Role.role_permissions).selectinload(RolePermission.permission)
             )
-            .where(User.id == pending["user_id"])
+            .where(User.id == user_id)
         )
         user = result.scalar_one_or_none()
         if not user:

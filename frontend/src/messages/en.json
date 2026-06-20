@@ -1,0 +1,55 @@
+{
+  "common": {
+    "appName": "TaMoR",
+    "appSubtitle": "Education Monitoring & Rating Platform",
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "save": "Save",
+    "cancel": "Cancel",
+    "search": "Search",
+    "logout": "Logout"
+  },
+  "auth": {
+    "login": "Login",
+    "username": "Username",
+    "password": "Password",
+    "phone": "Phone number",
+    "loginButton": "Sign in",
+    "otpLogin": "SMS login",
+    "otpRequest": "Send SMS code",
+    "otpCode": "SMS code",
+    "otpVerify": "Verify",
+    "mfaTitle": "Two-factor authentication",
+    "mfaCode": "TOTP code",
+    "mfaVerify": "Verify",
+    "errors": {
+      "INVALID_CREDENTIALS": "Invalid username or password",
+      "ACCOUNT_LOCKED": "Account temporarily locked",
+      "ACCOUNT_INACTIVE": "Account is inactive",
+      "MFA_INVALID_CODE": "Invalid TOTP code",
+      "MFA_TOKEN_EXPIRED": "MFA session expired",
+      "OTP_INVALID": "Invalid SMS code",
+      "OTP_EXPIRED": "SMS code expired",
+      "AUTH_REQUIRED": "Authentication required"
+    }
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "welcome": "Welcome, {name}",
+    "kpi": {
+      "centers": "{count, plural, one {# center} other {# centers}}",
+      "students": "{count, plural, one {# student} other {# students}}",
+      "teachers": "{count, plural, one {# teacher} other {# teachers}}",
+      "certificates": "{count, plural, one {# certificate} other {# certificates}}"
+    }
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "centers": "Centers",
+    "students": "Students",
+    "teachers": "Teachers",
+    "ratings": "Ratings",
+    "reports": "Reports",
+    "settings": "Settings"
+  }
+}

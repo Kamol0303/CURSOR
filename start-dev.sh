@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+# TaMoR — run backend + frontend (two terminals required)
+set -euo pipefail
+
+ROOT="$(cd "$(dirname "$0")" && pwd)"
+
+echo "============================================"
+echo " TaMoR — ishga tushirish ko'rsatmasi"
+echo "============================================"
+echo ""
+echo "IKKITA terminal oching (WSL):"
+echo ""
+echo "─── Terminal 1: BACKEND ───"
+echo "cd $ROOT/backend"
+echo "source .venv/bin/activate"
+echo "export DATABASE_URL_SYNC=sqlite:///./tamor.db"
+echo "export DATABASE_URL=sqlite+aiosqlite:///./tamor.db"
+echo "export PYTHONPATH=\$(pwd)"
+echo "uvicorn app.main:app --reload --host 0.0.0.0 --port 8000"
+echo ""
+echo "─── Terminal 2: FRONTEND ───"
+echo "cd $ROOT/frontend"
+echo "export NEXT_PUBLIC_API_URL=http://localhost:8000/api/v1"
+echo "npm run dev"
+echo ""
+echo "─── Brauzer ───"
+echo "Login:  http://localhost:3000/uz/login"
+echo "API:    http://localhost:8000/docs"
+echo ""
+echo "Demo login: admin.aspect / CenterAdmin#26!"
+echo "============================================"

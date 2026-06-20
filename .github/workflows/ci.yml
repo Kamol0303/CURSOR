@@ -72,6 +72,7 @@ jobs:
           JWT_PRIVATE_KEY_PATH: /tmp/secrets/jwt_private.pem
           JWT_PUBLIC_KEY_PATH: /tmp/secrets/jwt_public.pem
           TOTP_ENCRYPTION_KEY: ci-test-key-32-characters-long!!
+          PINFL_ENCRYPTION_KEY: ci-pinfl-key-32-characters-long!!
           ENVIRONMENT: test
         run: pytest tests/ -v
 

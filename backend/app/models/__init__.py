@@ -1,6 +1,18 @@
+from app.models.education import (
+    Enrollment,
+    Group,
+    Guardian,
+    Mahalla,
+    Region,
+    Student,
+    Subject,
+    Teacher,
+    TeacherSubject,
+)
 from app.models.identity import (
     ApiKey,
     ApiKeyScope,
+    AuditLog,
     DeviceFingerprint,
     LoginAuditLog,
     MfaBackupCode,
@@ -18,6 +30,15 @@ from app.models.identity import (
 )
 
 __all__ = [
+    "Region",
+    "Mahalla",
+    "Subject",
+    "Group",
+    "Teacher",
+    "TeacherSubject",
+    "Student",
+    "Guardian",
+    "Enrollment",
     "Role",
     "Permission",
     "RolePermission",
@@ -34,4 +55,5 @@ __all__ = [
     "ApiKey",
     "ApiKeyScope",
     "SystemSetting",
+    "AuditLog",
 ]

@@ -9,10 +9,8 @@ from __future__ import annotations
 
 import argparse
 import asyncio
-import hashlib
 import secrets
 import sys
-import uuid
 from datetime import UTC, datetime
 
 import pyotp
@@ -24,6 +22,8 @@ sys.path.insert(0, ".")
 from app.core.config import settings
 from app.core.permissions import ROLE_DEFINITIONS, ROLE_PERMISSIONS
 from app.core.security import encrypt_totp_secret, hash_password
+from app.core.pinfl import encrypt_pinfl
+from app.models.education import Guardian, Mahalla, Region, Student, Subject, Teacher, TeacherSubject
 from app.models.identity import Permission, Role, RolePermission, TrainingCenter, User
 
 
@@ -37,6 +37,113 @@ DEMO_USERS = [
 ]
 
 PARENT_PHONE = "+998901234567"
+
+DEFAULT_SUBJECTS = [
+    ("Ingliz tili", "Английский язык", "English"),
+    ("Matematika", "Математика", "Mathematics"),
+    ("Informatika", "Информатика", "IT"),
+    ("Dasturlash", "Программирование", "Programming"),
+]
+
+
+async def seed_education_data(session: AsyncSession, center: TrainingCenter, roles: dict[str, Role]) -> None:
+    region_result = await session.execute(select(Region).where(Region.name_uz == "Samarqand viloyati"))
+    region = region_result.scalar_one_or_none()
+    if not region:
+        region = Region(name_uz="Samarqand viloyati", name_ru="Самаркандская область", name_en="Samarkand Region")
+        session.add(region)
+        await session.flush()
+
+    mahalla_result = await session.execute(select(Mahalla).where(Mahalla.name_uz == "Toyloq MFY"))
+    mahalla = mahalla_result.scalar_one_or_none()
+    if not mahalla:
+        mahalla = Mahalla(
+            region_id=region.id,
+            name_uz="Toyloq MFY",
+            name_ru="Тойлок МФЙ",
+            name_en="Toyloq Mahalla",
+        )
+        session.add(mahalla)
+        await session.flush()
+
+    center.mahalla_id = mahalla.id
+    center.is_demo_data = True
+
+    subjects: list[Subject] = []
+    for uz, ru, en in DEFAULT_SUBJECTS:
+        result = await session.execute(select(Subject).where(Subject.name_uz == uz))
+        subject = result.scalar_one_or_none()
+        if not subject:
+            subject = Subject(name_uz=uz, name_ru=ru, name_en=en, is_active=True)
+            session.add(subject)
+            await session.flush()
+        subjects.append(subject)
+
+    teacher_user = (
+        await session.execute(select(User).where(User.username == "teacher.dilnoza"))
+    ).scalar_one_or_none()
+    teacher_result = await session.execute(
+        select(Teacher).where(Teacher.full_name == "Dilnoza Karimova")
+    )
+    teacher = teacher_result.scalar_one_or_none()
+    if not teacher:
+        teacher = Teacher(
+            center_id=center.id,
+            user_id=teacher_user.id if teacher_user else None,
+            full_name="Dilnoza Karimova",
+            phone="+998901112233",
+            specialization="Ingliz tili",
+            years_of_experience=5,
+            is_demo_data=True,
+        )
+        session.add(teacher)
+        await session.flush()
+        if subjects:
+            session.add(TeacherSubject(teacher_id=teacher.id, subject_id=subjects[0].id))
+
+    student_result = await session.execute(select(Student).where(Student.full_name == "Aliyev Sardor"))
+    if not student_result.scalar_one_or_none():
+        student = Student(
+            center_id=center.id,
+            full_name="Aliyev Sardor",
+            jshshir_encrypted=encrypt_pinfl("12345678901234"),
+            grade="9",
+            school="Toyloq maktabi",
+            is_demo_data=True,
+            consent_given_at=datetime.now(UTC),
+        )
+        session.add(student)
+        await session.flush()
+        session.add(
+            Guardian(
+                student_id=student.id,
+                full_name="Aliyev Botir",
+                phone=PARENT_PHONE,
+            )
+        )
+
+    # Second center for cross-tenant IDOR tests
+    other_center_result = await session.execute(
+        select(TrainingCenter).where(TrainingCenter.name == "Demo Boshqa Markaz")
+    )
+    if not other_center_result.scalar_one_or_none():
+        other = TrainingCenter(
+            name="Demo Boshqa Markaz",
+            stir="987654321",
+            center_type="public",
+            is_active=True,
+            is_demo_data=True,
+            mahalla_id=mahalla.id,
+        )
+        session.add(other)
+        await session.flush()
+        session.add(
+            Student(
+                center_id=other.id,
+                full_name="Demo Boshqa O'quvchi",
+                is_demo_data=True,
+            )
+        )
 
 
 def parse_args() -> argparse.Namespace:
@@ -185,6 +292,9 @@ async def seed() -> None:
         print("Parent/Guardian:")
         print(f"  Phone: {PARENT_PHONE}")
         print("  OTP: logged to console in dev (no real SMS)")
+
+        await seed_education_data(session, center, roles)
+
         print("\n" + "=" * 60 + "\n")
 
         await session.commit()

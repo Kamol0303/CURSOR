@@ -19,6 +19,7 @@ class Settings(BaseSettings):
     REFRESH_TOKEN_EXPIRE_DAYS: int = 7
 
     TOTP_ENCRYPTION_KEY: str = "dev-only-change-in-production-32bytes!!"
+    PINFL_ENCRYPTION_KEY: str = "dev-pinfl-key-change-in-prod!!"
 
     CORS_ORIGINS: list[str] = ["http://localhost:3000"]
 

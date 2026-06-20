@@ -2,7 +2,7 @@
 
 Government-grade education monitoring system for Toyloq District, Samarkand Region, Uzbekistan.
 
-## Phase 0 Status (Current)
+## Phase 0 Status (Complete)
 
 Phase 0 delivers the security foundation:
 
@@ -17,6 +17,17 @@ Phase 0 delivers the security foundation:
 - Login page with girih ornamental design
 - Docker Compose dev environment
 - CI/CD pipeline (GitHub Actions)
+
+## Phase 1 Status (MVP — Current)
+
+- **Centers CRUD** — `/api/v1/centers` with RBAC + tenant scoping
+- **Students CRUD** — `/api/v1/students` with PINFL encryption/masking
+- **Teachers CRUD** — `/api/v1/teachers` with subject assignments
+- **Dashboard KPIs** — `/api/v1/dashboard/kpis` (7 metrics)
+- **Auditor PINFL reveal** — `/api/v1/students/{id}/reveal-pinfl` with audit log
+- **Frontend dashboard** — KPI cards, centers/students/teachers list pages
+- **Demo seed data** — regions, mahallas, subjects, sample students/teachers
+- **Alembic migration** — `002_phase1_education_entities`
 
 ## Quick Start
 

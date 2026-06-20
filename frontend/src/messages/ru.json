@@ -14,6 +14,60 @@
       "RATE_LIMIT_EXCEEDED": "Слишком много попыток. Попробуйте позже"
     }
   },
+  "nav": {
+    "platform": "Платформа TaMoR",
+    "subtitle": "Тойлокский район",
+    "dashboard": "Главная",
+    "centers": "Центры",
+    "students": "Учащиеся",
+    "teachers": "Учителя",
+    "logout": "Выйти"
+  },
+  "dashboard": {
+    "welcome": "Панель хокимията",
+    "loading": "Загрузка...",
+    "kpi": {
+      "total_centers": "Всего центров",
+      "total_students": "Всего учащихся",
+      "total_teachers": "Всего учителей",
+      "total_subjects": "Всего предметов",
+      "active_centers": "Активные центры",
+      "new_registrations_month": "Новые регистрации (месяц)",
+      "license_expiring_30_days": "Истекает лицензия (30 дней)"
+    }
+  },
+  "centers": {
+    "title": "Образовательные центры",
+    "loading": "Загрузка...",
+    "name": "Название",
+    "stir": "ИНН",
+    "director": "Директор",
+    "type": "Тип",
+    "status": "Статус",
+    "active": "Активен",
+    "inactive": "Неактивен",
+    "empty": "Центры не найдены"
+  },
+  "students": {
+    "title": "Учащиеся",
+    "loading": "Загрузка...",
+    "name": "Ф.И.О.",
+    "grade": "Класс",
+    "school": "Школа",
+    "pinfl": "ПИНФЛ",
+    "empty": "Учащиеся не найдены"
+  },
+  "teachers": {
+    "title": "Учителя",
+    "loading": "Загрузка...",
+    "name": "Ф.И.О.",
+    "specialization": "Специализация",
+    "experience": "Опыт (лет)",
+    "status": "Статус",
+    "active": "Активен",
+    "inactive": "Неактивен",
+    "empty": "Учителя не найдены"
+  },
   "common": {
     "language": "Язык"
   }

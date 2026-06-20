@@ -14,6 +14,60 @@
       "RATE_LIMIT_EXCEEDED": "Juda ko'p urinish. Keyinroq qaytadan urinib ko'ring"
     }
   },
+  "nav": {
+    "platform": "TaMoR Platforma",
+    "subtitle": "Toyloq tumani",
+    "dashboard": "Bosh sahifa",
+    "centers": "Markazlar",
+    "students": "O'quvchilar",
+    "teachers": "O'qituvchilar",
+    "logout": "Chiqish"
+  },
+  "dashboard": {
+    "welcome": "Hokimiyat dashboard",
+    "loading": "Yuklanmoqda...",
+    "kpi": {
+      "total_centers": "Jami markazlar",
+      "total_students": "Jami o'quvchilar",
+      "total_teachers": "Jami o'qituvchilar",
+      "total_subjects": "Jami fanlar",
+      "active_centers": "Faol markazlar",
+      "new_registrations_month": "Yangi ro'yxatdan o'tganlar (oy)",
+      "license_expiring_30_days": "Litsenziya muddati tugaydi (30 kun)"
+    }
+  },
+  "centers": {
+    "title": "Ta'lim markazlari",
+    "loading": "Yuklanmoqda...",
+    "name": "Nomi",
+    "stir": "STIR",
+    "director": "Direktor",
+    "type": "Turi",
+    "status": "Holati",
+    "active": "Faol",
+    "inactive": "Nofaol",
+    "empty": "Markazlar topilmadi"
+  },
+  "students": {
+    "title": "O'quvchilar",
+    "loading": "Yuklanmoqda...",
+    "name": "F.I.Sh",
+    "grade": "Sinf",
+    "school": "Maktab",
+    "pinfl": "JSHSHIR",
+    "empty": "O'quvchilar topilmadi"
+  },
+  "teachers": {
+    "title": "O'qituvchilar",
+    "loading": "Yuklanmoqda...",
+    "name": "F.I.Sh",
+    "specialization": "Mutaxassislik",
+    "experience": "Tajriba (yil)",
+    "status": "Holati",
+    "active": "Faol",
+    "inactive": "Nofaol",
+    "empty": "O'qituvchilar topilmadi"
+  },
   "common": {
     "language": "Til"
   }

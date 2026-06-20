@@ -1,32 +1,44 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
-import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { DashboardLayout } from "@/components/DashboardLayout";
+import { KpiCards } from "@/components/KpiCards";
+import { getDashboardKpis, getMe } from "@/lib/api";
 
 export default function DashboardPage() {
-  const t = useTranslations("auth");
+  const t = useTranslations("dashboard");
+  const [kpis, setKpis] = useState<{ key: string; value: number }[]>([]);
+  const [userName, setUserName] = useState("");
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const token = localStorage.getItem("tamor_access_token");
     if (!token) {
       window.location.href = "/";
+      return;
     }
+    Promise.all([getMe(), getDashboardKpis()])
+      .then(([me, dash]) => {
+        if (me.success) setUserName(me.data.username || me.data.role);
+        if (dash.success) setKpis(dash.data.kpis);
+      })
+      .finally(() => setLoading(false));
   }, []);
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="bg-white border-b px-6 py-4 flex justify-between items-center">
-        <h1 className="text-lg font-bold text-naqsh-primary">TaMoR Dashboard</h1>
-        <LanguageSwitcher />
-      </header>
-      <main className="p-6">
-        <div className="bg-white rounded-xl shadow p-6 border">
-          <p className="text-gray-600">
-            Phase 0 — Authentication complete. Full dashboard coming in Phase 1.
-          </p>
+    <DashboardLayout>
+      <div className="space-y-6">
+        <div>
+          <h2 className="text-2xl font-bold text-gray-900">{t("welcome")}</h2>
+          {userName && <p className="text-gray-500 mt-1">{userName}</p>}
         </div>
-      </main>
-    </div>
+        {loading ? (
+          <p className="text-gray-400">{t("loading")}</p>
+        ) : (
+          <KpiCards kpis={kpis} />
+        )}
+      </div>
+    </DashboardLayout>
   );
 }

@@ -14,6 +14,60 @@
       "RATE_LIMIT_EXCEEDED": "Too many attempts. Please try again later"
     }
   },
+  "nav": {
+    "platform": "TaMoR Platform",
+    "subtitle": "Toyloq District",
+    "dashboard": "Dashboard",
+    "centers": "Centers",
+    "students": "Students",
+    "teachers": "Teachers",
+    "logout": "Sign out"
+  },
+  "dashboard": {
+    "welcome": "Hokimiyat Dashboard",
+    "loading": "Loading...",
+    "kpi": {
+      "total_centers": "Total centers",
+      "total_students": "Total students",
+      "total_teachers": "Total teachers",
+      "total_subjects": "Total subjects",
+      "active_centers": "Active centers",
+      "new_registrations_month": "New registrations (month)",
+      "license_expiring_30_days": "License expiring (30 days)"
+    }
+  },
+  "centers": {
+    "title": "Education centers",
+    "loading": "Loading...",
+    "name": "Name",
+    "stir": "Tax ID",
+    "director": "Director",
+    "type": "Type",
+    "status": "Status",
+    "active": "Active",
+    "inactive": "Inactive",
+    "empty": "No centers found"
+  },
+  "students": {
+    "title": "Students",
+    "loading": "Loading...",
+    "name": "Full name",
+    "grade": "Grade",
+    "school": "School",
+    "pinfl": "PINFL",
+    "empty": "No students found"
+  },
+  "teachers": {
+    "title": "Teachers",
+    "loading": "Loading...",
+    "name": "Full name",
+    "specialization": "Specialization",
+    "experience": "Experience (years)",
+    "status": "Status",
+    "active": "Active",
+    "inactive": "Inactive",
+    "empty": "No teachers found"
+  },
   "common": {
     "language": "Language"
   }

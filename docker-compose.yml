@@ -37,6 +37,7 @@ services:
       JWT_PRIVATE_KEY_PATH: /secrets/jwt_private.pem
       JWT_PUBLIC_KEY_PATH: /secrets/jwt_public.pem
       TOTP_ENCRYPTION_KEY: dev-only-change-in-production-32bytes!!
+      PINFL_ENCRYPTION_KEY: dev-pinfl-key-change-in-prod!!
       CORS_ORIGINS: '["http://localhost:3000"]'
     volumes:
       - jwt_secrets:/secrets

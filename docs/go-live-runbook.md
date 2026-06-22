@@ -82,6 +82,15 @@ docker compose -f docker-compose.prod.yml down
 # Restore PostgreSQL from last snapshot
 ```
 
+### Staging verification
+
+```bash
+# After docker compose up on staging:
+python scripts/red_team_verify.py --url https://staging.tamor.uz
+python scripts/load_test.py --url https://staging.tamor.uz -c 20 -n 50
+python scripts/pre_deploy_check.py  # must pass before go-live
+```
+
 ## Ownership
 
 See `docs/incident-response.md` Section 17A.6 for named roles.

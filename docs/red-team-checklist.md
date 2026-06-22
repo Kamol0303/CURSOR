@@ -1,6 +1,16 @@
 # TaMoR Red-Team Checklist (Section 24A)
 
-> Execute before production go-live. All items must pass or have documented risk acceptance.
+> Execute before production go-live. Automated checks: `python scripts/red_team_verify.py --offline` (CI) or against staging URL.
+
+| Auto | ID | Check |
+|:----:|----|-------|
+| CI | RT-07 | Center A director cannot read Center B students |
+| CI | RT-08 | Teacher cannot reveal PINFL |
+| CI | RT-09 | Parent sees only linked guardian children |
+| CI | RT-10 | RLS FORCE on students, enrollments, certificates, guardians |
+| CI | RT-11 | Auditor PINFL reveal returns decrypted value |
+| CI | RT-17/18 | Verify rate limit + certificate tamper detection |
+| ✓ | RT-03–05, RT-19, RT-21–23 | `red_team_verify.py --offline` |
 
 ## Authentication & Session
 

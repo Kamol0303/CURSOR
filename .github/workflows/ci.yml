@@ -76,7 +76,10 @@ jobs:
           AI_ANALYTICS_URL: http://localhost:8001
           PINFL_ENCRYPTION_KEY: ci-pinfl-key-32-characters-long!!
           ENVIRONMENT: test
-        run: pytest tests/ -v
+        run: pytest tests/ -v --tb=short
+
+      - name: Red-team automated checks (offline)
+        run: python scripts/red_team_verify.py --offline
 
   frontend:
     runs-on: ubuntu-latest

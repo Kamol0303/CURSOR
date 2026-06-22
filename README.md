@@ -51,7 +51,7 @@ Phase 0 delivers the security foundation:
 - **Security hardening** — HSTS/CSP in production, Permissions-Policy
 - **Load test** — `scripts/load_test.py`
 
-## Phase 5 Status (Current)
+## Phase 5 Status (Complete)
 
 - **Vault secrets** — KV v2 provider, JWT materialization at startup (ADR-008)
 - **Production validation** — fail-fast on dev secrets, DEBUG=true, localhost CORS
@@ -61,6 +61,19 @@ Phase 0 delivers the security foundation:
 - **Eskiz.uz SMS** — production API integration path
 - **CI gates** — production-gate workflow, Cosign image signing skeleton
 - **Docs** — go-live runbook, red-team checklist (Section 24A)
+
+## Security Verification
+
+```bash
+# Offline (CI / no server)
+python3 scripts/red_team_verify.py --offline
+
+# Against running staging
+python3 scripts/red_team_verify.py --url https://staging.tamor.uz --production
+
+# Integration security tests (PostgreSQL + Redis required)
+cd backend && pytest tests/security/ -v
+```
 
 ## Quick Start
 

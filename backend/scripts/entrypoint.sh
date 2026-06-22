@@ -11,11 +11,12 @@ if [ "$ENVIRONMENT" = "production" ]; then
     echo "ERROR: JWT keys must be provisioned (Vault or mounted secrets) in production."
     exit 1
   fi
-elif [ ! -f "$SECRETS_DIR/jwt_private.pem" ]; then
-  echo "Generating RS256 JWT key pair (non-production)..."
+elif [ ! -f "$SECRETS_DIR/jwt_private.pem" ] || [ ! -f "$SECRETS_DIR/jwt_public.pem" ]; then
+  echo "Generating RS256 JWT key pair (${ENVIRONMENT})..."
   openssl genrsa -out "$SECRETS_DIR/jwt_private.pem" 2048
   openssl rsa -in "$SECRETS_DIR/jwt_private.pem" -pubout -out "$SECRETS_DIR/jwt_public.pem"
   chmod 600 "$SECRETS_DIR/jwt_private.pem"
+  chmod 644 "$SECRETS_DIR/jwt_public.pem"
 fi
 
 exec "$@"

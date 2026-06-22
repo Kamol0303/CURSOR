@@ -236,6 +236,8 @@ async def seed() -> None:
         print("ERROR: Refusing to run in production environment", file=sys.stderr)
         sys.exit(1)
 
+    print(f"Starting demo seed (ENVIRONMENT={settings.ENVIRONMENT})...", flush=True)
+
     engine = create_async_engine(settings.DATABASE_URL)
     Session = async_sessionmaker(engine, expire_on_commit=False)
 
@@ -422,6 +424,7 @@ async def seed() -> None:
             print("Demo notifications created.")
 
         print("\n" + "=" * 60 + "\n")
+        print("SEED COMPLETE — use credentials printed above.", flush=True)
 
         await session.commit()
 

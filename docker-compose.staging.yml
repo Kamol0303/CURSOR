@@ -15,11 +15,21 @@ services:
     volumes:
       - postgres_staging:/var/lib/postgresql/data
       - ./infra/postgres/init-analytics-role.sql:/docker-entrypoint-initdb.d/02-analytics-role.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-tamor} -d ${POSTGRES_DB:-tamor}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
     networks: [internal]
 
   redis:
     image: redis:7-alpine
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
     networks: [internal]
 
   backend:
@@ -32,9 +42,23 @@ services:
       SECRETS_BACKEND: file
     volumes:
       - jwt_secrets:/secrets
-    depends_on: [postgres, redis]
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
     command: >
-      sh -c "alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port 8000 --workers 2 --proxy-headers --forwarded-allow-ips='*'"
+      sh -c "
+        for i in $$(seq 1 30); do
+          if alembic upgrade head; then
+            exec uvicorn app.main:app --host 0.0.0.0 --port 8000 --workers 2 --proxy-headers --forwarded-allow-ips='*';
+          fi;
+          echo \"Migration attempt $$i failed, retrying in 2s...\";
+          sleep 2;
+        done;
+        echo 'ERROR: migrations failed after 30 attempts';
+        exit 1
+      "
     networks: [internal]
 
   frontend:

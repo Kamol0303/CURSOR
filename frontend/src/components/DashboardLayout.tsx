@@ -21,6 +21,8 @@ const NAV: ReadonlyArray<{
   { href: "/dashboard/groups", key: "groups", permission: "groups.read" },
   { href: "/dashboard/attendance", key: "attendance", permission: "attendance.read" },
   { href: "/dashboard/payments", key: "payments", permission: "payments.read" },
+  { href: "/dashboard/exams", key: "exams", permission: "exams.read" },
+  { href: "/dashboard/grades", key: "grades", permission: "grades.read" },
   { href: "/dashboard/ratings", key: "ratings", permission: "ratings.view" },
   { href: "/dashboard/certificates", key: "certificates", permission: "students.read" },
   { href: "/dashboard/analytics", key: "analytics", permission: "analytics.view" },

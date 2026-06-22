@@ -6,12 +6,14 @@ from fastapi.responses import JSONResponse
 
 from app.api.v1.router import api_router
 from app.core.config import settings
+from app.core.logging_config import setup_logging
 from app.core.production import validate_production_settings
 from app.core.secrets_provider import bootstrap_secrets
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    setup_logging()
     await bootstrap_secrets()
     errors = validate_production_settings()
     if errors and settings.ENVIRONMENT == "production":
@@ -21,7 +23,7 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(
     title=settings.APP_NAME,
-    version="0.5.0-phase5",
+    version="0.8.0-ocms",
     docs_url="/docs" if settings.DEBUG else None,
     redoc_url="/redoc" if settings.DEBUG else None,
     lifespan=lifespan,

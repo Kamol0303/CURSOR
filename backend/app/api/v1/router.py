@@ -6,6 +6,8 @@ from app.api.v1.auth import router as auth_router
 from app.api.v1.centers import router as centers_router
 from app.api.v1.certificates import router as certificates_router
 from app.api.v1.dashboard import router as dashboard_router
+from app.api.v1.exams import router as exams_router
+from app.api.v1.grades import router as grades_router
 from app.api.v1.groups import groups_router, payments_router, subjects_router
 from app.api.v1.integrations import router as integrations_router
 from app.api.v1.notifications import router as notifications_router
@@ -26,6 +28,8 @@ api_router.include_router(subjects_router)
 api_router.include_router(attendance_router)
 api_router.include_router(payments_router)
 api_router.include_router(dashboard_router)
+api_router.include_router(exams_router)
+api_router.include_router(grades_router)
 api_router.include_router(ratings_router)
 api_router.include_router(certificates_router)
 api_router.include_router(reports_router)

@@ -38,6 +38,9 @@ from app.models.identity import (
 )
 
 from app.models.integrations import TelegramSubscription
+from app.models.academics import Course, Exam, ExamQuestion, ExamResult, Grade, Lesson
+from app.models.files_messages import Message, StoredFile
+from app.models.finance import PaymentTransaction
 from app.models.operations import AttendanceRecord, AttendanceSession, StudentPayment
 from app.models.ratings_certs import (
     Certificate,
@@ -55,6 +58,15 @@ __all__ = [
     "NotificationPreference",
     "SmsLog",
     "TelegramSubscription",
+    "Course",
+    "Lesson",
+    "Exam",
+    "ExamQuestion",
+    "ExamResult",
+    "Grade",
+    "StoredFile",
+    "Message",
+    "PaymentTransaction",
     "AttendanceSession",
     "AttendanceRecord",
     "StudentPayment",

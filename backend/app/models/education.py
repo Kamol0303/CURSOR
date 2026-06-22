@@ -66,6 +66,7 @@ class Group(Base, TimestampMixin):
     schedule_json: Mapped[dict | None] = mapped_column(JSONB, nullable=True)
     start_date: Mapped[date | None] = mapped_column(Date, nullable=True)
     end_date: Mapped[date | None] = mapped_column(Date, nullable=True)
+    max_students: Mapped[int | None] = mapped_column(Integer, nullable=True)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
 
     center: Mapped[TrainingCenter] = relationship(back_populates="groups")

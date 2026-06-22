@@ -62,6 +62,23 @@ Phase 0 delivers the security foundation:
 - **CI gates** — production-gate workflow, Cosign image signing skeleton
 - **Docs** — go-live runbook, red-team checklist (Section 24A)
 
+## Phase 7 — OCMS Platform Extension
+
+Full education center management modules on Clean Architecture:
+
+- **Migration `008_ocms`** — courses, lessons, exams, grades, payment_transactions, files, messages
+- **Roles** — `accountant`, `student` (+ existing 8-role RBAC)
+- **Dashboard** — active students, monthly revenue, debtors, daily/weekly/monthly charts
+- **Exams API/UI** — create tests, question bank, submit & score results
+- **Grades API/UI** — student grade tracking
+- **Payments** — Click/Payme webhook endpoints (`/integrations/click|payme/webhook`)
+- **Logging** — structured `core/logging_config.py`
+- **Architecture doc** — `docs/ocms-master-architecture.md`
+
+```bash
+docker compose exec backend alembic upgrade head
+```
+
 ## Security Verification
 
 ```bash

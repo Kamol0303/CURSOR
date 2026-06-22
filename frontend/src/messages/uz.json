@@ -79,12 +79,16 @@
     "groups": "Guruhlar",
     "attendance": "Davomat",
     "payments": "To'lovlar",
+    "exams": "Imtihonlar",
+    "grades": "Baholar",
     "roles": {
       "super_admin": "Super admin",
       "hokimiyat_operator": "Hokimiyat operatori",
       "center_director": "Direktor",
       "center_admin": "Menejer",
       "teacher": "O'qituvchi",
+      "accountant": "Buxgalter",
+      "student": "O'quvchi",
       "auditor": "Auditor"
     }
   },
@@ -92,13 +96,22 @@
     "welcome": "Hokimiyat dashboard",
     "loading": "Yuklanmoqda...",
     "kpi": {
-      "total_centers": "Jami markazlar",
+      "total_centers": "Jami filiallar",
       "total_students": "Jami o'quvchilar",
-      "total_teachers": "Jami o'qituvchilar",
+      "active_students": "Faol o'quvchilar",
+      "total_teachers": "O'qituvchilar",
       "total_subjects": "Jami fanlar",
+      "total_courses": "Kurslar soni",
       "active_centers": "Faol markazlar",
-      "new_registrations_month": "Yangi ro'yxatdan o'tganlar (oy)",
-      "license_expiring_30_days": "Litsenziya muddati tugaydi (30 kun)"
+      "new_registrations_month": "Yangi ro'yxatdan o'tganlar",
+      "license_expiring_30_days": "Litsenziya tugaydi (30 kun)",
+      "monthly_revenue": "Oylik daromad",
+      "debtors_count": "Qarzdorlar"
+    },
+    "charts": {
+      "daily": "Kunlik statistika",
+      "weekly": "Haftalik statistika",
+      "monthly": "Oylik statistika"
     }
   },
   "centers": {
@@ -176,6 +189,27 @@
     "empty": "To'lovlar yo'q",
     "markPaid": "To'langan deb belgilash",
     "clickPaymeNote": "Click va Payme integratsiyasi keyingi bosqichda qo'shiladi."
+  },
+  "exams": {
+    "title": "Imtihonlar",
+    "loading": "Yuklanmoqda...",
+    "create": "Imtihon yaratish",
+    "examTitle": "Imtihon nomi",
+    "questions": "Savollar",
+    "passScore": "O'tish bali",
+    "published": "Nashr qilingan",
+    "draft": "Qoralama",
+    "empty": "Imtihonlar yo'q",
+    "defaultQuestion": "Namuna savol?"
+  },
+  "grades": {
+    "title": "Baholar",
+    "loading": "Yuklanmoqda...",
+    "add": "Baho qo'shish",
+    "student": "O'quvchi",
+    "grade": "Baho",
+    "type": "Turi",
+    "empty": "Baholar yo'q"
   },
   "common": {
     "language": "Til"

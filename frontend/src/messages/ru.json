@@ -79,12 +79,16 @@
     "groups": "Группы",
     "attendance": "Посещаемость",
     "payments": "Платежи",
+    "exams": "Экзамены",
+    "grades": "Оценки",
     "roles": {
       "super_admin": "Супер админ",
-      "hokimiyat_operator": "Оператор хокимията",
+      "hokimiyat_operator": "Оператор",
       "center_director": "Директор",
       "center_admin": "Менеджер",
       "teacher": "Учитель",
+      "accountant": "Бухгалтер",
+      "student": "Учащийся",
       "auditor": "Аудитор"
     }
   },
@@ -92,13 +96,22 @@
     "welcome": "Панель хокимията",
     "loading": "Загрузка...",
     "kpi": {
-      "total_centers": "Всего центров",
+      "total_centers": "Филиалы",
       "total_students": "Всего учащихся",
-      "total_teachers": "Всего учителей",
-      "total_subjects": "Всего предметов",
-      "active_centers": "Активные центры",
-      "new_registrations_month": "Новые регистрации (месяц)",
-      "license_expiring_30_days": "Истекает лицензия (30 дней)"
+      "active_students": "Активные учащиеся",
+      "total_teachers": "Учителя",
+      "total_subjects": "Предметы",
+      "total_courses": "Курсы",
+      "active_centers": "Активные филиалы",
+      "new_registrations_month": "Новые регистрации",
+      "license_expiring_30_days": "Истекает лицензия (30д)",
+      "monthly_revenue": "Месячный доход",
+      "debtors_count": "Должники"
+    },
+    "charts": {
+      "daily": "Дневная статистика",
+      "weekly": "Недельная статистика",
+      "monthly": "Месячная статистика"
     }
   },
   "centers": {
@@ -164,6 +177,27 @@
     "empty": "Платежи не найдены",
     "markPaid": "Отметить оплаченным",
     "clickPaymeNote": "Интеграция Click и Payme будет добавлена на следующем этапе."
+  },
+  "exams": {
+    "title": "Экзамены",
+    "loading": "Загрузка...",
+    "create": "Создать экзамен",
+    "examTitle": "Название экзамена",
+    "questions": "Вопросы",
+    "passScore": "Проходной балл",
+    "published": "Опубликован",
+    "draft": "Черновик",
+    "empty": "Экзамены не найдены",
+    "defaultQuestion": "Пример вопроса?"
+  },
+  "grades": {
+    "title": "Оценки",
+    "loading": "Загрузка...",
+    "add": "Добавить оценку",
+    "student": "Учащийся",
+    "grade": "Оценка",
+    "type": "Тип",
+    "empty": "Оценки не найдены"
   },
   "common": {
     "language": "Язык"

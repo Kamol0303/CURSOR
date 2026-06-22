@@ -79,12 +79,16 @@
     "groups": "Groups",
     "attendance": "Attendance",
     "payments": "Payments",
+    "exams": "Exams",
+    "grades": "Grades",
     "roles": {
       "super_admin": "Super admin",
-      "hokimiyat_operator": "District operator",
+      "hokimiyat_operator": "Operator",
       "center_director": "Director",
       "center_admin": "Manager",
       "teacher": "Teacher",
+      "accountant": "Accountant",
+      "student": "Student",
       "auditor": "Auditor"
     }
   },
@@ -92,13 +96,22 @@
     "welcome": "Hokimiyat Dashboard",
     "loading": "Loading...",
     "kpi": {
-      "total_centers": "Total centers",
+      "total_centers": "Branches",
       "total_students": "Total students",
-      "total_teachers": "Total teachers",
-      "total_subjects": "Total subjects",
-      "active_centers": "Active centers",
-      "new_registrations_month": "New registrations (month)",
-      "license_expiring_30_days": "License expiring (30 days)"
+      "active_students": "Active students",
+      "total_teachers": "Teachers",
+      "total_subjects": "Subjects",
+      "total_courses": "Courses",
+      "active_centers": "Active branches",
+      "new_registrations_month": "New registrations",
+      "license_expiring_30_days": "License expiring (30d)",
+      "monthly_revenue": "Monthly revenue",
+      "debtors_count": "Debtors"
+    },
+    "charts": {
+      "daily": "Daily stats",
+      "weekly": "Weekly stats",
+      "monthly": "Monthly stats"
     }
   },
   "centers": {
@@ -164,6 +177,27 @@
     "empty": "No payments found",
     "markPaid": "Mark as paid",
     "clickPaymeNote": "Click and Payme integration will be added in a later phase."
+  },
+  "exams": {
+    "title": "Exams",
+    "loading": "Loading...",
+    "create": "Create exam",
+    "examTitle": "Exam title",
+    "questions": "Questions",
+    "passScore": "Pass score",
+    "published": "Published",
+    "draft": "Draft",
+    "empty": "No exams",
+    "defaultQuestion": "Sample question?"
+  },
+  "grades": {
+    "title": "Grades",
+    "loading": "Loading...",
+    "add": "Add grade",
+    "student": "Student",
+    "grade": "Grade",
+    "type": "Type",
+    "empty": "No grades"
   },
   "common": {
     "language": "Language"

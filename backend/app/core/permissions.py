@@ -1,6 +1,10 @@
-"""Role-based permissions for TMB platform operations."""
+"""Extended permissions for OCMS platform (8+ roles)."""
 
 MANDATORY_MFA_ROLES = {"super_admin", "hokimiyat_operator", "center_director"}
+
+_EXAM_PERMS = ["exams.create", "exams.read", "exams.update", "exams.delete", "exams.submit"]
+_GRADE_PERMS = ["grades.create", "grades.read", "grades.update", "grades.delete"]
+_COURSE_PERMS = ["courses.create", "courses.read", "courses.update", "courses.delete"]
 
 ROLE_PERMISSIONS: dict[str, list[str]] = {
     "super_admin": [
@@ -33,6 +37,11 @@ ROLE_PERMISSIONS: dict[str, list[str]] = {
         "audit.read",
         "dashboard.view",
         "analytics.view",
+        *_EXAM_PERMS,
+        *_GRADE_PERMS,
+        *_COURSE_PERMS,
+        "files.upload",
+        "files.read",
     ],
     "hokimiyat_operator": [
         "centers.read",
@@ -46,6 +55,9 @@ ROLE_PERMISSIONS: dict[str, list[str]] = {
         "audit.read",
         "dashboard.view",
         "analytics.view",
+        "exams.read",
+        "grades.read",
+        "courses.read",
     ],
     "center_director": [
         "centers.read",
@@ -72,6 +84,11 @@ ROLE_PERMISSIONS: dict[str, list[str]] = {
         "users.password_reset",
         "dashboard.view",
         "analytics.view",
+        *_EXAM_PERMS,
+        *_GRADE_PERMS,
+        *_COURSE_PERMS,
+        "files.upload",
+        "files.read",
     ],
     "center_admin": [
         "centers.read",
@@ -89,6 +106,13 @@ ROLE_PERMISSIONS: dict[str, list[str]] = {
         "payments.create",
         "ratings.view",
         "dashboard.view",
+        "exams.read",
+        "exams.create",
+        "grades.read",
+        "grades.create",
+        "courses.read",
+        "files.upload",
+        "files.read",
     ],
     "teacher": [
         "students.create",
@@ -98,6 +122,19 @@ ROLE_PERMISSIONS: dict[str, list[str]] = {
         "attendance.read",
         "attendance.mark",
         "ratings.view",
+        "dashboard.view",
+        "exams.read",
+        "exams.create",
+        "grades.read",
+        "grades.create",
+        "courses.read",
+    ],
+    "accountant": [
+        "students.read",
+        "payments.read",
+        "payments.create",
+        "payments.update",
+        "reports.generate",
         "dashboard.view",
     ],
     "auditor": [
@@ -113,11 +150,24 @@ ROLE_PERMISSIONS: dict[str, list[str]] = {
         "pinfl.reveal",
         "dashboard.view",
         "analytics.view",
+        "exams.read",
+        "grades.read",
+    ],
+    "student": [
+        "students.read",
+        "grades.read",
+        "attendance.read",
+        "exams.read",
+        "exams.submit",
+        "certificates.read",
     ],
     "parent": [
         "students.read",
         "ratings.view",
         "certificates.read",
+        "grades.read",
+        "attendance.read",
+        "payments.read",
     ],
     "external_api": [
         "aggregate_stats.read",
@@ -126,16 +176,17 @@ ROLE_PERMISSIONS: dict[str, list[str]] = {
 
 ROLE_DEFINITIONS = [
     ("super_admin", "Super administrator", "Super administrator", "Super administrator"),
-    ("hokimiyat_operator", "Hokimiyat operatori", "Оператор хокимията", "Hokimiyat operator"),
-    ("center_director", "Markaz direktori", "Директор центра", "Center director"),
-    ("center_admin", "Markaz administratori", "Администратор центра", "Center admin / Menejer"),
+    ("hokimiyat_operator", "Operator", "Оператор", "Operator"),
+    ("center_director", "Direktor", "Директор", "Director"),
+    ("center_admin", "Menejer", "Менеджер", "Manager"),
     ("teacher", "O'qituvchi", "Учитель", "Teacher"),
+    ("accountant", "Buxgalter", "Бухгалтер", "Accountant"),
+    ("student", "O'quvchi", "Учащийся", "Student"),
     ("auditor", "Auditor", "Аудитор", "Auditor"),
     ("parent", "Ota-ona", "Родитель", "Parent/Guardian"),
     ("external_api", "Tashqi API", "Внешний API", "External API consumer"),
 ]
 
-# UI navigation: minimum permission to show menu item
 NAV_PERMISSIONS: dict[str, str] = {
     "dashboard": "dashboard.view",
     "centers": "centers.read",
@@ -144,6 +195,8 @@ NAV_PERMISSIONS: dict[str, str] = {
     "groups": "groups.read",
     "attendance": "attendance.read",
     "payments": "payments.read",
+    "exams": "exams.read",
+    "grades": "grades.read",
     "ratings": "ratings.view",
     "certificates": "students.read",
     "analytics": "analytics.view",

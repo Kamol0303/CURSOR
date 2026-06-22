@@ -51,12 +51,19 @@ export async function getDashboardKpis() {
   return apiFetch<{
     total_centers: number;
     total_students: number;
+    active_students: number;
     total_teachers: number;
     total_subjects: number;
+    total_courses: number;
     active_centers: number;
     new_registrations_month: number;
     license_expiring_30_days: number;
+    monthly_revenue: number;
+    debtors_count: number;
     kpis: { key: string; value: number }[];
+    daily_stats: { label: string; value: number }[];
+    weekly_stats: { label: string; value: number }[];
+    monthly_stats: { label: string; value: number }[];
   }>("/dashboard/kpis");
 }
 

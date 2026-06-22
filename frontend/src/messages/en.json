@@ -8,10 +8,34 @@
     "mfaTitle": "Two-factor authentication",
     "mfaCode": "TOTP code",
     "verify": "Verify",
+    "mfaSetupTitle": "Set up two-factor authentication",
+    "mfaSetupInstructions": "Scan the secret in Google Authenticator, Authy, or another TOTP app, then enter the 6-digit code.",
+    "mfaSetupSecret": "Secret key",
+    "mfaSetupAdvanced": "Advanced: provisioning URI",
+    "mfaSetupConfirm": "Enable MFA and continue",
+    "mfaSetupLoading": "Preparing MFA setup…",
     "errors": {
       "INVALID_CREDENTIALS": "Invalid username or password",
       "MFA_INVALID": "Invalid TOTP code",
+      "MFA_SETUP_EXPIRED": "MFA setup session expired. Sign in again.",
+      "MFA_ALREADY_ENABLED": "MFA is already enabled",
       "RATE_LIMIT_EXCEEDED": "Too many attempts. Please try again later"
+    }
+  },
+  "security": {
+    "title": "Security",
+    "subtitle": "Account protection settings",
+    "mfaLabel": "Two-factor authentication (TOTP)",
+    "mfaEnabled": "MFA is active on your account",
+    "mfaDisabled": "MFA is not configured",
+    "mfaRequired": "required for your role",
+    "statusOn": "ON",
+    "statusOff": "OFF",
+    "enableMfa": "Enable MFA",
+    "mfaEnabledSuccess": "MFA enabled successfully",
+    "errors": {
+      "MFA_INVALID": "Invalid TOTP code",
+      "MFA_SETUP_EXPIRED": "Setup session expired"
     }
   },
   "nav": {
@@ -24,6 +48,7 @@
     "ratings": "Ratings",
     "certificates": "Certificates",
     "analytics": "AI analytics",
+    "security": "Security",
     "logout": "Sign out"
   },
   "dashboard": {

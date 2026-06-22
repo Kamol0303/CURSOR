@@ -8,10 +8,34 @@
     "mfaTitle": "Двухфакторная аутентификация",
     "mfaCode": "TOTP код",
     "verify": "Подтвердить",
+    "mfaSetupTitle": "Настройка двухфакторной аутентификации",
+    "mfaSetupInstructions": "Добавьте секретный ключ в Google Authenticator, Authy или другое TOTP-приложение, затем введите 6-значный код.",
+    "mfaSetupSecret": "Секретный ключ",
+    "mfaSetupAdvanced": "Дополнительно: provisioning URI",
+    "mfaSetupConfirm": "Включить MFA и продолжить",
+    "mfaSetupLoading": "Подготовка настройки MFA…",
     "errors": {
       "INVALID_CREDENTIALS": "Неверный логин или пароль",
       "MFA_INVALID": "Неверный TOTP код",
+      "MFA_SETUP_EXPIRED": "Сессия настройки MFA истекла. Войдите снова.",
+      "MFA_ALREADY_ENABLED": "MFA уже включена",
       "RATE_LIMIT_EXCEEDED": "Слишком много попыток. Попробуйте позже"
+    }
+  },
+  "security": {
+    "title": "Безопасность",
+    "subtitle": "Настройки защиты учётной записи",
+    "mfaLabel": "Двухфакторная аутентификация (TOTP)",
+    "mfaEnabled": "MFA активна для вашей учётной записи",
+    "mfaDisabled": "MFA не настроена",
+    "mfaRequired": "обязательна для вашей роли",
+    "statusOn": "ВКЛ",
+    "statusOff": "ВЫКЛ",
+    "enableMfa": "Включить MFA",
+    "mfaEnabledSuccess": "MFA успешно включена",
+    "errors": {
+      "MFA_INVALID": "Неверный TOTP код",
+      "MFA_SETUP_EXPIRED": "Сессия настройки истекла"
     }
   },
   "nav": {
@@ -24,6 +48,7 @@
     "ratings": "Рейтинг",
     "certificates": "Сертификаты",
     "analytics": "AI аналитика",
+    "security": "Безопасность",
     "logout": "Выйти"
   },
   "dashboard": {

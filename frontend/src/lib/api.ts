@@ -32,6 +32,9 @@ export async function getMe() {
     center_id: string | null;
     permissions: string[];
     locale_preference: string;
+    mfa_enabled: boolean;
+    mfa_required?: boolean;
+    mfa_configured?: boolean;
   }>("/auth/me");
 }
 

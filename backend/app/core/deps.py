@@ -47,6 +47,38 @@ async def get_current_user(
     return user
 
 
+async def get_current_user_optional(
+    request: Request,
+    credentials: HTTPAuthorizationCredentials | None = Depends(bearer_scheme),
+    db: AsyncSession = Depends(get_db),
+) -> User | None:
+    if not credentials:
+        return None
+
+    try:
+        payload = verify_access_token(credentials.credentials)
+    except ValueError:
+        return None
+
+    jti = payload.get("jti")
+    if jti and await is_jti_denied(jti):
+        return None
+
+    user_id = UUID(payload["sub"])
+    result = await db.execute(
+        select(User).options(selectinload(User.role)).where(User.id == user_id, User.deleted_at.is_(None))
+    )
+    user = result.scalar_one_or_none()
+    if not user or not user.is_active or user.is_locked:
+        return None
+
+    set_rls_user(user)
+    await apply_rls_context(db)
+
+    request.state.token_payload = payload
+    return user
+
+
 def requires_permission(permission: str):
     async def checker(
         request: Request,

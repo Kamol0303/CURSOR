@@ -2,11 +2,13 @@ from fastapi import APIRouter, Depends, HTTPException, Request, Response
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
-from app.core.deps import get_current_user
+from app.core.deps import get_current_user, get_current_user_optional
 from app.models.identity import User
 from app.schemas.auth import (
     ApiResponse,
     LoginRequest,
+    MfaSetupConfirmRequest,
+    MfaSetupInitRequest,
     MfaVerifyRequest,
     ParentOtpRequest,
     ParentOtpVerifyRequest,
@@ -15,7 +17,9 @@ from app.schemas.auth import (
 )
 from app.services.auth_service import (
     AuthError,
+    confirm_mfa_setup,
     get_user_permissions,
+    init_mfa_setup,
     login_with_password,
     logout,
     refresh_access_token,
@@ -23,6 +27,7 @@ from app.services.auth_service import (
     verify_mfa_and_issue_tokens,
     verify_parent_otp,
 )
+from app.core.permissions import MANDATORY_MFA_ROLES
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -65,6 +70,15 @@ async def login(
         )
     except AuthError as exc:
         raise HTTPException(status_code=exc.status, detail={"code": exc.code}) from exc
+
+    if result.get("requires_mfa_setup"):
+        return ApiResponse(
+            success=True,
+            data={
+                "requires_mfa_setup": True,
+                "setup_token": result["setup_token"],
+            },
+        )
 
     if result.get("requires_mfa"):
         return ApiResponse(
@@ -112,6 +126,71 @@ async def mfa_verify(
             expires_at=result["expires_at"],
         ).model_dump(),
     )
+
+
+@router.post("/mfa/setup/init", response_model=ApiResponse)
+async def mfa_setup_init(
+    body: MfaSetupInitRequest,
+    request: Request,
+    db: AsyncSession = Depends(get_db),
+    user: User | None = Depends(get_current_user_optional),
+):
+    try:
+        if body.setup_token:
+            result = await init_mfa_setup(db, setup_token=body.setup_token)
+        elif user:
+            result = await init_mfa_setup(db, user=user)
+        else:
+            raise AuthError("NOT_AUTHENTICATED", 401)
+    except AuthError as exc:
+        raise HTTPException(status_code=exc.status, detail={"code": exc.code}) from exc
+
+    return ApiResponse(success=True, data=result)
+
+
+@router.post("/mfa/setup/confirm", response_model=ApiResponse)
+async def mfa_setup_confirm(
+    body: MfaSetupConfirmRequest,
+    request: Request,
+    response: Response,
+    db: AsyncSession = Depends(get_db),
+    user: User | None = Depends(get_current_user_optional),
+):
+    try:
+        if body.setup_token:
+            result = await confirm_mfa_setup(
+                db,
+                setup_token=body.setup_token,
+                code=body.code,
+                ip=request.client.host if request.client else None,
+                user_agent=request.headers.get("user-agent"),
+                client_hint=request.headers.get("x-client-hint", ""),
+            )
+        elif user:
+            result = await confirm_mfa_setup(
+                db,
+                user=user,
+                code=body.code,
+                ip=request.client.host if request.client else None,
+                user_agent=request.headers.get("user-agent"),
+                client_hint=request.headers.get("x-client-hint", ""),
+            )
+        else:
+            raise AuthError("NOT_AUTHENTICATED", 401)
+    except AuthError as exc:
+        raise HTTPException(status_code=exc.status, detail={"code": exc.code}) from exc
+
+    if result.get("access_token"):
+        _set_refresh_cookie(response, result["refresh_token"])
+        return ApiResponse(
+            success=True,
+            data=TokenResponse(
+                access_token=result["access_token"],
+                expires_at=result["expires_at"],
+            ).model_dump(),
+        )
+
+    return ApiResponse(success=True, data={"mfa_enabled": True})
 
 
 @router.post("/refresh", response_model=ApiResponse)
@@ -219,5 +298,7 @@ async def me(user: User = Depends(get_current_user), db: AsyncSession = Depends(
             locale_preference=user.locale_preference,
             permissions=permissions,
             mfa_enabled=user.mfa_enabled,
+            mfa_required=user.role.code in MANDATORY_MFA_ROLES,
+            mfa_configured=bool(user.mfa_secret_encrypted),
         ).model_dump(),
     )

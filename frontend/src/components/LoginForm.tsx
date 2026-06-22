@@ -3,14 +3,19 @@
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { MfaSetupForm } from "@/components/MfaSetupForm";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+
+type Step = "login" | "mfa" | "mfa_setup";
 
 export function LoginForm() {
   const t = useTranslations("auth");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [step, setStep] = useState<Step>("login");
   const [mfaToken, setMfaToken] = useState<string | null>(null);
+  const [setupToken, setSetupToken] = useState<string | null>(null);
   const [mfaCode, setMfaCode] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -40,8 +45,14 @@ export function LoginForm() {
         handleError(data.detail?.code || "INVALID_CREDENTIALS");
         return;
       }
+      if (data.data?.requires_mfa_setup) {
+        setSetupToken(data.data.setup_token);
+        setStep("mfa_setup");
+        return;
+      }
       if (data.data?.requires_mfa) {
         setMfaToken(data.data.mfa_token);
+        setStep("mfa");
         return;
       }
       localStorage.setItem("tamor_access_token", data.data.access_token);
@@ -100,7 +111,7 @@ export function LoginForm() {
             </div>
           </div>
 
-          {!mfaToken ? (
+          {step === "login" ? (
             <form onSubmit={handleLogin} className="space-y-4">
               <div>
                 <label htmlFor="username" className="block text-sm font-medium mb-1">
@@ -143,6 +154,17 @@ export function LoginForm() {
                 {t("login")}
               </button>
             </form>
+          ) : step === "mfa_setup" && setupToken ? (
+            <MfaSetupForm
+              setupToken={setupToken}
+              onComplete={(accessToken) => {
+                if (accessToken) {
+                  localStorage.setItem("tamor_access_token", accessToken);
+                  window.location.href = "/dashboard";
+                }
+              }}
+              onError={(code) => handleError(code)}
+            />
           ) : (
             <form onSubmit={handleMfa} className="space-y-4">
               <h2 className="font-semibold text-naqsh-primary">{t("mfaTitle")}</h2>

@@ -25,6 +25,26 @@ class MfaVerifyRequest(BaseModel):
     code: str = Field(min_length=6, max_length=8)
 
 
+class MfaSetupInitRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    setup_token: str | None = Field(default=None, max_length=128)
+
+
+class MfaSetupConfirmRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    code: str = Field(min_length=6, max_length=8)
+    setup_token: str | None = Field(default=None, max_length=128)
+
+
+class MfaSetupInitResponse(BaseModel):
+    provisioning_uri: str
+    secret: str
+    issuer: str
+    setup_token: str | None = None
+
+
 class ParentOtpRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
@@ -58,3 +78,5 @@ class UserMeResponse(BaseModel):
     locale_preference: str
     permissions: list[str]
     mfa_enabled: bool
+    mfa_required: bool = False
+    mfa_configured: bool = False

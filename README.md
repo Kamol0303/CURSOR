@@ -75,6 +75,19 @@ python3 scripts/red_team_verify.py --url https://staging.tamor.uz --production
 cd backend && pytest tests/security/ -v
 ```
 
+## Staging deployment
+
+See `docs/staging-deploy.md` and `.env.staging.example`.
+
+```bash
+cp .env.staging.example .env.staging
+docker compose -f docker-compose.staging.yml --env-file .env.staging up -d --build
+```
+
+## Integrations
+
+SMS (eskiz.uz) works in staging/production when configured. **Email is not implemented** — see `docs/integrations.md`.
+
 ## Quick Start
 
 ### Prerequisites

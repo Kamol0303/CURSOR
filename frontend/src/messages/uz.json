@@ -8,10 +8,34 @@
     "mfaTitle": "Ikki bosqichli autentifikatsiya",
     "mfaCode": "TOTP kodi",
     "verify": "Tasdiqlash",
+    "mfaSetupTitle": "Ikki bosqichli autentifikatsiyani sozlash",
+    "mfaSetupInstructions": "Google Authenticator, Authy yoki boshqa TOTP ilovasiga maxfiy kalitni kiriting, so'ng 6 xonali kodni yozing.",
+    "mfaSetupSecret": "Maxfiy kalit",
+    "mfaSetupAdvanced": "Qo'shimcha: provisioning URI",
+    "mfaSetupConfirm": "MFA yoqish va davom etish",
+    "mfaSetupLoading": "MFA sozlash tayyorlanmoqda…",
     "errors": {
       "INVALID_CREDENTIALS": "Noto'g'ri login yoki parol",
       "MFA_INVALID": "Noto'g'ri TOTP kodi",
+      "MFA_SETUP_EXPIRED": "MFA sozlash vaqti tugadi. Qayta kiring.",
+      "MFA_ALREADY_ENABLED": "MFA allaqachon yoqilgan",
       "RATE_LIMIT_EXCEEDED": "Juda ko'p urinish. Keyinroq qaytadan urinib ko'ring"
+    }
+  },
+  "security": {
+    "title": "Xavfsizlik",
+    "subtitle": "Hisob himoyasi sozlamalari",
+    "mfaLabel": "Ikki bosqichli autentifikatsiya (TOTP)",
+    "mfaEnabled": "Hisobingizda MFA faol",
+    "mfaDisabled": "MFA sozlanmagan",
+    "mfaRequired": "rolingiz uchun majburiy",
+    "statusOn": "YOQILGAN",
+    "statusOff": "O'CHIQ",
+    "enableMfa": "MFA yoqish",
+    "mfaEnabledSuccess": "MFA muvaffaqiyatli yoqildi",
+    "errors": {
+      "MFA_INVALID": "Noto'g'ri TOTP kodi",
+      "MFA_SETUP_EXPIRED": "Sozlash vaqti tugadi"
     }
   },
   "nav": {
@@ -24,6 +48,7 @@
     "ratings": "Reyting",
     "certificates": "Sertifikatlar",
     "analytics": "AI tahlil",
+    "security": "Xavfsizlik",
     "logout": "Chiqish"
   },
   "dashboard": {

@@ -17,6 +17,7 @@ from app.core.security import (
     decrypt_totp_secret,
     device_fingerprint_hash,
     DUMMY_PASSWORD_HASH,
+    encrypt_totp_secret,
     generate_refresh_token,
     hash_token,
     verify_password,
@@ -35,6 +36,10 @@ class AuthError(Exception):
         self.code = code
         self.status = status
         super().__init__(code)
+
+
+MFA_ISSUER = "TaMoR"
+MFA_SETUP_TTL_SECONDS = 600
 
 
 async def _log_login(
@@ -158,6 +163,26 @@ async def login_with_password(
         requires_mfa = role_code in MANDATORY_MFA_ROLES or user.mfa_enabled
 
         if requires_mfa:
+            if not user.mfa_secret_encrypted:
+                setup_token = secrets.token_urlsafe(32)
+                user.login_state = "pending_mfa_setup"
+                user.login_state_expires_at = datetime.now(UTC) + timedelta(minutes=10)
+                await db.flush()
+                await cache_mfa_setup_token(setup_token, user.id)
+                await _log_login(
+                    db,
+                    username=username,
+                    user_id=user.id,
+                    ip=ip,
+                    user_agent=user_agent,
+                    success=True,
+                    failure_reason=None,
+                )
+                return {
+                    "requires_mfa_setup": True,
+                    "setup_token": setup_token,
+                }
+
             mfa_token = secrets.token_urlsafe(32)
             user.login_state = "pending_mfa"
             user.login_state_expires_at = datetime.now(UTC) + timedelta(minutes=5)
@@ -413,6 +438,144 @@ async def logout(db: AsyncSession, *, refresh_token: str) -> None:
 
 async def get_user_permissions(user: User) -> list[str]:
     return ROLE_PERMISSIONS.get(user.role.code, [])
+
+
+async def cache_mfa_setup_token(token: str, user_id: UUID) -> None:
+    from app.core.redis_client import get_redis
+
+    r = await get_redis()
+    await r.setex(f"mfa:setup:token:{token}", MFA_SETUP_TTL_SECONDS, str(user_id))
+
+
+async def get_mfa_setup_user_id(token: str) -> UUID | None:
+    from app.core.redis_client import get_redis
+
+    r = await get_redis()
+    val = await r.get(f"mfa:setup:token:{token}")
+    return UUID(val) if val else None
+
+
+async def cache_pending_mfa_secret(user_id: UUID, secret: str) -> None:
+    from app.core.redis_client import get_redis
+
+    r = await get_redis()
+    await r.setex(f"mfa:setup:secret:{user_id}", MFA_SETUP_TTL_SECONDS, secret)
+
+
+async def get_pending_mfa_secret(user_id: UUID) -> str | None:
+    from app.core.redis_client import get_redis
+
+    r = await get_redis()
+    return await r.get(f"mfa:setup:secret:{user_id}")
+
+
+async def _load_user_for_mfa_setup(db: AsyncSession, user_id: UUID) -> User:
+    result = await db.execute(
+        select(User).options(selectinload(User.role)).where(User.id == user_id, User.deleted_at.is_(None))
+    )
+    user = result.scalar_one_or_none()
+    if not user or not user.is_active or user.is_locked:
+        raise AuthError("ACCOUNT_INACTIVE", 403)
+    return user
+
+
+async def init_mfa_setup(
+    db: AsyncSession,
+    *,
+    setup_token: str | None = None,
+    user: User | None = None,
+) -> dict:
+    if setup_token:
+        user_id = await get_mfa_setup_user_id(setup_token)
+        if not user_id:
+            raise AuthError("MFA_SETUP_EXPIRED")
+        target = await _load_user_for_mfa_setup(db, user_id)
+    elif user:
+        target = user
+        user_id = user.id
+    else:
+        raise AuthError("NOT_AUTHENTICATED", 401)
+
+    if target.mfa_secret_encrypted and target.mfa_enabled:
+        raise AuthError("MFA_ALREADY_ENABLED", 400)
+
+    secret = pyotp.random_base32()
+    await cache_pending_mfa_secret(user_id, secret)
+
+    label = target.username or target.email or str(target.id)
+    totp = pyotp.TOTP(secret)
+    provisioning_uri = totp.provisioning_uri(name=label, issuer_name=MFA_ISSUER)
+
+    return {
+        "provisioning_uri": provisioning_uri,
+        "secret": secret,
+        "issuer": MFA_ISSUER,
+        "setup_token": setup_token,
+    }
+
+
+async def confirm_mfa_setup(
+    db: AsyncSession,
+    *,
+    code: str,
+    setup_token: str | None = None,
+    user: User | None = None,
+    ip: str | None = None,
+    user_agent: str | None = None,
+    client_hint: str = "",
+) -> dict:
+    if setup_token:
+        user_id = await get_mfa_setup_user_id(setup_token)
+        if not user_id:
+            raise AuthError("MFA_SETUP_EXPIRED")
+        target = await _load_user_for_mfa_setup(db, user_id)
+    elif user:
+        target = user
+        user_id = user.id
+    else:
+        raise AuthError("NOT_AUTHENTICATED", 401)
+
+    pending_secret = await get_pending_mfa_secret(user_id)
+    if not pending_secret:
+        raise AuthError("MFA_SETUP_EXPIRED")
+
+    totp = pyotp.TOTP(pending_secret)
+    if not totp.verify(code, valid_window=1):
+        raise AuthError("MFA_INVALID")
+
+    was_first_login_setup = target.login_state == "pending_mfa_setup"
+    target.mfa_secret_encrypted = encrypt_totp_secret(pending_secret)
+    target.mfa_enabled = True
+    target.login_state = None
+    target.login_state_expires_at = None
+
+    from app.core.redis_client import get_redis
+
+    r = await get_redis()
+    await r.delete(f"mfa:setup:secret:{user_id}")
+    if setup_token:
+        await r.delete(f"mfa:setup:token:{setup_token}")
+
+    await _record_security_event(
+        db,
+        event_type="mfa_enabled",
+        severity="info",
+        user_id=target.id,
+        ip=ip,
+        details={"first_login_setup": was_first_login_setup},
+    )
+
+    if was_first_login_setup:
+        return await _issue_tokens(
+            db,
+            user=target,
+            ip=ip,
+            user_agent=user_agent,
+            client_hint=client_hint,
+            mfa_used=True,
+        )
+
+    return {"mfa_enabled": True}
 
 
 async def request_parent_otp(db: AsyncSession, *, phone: str, ip: str | None) -> dict:

@@ -81,6 +81,9 @@ jobs:
       - name: Red-team automated checks (offline)
         run: python scripts/red_team_verify.py --offline
 
+      - name: AI analytics PINFL guard (RT-14)
+        run: pip install pytest && pytest ai-analytics-service/tests/ -v
+
   frontend:
     runs-on: ubuntu-latest
     steps:

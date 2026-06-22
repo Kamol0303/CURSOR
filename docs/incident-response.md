@@ -39,9 +39,11 @@ Blameless review within 5 business days: timeline, root cause, action items with
 
 ## 17A.6 Named Ownership (fill before go-live)
 
-| Role | Responsibility |
-|---|---|
-| Incident Commander (on-call) | First responder, coordinates containment |
-| Data Protection Lead | PINFL incident notification decisions |
-| Super Admin (district IT) | Credential/key rotation |
-| Hokimlik liaison | External communication if disclosure warranted |
+| Role | Responsibility | Contact (fill before go-live) |
+|------|----------------|-------------------------------|
+| Incident Commander (on-call) | First responder, coordinates containment | District IT on-call rotation |
+| Data Protection Lead | PINFL incident notification decisions | Hokimlik legal / DPO |
+| Super Admin (district IT) | Credential/key rotation | `admin.tamor` successor account |
+| Hokimlik liaison | External communication if disclosure warranted | Press office / hokimiyat operator lead |
+
+> Template: replace generic titles with named individuals and phone numbers before production launch.

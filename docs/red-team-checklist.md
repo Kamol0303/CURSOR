@@ -4,7 +4,10 @@
 
 | Auto | ID | Check |
 |:----:|----|-------|
-| CI | RT-07 | Center A director cannot read Center B students |
+| CI | RT-01 | Login rate limit per account |
+| CI | RT-02 | Refresh token reuse revokes family |
+| CI | RT-06 | Parent OTP max attempts |
+| CI | RT-12 | PINFL encrypted at rest |
 | CI | RT-08 | Teacher cannot reveal PINFL |
 | CI | RT-09 | Parent sees only linked guardian children |
 | CI | RT-10 | RLS FORCE on students, enrollments, certificates, guardians |

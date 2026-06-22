@@ -178,7 +178,10 @@ async def security_fixtures(db_session: AsyncSession) -> dict:
 
 
 @pytest_asyncio.fixture
-async def api_client() -> AsyncGenerator[AsyncClient, None]:
+async def api_client(integration_available) -> AsyncGenerator[AsyncClient, None]:
+    if not integration_available:
+        pytest.skip("PostgreSQL not available")
+
     transport = ASGITransport(app=app)
     async with AsyncClient(transport=transport, base_url="http://test") as client:
         yield client

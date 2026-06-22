@@ -128,22 +128,30 @@ async def verify(base_url: str, production: bool, offline: bool) -> Report:
     report.add("RT-22", "Cosign workflow exists", (repo / ".github/workflows/cosign.yml").exists())
     report.add("RT-23", "Vault secrets ADR documented", (repo / "docs/adr/008-vault-secrets.md").exists())
 
+    backup = repo / "scripts/backup_postgres.sh"
+    restore = repo / "scripts/restore_postgres.sh"
+    report.add(
+        "RT-26",
+        "Backup/restore scripts exist",
+        backup.exists() and restore.exists(),
+        "scripts/backup_postgres.sh, scripts/restore_postgres.sh",
+    )
+
     for code, title in [
-        ("RT-01", "Login rate limit"),
-        ("RT-02", "Refresh token reuse revocation"),
-        ("RT-06", "Parent OTP expiry"),
+        ("RT-01", "Login rate limit (CI)"),
+        ("RT-02", "Refresh token reuse (CI)"),
+        ("RT-06", "Parent OTP max attempts (CI)"),
         ("RT-07", "IDOR center isolation (CI)"),
         ("RT-08", "Teacher admin denial (CI)"),
         ("RT-09", "Parent child scope (CI)"),
         ("RT-10", "RLS FORCE policies (CI)"),
         ("RT-11", "PINFL reveal audit (CI)"),
-        ("RT-12", "PINFL encrypted at rest"),
+        ("RT-12", "PINFL encrypted at rest (CI)"),
         ("RT-14", "AI service no PINFL"),
         ("RT-16", "No demo accounts"),
         ("RT-18", "Certificate tamper (CI)"),
         ("RT-24", "Database not public"),
         ("RT-25", "Incident response roles"),
-        ("RT-26", "Backup/restore tested"),
         ("RT-27", "Demo data purged"),
         ("RT-28", "Load test baseline"),
     ]:

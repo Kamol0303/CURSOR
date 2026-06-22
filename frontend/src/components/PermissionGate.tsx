@@ -1,6 +1,6 @@
 "use client";
 
-import { usePermissions } from "@/hooks/usePermissions";
+import { useAuth } from "@/contexts/AuthContext";
 
 export function PermissionGate({
   permission,
@@ -11,7 +11,7 @@ export function PermissionGate({
   children: React.ReactNode;
   fallback?: React.ReactNode;
 }) {
-  const { can, loading } = usePermissions();
+  const { can, loading } = useAuth();
   if (loading) return null;
   if (!can(permission)) return <>{fallback}</>;
   return <>{children}</>;

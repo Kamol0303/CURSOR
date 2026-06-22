@@ -2,7 +2,6 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
-import { DashboardLayout } from "@/components/DashboardLayout";
 import { PermissionGate } from "@/components/PermissionGate";
 import { apiFetch, getMe, listCenters } from "@/lib/api";
 
@@ -65,7 +64,7 @@ export default function GroupsPage() {
   };
 
   return (
-    <DashboardLayout>
+    
       <div className="space-y-4">
         <div className="flex justify-between items-center">
           <h2 className="text-xl font-bold text-naqsh-primary">{t("title")}</h2>
@@ -110,6 +109,6 @@ export default function GroupsPage() {
           </div>
         )}
       </div>
-    </DashboardLayout>
+    
   );
 }

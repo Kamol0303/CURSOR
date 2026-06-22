@@ -33,6 +33,32 @@
     "statusOff": "ВЫКЛ",
     "enableMfa": "Включить MFA",
     "mfaEnabledSuccess": "MFA успешно включена",
+    "changePasswordTitle": "Сменить пароль",
+    "currentPassword": "Текущий пароль",
+    "newPassword": "Новый пароль",
+    "confirmPassword": "Подтвердите новый пароль",
+    "passwordPolicy": "Минимум 12 символов: заглавные/строчные буквы, цифра и спецсимвол.",
+    "changePasswordButton": "Обновить пароль",
+    "passwordChanged": "Пароль успешно обновлён",
+    "passwordMismatch": "Новые пароли не совпадают",
+    "saving": "Сохранение...",
+    "adminResetTitle": "Сброс пароля пользователя",
+    "adminResetHint": "Супер админ или директор может задать новый пароль другому пользователю.",
+    "targetUsername": "Имя пользователя",
+    "adminResetButton": "Сбросить пароль",
+    "adminResetSuccess": "Пароль обновлён для {username}",
+    "passwordErrors": {
+      "INVALID_CREDENTIALS": "Неверный текущий пароль",
+      "PASSWORD_TOO_SHORT": "Пароль слишком короткий (минимум 12 символов)",
+      "PASSWORD_MISSING_UPPERCASE": "Нужна заглавная буква",
+      "PASSWORD_MISSING_LOWERCASE": "Нужна строчная буква",
+      "PASSWORD_MISSING_DIGIT": "Нужна цифра",
+      "PASSWORD_MISSING_SPECIAL": "Нужен спецсимвол",
+      "PASSWORD_BREACHED": "Этот пароль небезопасен",
+      "FORBIDDEN": "Доступ запрещён",
+      "NOT_FOUND": "Пользователь не найден",
+      "UNKNOWN": "Произошла ошибка"
+    },
     "errors": {
       "MFA_INVALID": "Неверный TOTP код",
       "MFA_SETUP_EXPIRED": "Сессия настройки истекла"
@@ -106,6 +132,38 @@
     "active": "Активен",
     "inactive": "Неактивен",
     "empty": "Учителя не найдены"
+  },
+  "groups": {
+    "title": "Группы",
+    "loading": "Загрузка...",
+    "name": "Название группы",
+    "room": "Аудитория",
+    "students": "Учащиеся",
+    "add": "Создать группу",
+    "save": "Сохранить",
+    "cancel": "Отмена",
+    "empty": "Группы не найдены",
+    "selectSubject": "Выберите предмет",
+    "noTeacher": "Учитель не назначен"
+  },
+  "attendance": {
+    "title": "Посещаемость",
+    "student": "Учащийся",
+    "status": "Статус",
+    "actions": "Действия",
+    "qrSession": "Создать QR-сессию",
+    "qrCode": "QR-код (сканировать)"
+  },
+  "payments": {
+    "title": "Платежи",
+    "loading": "Загрузка...",
+    "student": "Учащийся",
+    "amount": "Сумма",
+    "status": "Статус",
+    "dueDate": "Срок",
+    "empty": "Платежи не найдены",
+    "markPaid": "Отметить оплаченным",
+    "clickPaymeNote": "Интеграция Click и Payme будет добавлена на следующем этапе."
   },
   "common": {
     "language": "Язык"

@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
-import { DashboardLayout } from "@/components/DashboardLayout";
 import { apiFetch } from "@/lib/api";
 
 type Group = { id: string; name: string };
@@ -57,7 +56,7 @@ export default function AttendancePage() {
   const statusFor = (studentId: string) => records.find((r) => r.student_id === studentId)?.status;
 
   return (
-    <DashboardLayout>
+    
       <div className="space-y-4">
         <h2 className="text-xl font-bold text-naqsh-primary">{t("title")}</h2>
         <div className="flex flex-wrap gap-3">
@@ -101,6 +100,6 @@ export default function AttendancePage() {
           </table>
         </div>
       </div>
-    </DashboardLayout>
+    
   );
 }

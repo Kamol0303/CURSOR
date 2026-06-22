@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, Request, Response
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
-from app.core.deps import get_current_user, get_current_user_optional
+from app.core.deps import get_current_user, get_current_user_optional, requires_permission
 from app.models.identity import User
 from app.schemas.auth import (
     ApiResponse,
@@ -12,6 +12,8 @@ from app.schemas.auth import (
     MfaVerifyRequest,
     ParentOtpRequest,
     ParentOtpVerifyRequest,
+    ChangePasswordRequest,
+    AdminResetPasswordRequest,
     TokenResponse,
     UserMeResponse,
 )
@@ -22,6 +24,8 @@ from app.services.auth_service import (
     init_mfa_setup,
     login_with_password,
     logout,
+    change_password,
+    admin_reset_password,
     refresh_access_token,
     request_parent_otp,
     verify_mfa_and_issue_tokens,
@@ -281,6 +285,44 @@ async def parent_verify_otp(
             expires_at=result["expires_at"],
         ).model_dump(),
     )
+
+
+@router.post("/change-password", response_model=ApiResponse)
+async def change_password_endpoint(
+    body: ChangePasswordRequest,
+    user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    try:
+        await change_password(
+            db,
+            user,
+            current_password=body.current_password,
+            new_password=body.new_password,
+        )
+        await db.commit()
+    except AuthError as exc:
+        raise HTTPException(status_code=exc.status, detail={"code": exc.code}) from exc
+    return ApiResponse(success=True, data={"password_changed": True})
+
+
+@router.post("/admin/reset-password", response_model=ApiResponse)
+async def admin_reset_password_endpoint(
+    body: AdminResetPasswordRequest,
+    user: User = Depends(requires_permission("users.password_reset")),
+    db: AsyncSession = Depends(get_db),
+):
+    try:
+        await admin_reset_password(
+            db,
+            user,
+            username=body.username,
+            new_password=body.new_password,
+        )
+        await db.commit()
+    except AuthError as exc:
+        raise HTTPException(status_code=exc.status, detail={"code": exc.code}) from exc
+    return ApiResponse(success=True, data={"username": body.username, "password_reset": True})
 
 
 @router.get("/me", response_model=ApiResponse)

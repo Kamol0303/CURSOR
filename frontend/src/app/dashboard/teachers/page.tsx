@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
-import { DashboardLayout } from "@/components/DashboardLayout";
 import { listTeachers } from "@/lib/api";
 
 type Teacher = {
@@ -27,7 +26,7 @@ export default function TeachersPage() {
   }, []);
 
   return (
-    <DashboardLayout>
+    
       <div className="space-y-4">
         <h2 className="text-xl font-bold text-naqsh-primary">{t("title")}</h2>
         {loading ? (
@@ -72,6 +71,6 @@ export default function TeachersPage() {
           </div>
         )}
       </div>
-    </DashboardLayout>
+    
   );
 }

@@ -19,7 +19,9 @@ from app.core.security import (
     DUMMY_PASSWORD_HASH,
     encrypt_totp_secret,
     generate_refresh_token,
+    hash_password,
     hash_token,
+    validate_password_policy,
     verify_password,
 )
 from app.models.identity import (
@@ -696,3 +698,58 @@ async def verify_parent_otp(
         client_hint=client_hint,
         mfa_used=True,
     )
+
+
+async def change_password(
+    db: AsyncSession,
+    user: User,
+    *,
+    current_password: str,
+    new_password: str,
+) -> None:
+    if not user.password_hash or not verify_password(user.password_hash, current_password):
+        raise AuthError("INVALID_CREDENTIALS")
+    policy_errors = validate_password_policy(new_password)
+    if policy_errors:
+        raise AuthError(policy_errors[0], 422)
+    user.password_hash = hash_password(new_password)
+    user.password_changed_at = datetime.now(UTC)
+    user.must_change_password = False
+    user.failed_login_attempts = 0
+    user.is_locked = False
+    await db.flush()
+
+
+async def admin_reset_password(
+    db: AsyncSession,
+    admin: User,
+    *,
+    username: str,
+    new_password: str,
+) -> None:
+    if admin.role.code not in {"super_admin", "center_director"}:
+        raise AuthError("FORBIDDEN", 403)
+
+    policy_errors = validate_password_policy(new_password)
+    if policy_errors:
+        raise AuthError(policy_errors[0], 422)
+
+    result = await db.execute(
+        select(User).options(selectinload(User.role)).where(User.username == username, User.deleted_at.is_(None))
+    )
+    target = result.scalar_one_or_none()
+    if not target:
+        raise AuthError("NOT_FOUND", 404)
+
+    if admin.role.code == "center_director":
+        if target.center_id != admin.center_id and target.role.code not in {"teacher", "center_admin"}:
+            raise AuthError("FORBIDDEN", 403)
+        if target.center_id and admin.center_id and target.center_id != admin.center_id:
+            raise AuthError("FORBIDDEN", 403)
+
+    target.password_hash = hash_password(new_password)
+    target.password_changed_at = datetime.now(UTC)
+    target.must_change_password = False
+    target.failed_login_attempts = 0
+    target.is_locked = False
+    await db.flush()

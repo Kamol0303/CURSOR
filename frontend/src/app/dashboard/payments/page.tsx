@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
-import { DashboardLayout } from "@/components/DashboardLayout";
 import { PermissionGate } from "@/components/PermissionGate";
 import { apiFetch } from "@/lib/api";
 
@@ -42,7 +41,7 @@ export default function PaymentsPage() {
   };
 
   return (
-    <DashboardLayout>
+    
       <div className="space-y-4">
         <h2 className="text-xl font-bold text-naqsh-primary">{t("title")}</h2>
         <p className="text-sm text-gray-500">{t("clickPaymeNote")}</p>
@@ -88,6 +87,6 @@ export default function PaymentsPage() {
           </div>
         )}
       </div>
-    </DashboardLayout>
+    
   );
 }

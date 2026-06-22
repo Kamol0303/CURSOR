@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
-import { DashboardLayout } from "@/components/DashboardLayout";
 import { apiFetch } from "@/lib/api";
 
 type Prediction = {
@@ -36,7 +35,7 @@ export default function AnalyticsPage() {
   };
 
   return (
-    <DashboardLayout>
+    
       <div className="space-y-6">
         <div>
           <h2 className="text-2xl font-bold text-naqsh-primary">{t("title")}</h2>
@@ -69,7 +68,7 @@ export default function AnalyticsPage() {
           </p>
         )}
       </div>
-    </DashboardLayout>
+    
   );
 }
 

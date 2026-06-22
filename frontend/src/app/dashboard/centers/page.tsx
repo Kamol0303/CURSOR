@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
-import { DashboardLayout } from "@/components/DashboardLayout";
 import { listCenters } from "@/lib/api";
 
 type Center = {
@@ -28,7 +27,7 @@ export default function CentersPage() {
   }, []);
 
   return (
-    <DashboardLayout>
+    
       <div className="space-y-4">
         <h2 className="text-xl font-bold text-naqsh-primary">{t("title")}</h2>
         {loading ? (
@@ -75,6 +74,6 @@ export default function CentersPage() {
           </div>
         )}
       </div>
-    </DashboardLayout>
+    
   );
 }

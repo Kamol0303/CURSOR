@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
-import { DashboardLayout } from "@/components/DashboardLayout";
 import { KpiCards } from "@/components/KpiCards";
 import { getDashboardKpis, getMe } from "@/lib/api";
 
@@ -27,7 +26,7 @@ export default function DashboardPage() {
   }, []);
 
   return (
-    <DashboardLayout>
+    
       <div className="space-y-6">
         <div>
           <h2 className="text-2xl font-bold text-gray-900">{t("welcome")}</h2>
@@ -39,6 +38,6 @@ export default function DashboardPage() {
           <KpiCards kpis={kpis} />
         )}
       </div>
-    </DashboardLayout>
+    
   );
 }

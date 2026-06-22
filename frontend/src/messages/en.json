@@ -33,6 +33,32 @@
     "statusOff": "OFF",
     "enableMfa": "Enable MFA",
     "mfaEnabledSuccess": "MFA enabled successfully",
+    "changePasswordTitle": "Change password",
+    "currentPassword": "Current password",
+    "newPassword": "New password",
+    "confirmPassword": "Confirm new password",
+    "passwordPolicy": "At least 12 characters with upper/lowercase, digit, and special character.",
+    "changePasswordButton": "Update password",
+    "passwordChanged": "Password updated successfully",
+    "passwordMismatch": "New passwords do not match",
+    "saving": "Saving...",
+    "adminResetTitle": "Reset user password",
+    "adminResetHint": "Super admin or director can set a new password for another user.",
+    "targetUsername": "Username",
+    "adminResetButton": "Reset password",
+    "adminResetSuccess": "Password updated for {username}",
+    "passwordErrors": {
+      "INVALID_CREDENTIALS": "Current password is incorrect",
+      "PASSWORD_TOO_SHORT": "Password is too short (minimum 12 characters)",
+      "PASSWORD_MISSING_UPPERCASE": "Must include an uppercase letter",
+      "PASSWORD_MISSING_LOWERCASE": "Must include a lowercase letter",
+      "PASSWORD_MISSING_DIGIT": "Must include a digit",
+      "PASSWORD_MISSING_SPECIAL": "Must include a special character",
+      "PASSWORD_BREACHED": "This password is not secure",
+      "FORBIDDEN": "Permission denied",
+      "NOT_FOUND": "User not found",
+      "UNKNOWN": "An error occurred"
+    },
     "errors": {
       "MFA_INVALID": "Invalid TOTP code",
       "MFA_SETUP_EXPIRED": "Setup session expired"
@@ -106,6 +132,38 @@
     "active": "Active",
     "inactive": "Inactive",
     "empty": "No teachers found"
+  },
+  "groups": {
+    "title": "Groups",
+    "loading": "Loading...",
+    "name": "Group name",
+    "room": "Room",
+    "students": "Students",
+    "add": "Create group",
+    "save": "Save",
+    "cancel": "Cancel",
+    "empty": "No groups found",
+    "selectSubject": "Select subject",
+    "noTeacher": "No teacher assigned"
+  },
+  "attendance": {
+    "title": "Attendance",
+    "student": "Student",
+    "status": "Status",
+    "actions": "Actions",
+    "qrSession": "Create QR session",
+    "qrCode": "QR code (scan)"
+  },
+  "payments": {
+    "title": "Payments",
+    "loading": "Loading...",
+    "student": "Student",
+    "amount": "Amount",
+    "status": "Status",
+    "dueDate": "Due date",
+    "empty": "No payments found",
+    "markPaid": "Mark as paid",
+    "clickPaymeNote": "Click and Payme integration will be added in a later phase."
   },
   "common": {
     "language": "Language"

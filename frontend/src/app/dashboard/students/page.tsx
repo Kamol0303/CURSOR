@@ -2,7 +2,6 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
-import { DashboardLayout } from "@/components/DashboardLayout";
 import { PermissionGate } from "@/components/PermissionGate";
 import { StudentFormModal } from "@/components/StudentFormModal";
 import { getMe, listCenters, listStudents } from "@/lib/api";
@@ -51,7 +50,7 @@ export default function StudentsPage() {
   }, [load]);
 
   return (
-    <DashboardLayout>
+    <>
       <div className="space-y-4">
         <div className="flex justify-between items-center">
           <h2 className="text-xl font-bold text-naqsh-primary">{t("title")}</h2>
@@ -129,6 +128,6 @@ export default function StudentsPage() {
           onSaved={load}
         />
       )}
-    </DashboardLayout>
+    </>
   );
 }

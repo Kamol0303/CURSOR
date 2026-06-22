@@ -1,27 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { getMe } from "@/lib/api";
+import { useAuth } from "@/contexts/AuthContext";
 
-type Me = {
-  role: string;
-  center_id: string | null;
-  permissions: string[];
-};
-
+/** @deprecated Use useAuth() from contexts/AuthContext */
 export function usePermissions() {
-  const [me, setMe] = useState<Me | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    getMe()
-      .then((res) => {
-        if (res.success && res.data) setMe(res.data as Me);
-      })
-      .finally(() => setLoading(false));
-  }, []);
-
-  const can = (permission: string) => me?.permissions.includes(permission) ?? false;
-
-  return { me, loading, can };
+  const { user, loading, can } = useAuth();
+  return { me: user, loading, can };
 }

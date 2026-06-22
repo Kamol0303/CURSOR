@@ -60,6 +60,18 @@ services:
         exit 1
       "
     networks: [internal]
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=3)",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 40s
 
   frontend:
     build: ./frontend
@@ -92,7 +104,11 @@ services:
       - "443:443"
     volumes:
       - ./infra/nginx/tls:/etc/nginx/tls:ro
-    depends_on: [backend, frontend]
+    depends_on:
+      backend:
+        condition: service_healthy
+      frontend:
+        condition: service_started
     networks: [internal, edge]
 
 networks:

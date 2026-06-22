@@ -81,6 +81,17 @@ docker compose -f docker-compose.staging.yml --env-file .env.staging up -d --bui
 ./scripts/show-mfa-qr.sh admin.tmb
 ```
 
+### MFA kod noto'g'ri (xato deyapti)
+
+1. **Seed har safar yangi secret yaratmasin** — oddiy seed eski secretni saqlaydi. Yangilash kerak bo'lsa:
+   ```bash
+   docker compose ... exec -T backend python scripts/seed_demo_users.py \
+     --i-understand-this-creates-demo-credentials --rotate-mfa-secrets
+   ```
+2. Google Authenticator dan **eski TMB yozuvini o'chiring**, keyin `./scripts/show-mfa-qr.sh admin.tmb` QR ni qayta skanerlang.
+3. `Hozirgi kod` qatoridagi 6 raqam Authenticator dagi kod bilan **bir xil** bo'lishi kerak.
+4. Test: `chmod +x scripts/test-mfa-login.sh && ./scripts/test-mfa-login.sh`
+
 ## 5. Seed demo users (staging only)
 
 See commands in step 4 above if you skipped seeding after deploy.

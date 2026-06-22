@@ -67,10 +67,13 @@ async def run(username: str | None, list_users: bool) -> int:
         secret = decrypt_totp_secret(user.mfa_secret_encrypted)
         totp = pyotp.TOTP(secret)
         uri = totp.provisioning_uri(name=username, issuer_name="TMB")
+        current_code = totp.now()
 
         print()
         print(f"Username: {username}")
         print(f"TOTP Secret: {secret}")
+        print(f"Hozirgi kod (30s): {current_code}")
+        print("  → Agar Google Authenticator boshqa kod ko'rsatsa, eski yozuvni o'chiring va QR ni qayta skanerlang.")
         print(f"TOTP URI: {uri}")
         print()
         print_totp_qr(uri, username=username)

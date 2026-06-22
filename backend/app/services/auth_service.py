@@ -257,7 +257,8 @@ async def verify_mfa_and_issue_tokens(
 
     secret = decrypt_totp_secret(user.mfa_secret_encrypted)
     totp = pyotp.TOTP(secret)
-    if not totp.verify(code, valid_window=1):
+    code = "".join(ch for ch in code if ch.isdigit())
+    if not totp.verify(code, valid_window=2):
         await _log_login(
             db,
             username=user.username,
@@ -540,7 +541,8 @@ async def confirm_mfa_setup(
         raise AuthError("MFA_SETUP_EXPIRED")
 
     totp = pyotp.TOTP(pending_secret)
-    if not totp.verify(code, valid_window=1):
+    code = "".join(ch for ch in code if ch.isdigit())
+    if not totp.verify(code, valid_window=2):
         raise AuthError("MFA_INVALID")
 
     was_first_login_setup = target.login_state == "pending_mfa_setup"

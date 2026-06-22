@@ -21,7 +21,7 @@ sys.path.insert(0, ".")
 
 from app.core.config import settings
 from app.core.permissions import ROLE_DEFINITIONS, ROLE_PERMISSIONS
-from app.core.security import encrypt_totp_secret, hash_password
+from app.core.security import decrypt_totp_secret, encrypt_totp_secret, hash_password
 from app.core.pinfl import encrypt_pinfl
 from app.models.education import Guardian, Mahalla, Region, Student, Subject, Teacher, TeacherSubject
 from app.models.identity import Permission, Role, RolePermission, TrainingCenter, User
@@ -191,6 +191,11 @@ def parse_args() -> argparse.Namespace:
         action="store_true",
         help="Required flag confirming you understand this creates demo credentials",
     )
+    parser.add_argument(
+        "--rotate-mfa-secrets",
+        action="store_true",
+        help="Generate new TOTP secrets (invalidates existing Authenticator entries)",
+    )
     return parser.parse_args()
 
 
@@ -307,16 +312,27 @@ async def seed() -> None:
             await session.flush()
 
             if mfa:
-                secret = pyotp.random_base32()
+                had_secret = bool(user.mfa_secret_encrypted)
+                if had_secret and not args.rotate_mfa_secrets:
+                    secret = decrypt_totp_secret(user.mfa_secret_encrypted)
+                    secret_note = "(MFA secret saqlanadi — Authenticator o'zgartirmang)"
+                else:
+                    secret = pyotp.random_base32()
+                    user.mfa_secret_encrypted = encrypt_totp_secret(secret)
+                    secret_note = (
+                        "(YANGI MFA secret — Authenticator dan eski yozuvni o'chiring, QR ni qayta skanerlang)"
+                        if had_secret or args.rotate_mfa_secrets
+                        else "(YANGI MFA secret)"
+                    )
                 user.mfa_enabled = True
                 user.mfa_method = "totp"
-                user.mfa_secret_encrypted = encrypt_totp_secret(secret)
                 totp = pyotp.TOTP(secret)
                 uri = totp.provisioning_uri(name=username, issuer_name="TMB")
                 print(f"Role: {role_code}")
                 print(f"  Username: {username}")
                 print(f"  Password: {password}")
                 print(f"  TOTP Secret: {secret}")
+                print(f"  Hozirgi kod: {totp.now()}  {secret_note}")
                 print(f"  TOTP URI: {uri}")
                 print()
                 print_totp_qr(uri, username=username)

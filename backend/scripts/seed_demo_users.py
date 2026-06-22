@@ -294,7 +294,16 @@ async def seed() -> None:
                     password_changed_at=datetime.now(UTC),
                 )
                 session.add(user)
-                await session.flush()
+            else:
+                user.password_hash = hash_password(password)
+                user.role_id = roles[role_code].id
+                user.center_id = center.id if role_code in {"center_director", "center_admin", "teacher"} else None
+                user.is_demo_account = True
+                user.is_active = True
+                user.is_locked = False
+                user.failed_login_attempts = 0
+                user.password_changed_at = datetime.now(UTC)
+            await session.flush()
 
             if mfa:
                 secret = pyotp.random_base32()

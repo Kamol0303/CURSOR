@@ -54,14 +54,21 @@ PUBLIC_HOST=tamor.staging.local ./scripts/verify-staging.sh
 
 Open: **https://tamor.staging.local**
 
-## 5. Seed demo users (staging only)
+**Important:** After a fresh deploy or `down -v`, seed demo users before logging in:
 
 ```bash
-docker compose -f docker-compose.staging.yml --env-file .env.staging exec backend \
+docker compose -f docker-compose.staging.yml --env-file .env.staging exec -T backend \
   python scripts/seed_demo_users.py --i-understand-this-creates-demo-credentials
+
+./scripts/test-login.sh
 ```
 
-Login: `admin.tmb` / `Tmb#2026Admin!` → MFA setup → dashboard
+Quick login (no MFA): `admin.aspect` / `CenterAdmin#26!`  
+MFA admin: `admin.tmb` / `Tmb#2026Admin!` → complete MFA setup in browser
+
+## 5. Seed demo users (staging only)
+
+See commands in step 4 above if you skipped seeding after deploy.
 
 ## Architecture
 

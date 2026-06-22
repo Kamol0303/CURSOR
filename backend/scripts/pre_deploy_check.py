@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 import asyncio
 import sys
+from pathlib import Path
 
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
@@ -45,6 +46,13 @@ async def run_checks(skip_demo: bool = False) -> int:
     errors = validate_production_settings()
     if settings.SECRETS_BACKEND != "vault":
         errors.append("SECRETS_BACKEND must be 'vault' for production deploy")
+    elif not settings.VAULT_ADDR:
+        errors.append("VAULT_ADDR must be set when SECRETS_BACKEND=vault")
+    elif not settings.VAULT_TOKEN:
+        errors.append("VAULT_TOKEN must be set when SECRETS_BACKEND=vault")
+
+    if not Path(settings.JWT_PUBLIC_KEY_PATH).exists():
+        errors.append(f"JWT public key missing at {settings.JWT_PUBLIC_KEY_PATH}")
 
     engine = create_async_engine(settings.DATABASE_URL)
     Session = async_sessionmaker(engine, expire_on_commit=False)
@@ -70,7 +78,11 @@ async def run_checks(skip_demo: bool = False) -> int:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="TMB pre-deployment safety gate")
-    parser.add_argument("--skip-demo-data-check", action="store_true", help="Only check is_demo_account users")
+    parser.add_argument(
+        "--skip-demo-data-check",
+        action="store_true",
+        help="Skip is_demo_data entity checks (still checks is_demo_account users)",
+    )
     args = parser.parse_args()
     if settings.ENVIRONMENT != "production":
         print("WARNING: ENVIRONMENT is not 'production' — running checks anyway", file=sys.stderr)

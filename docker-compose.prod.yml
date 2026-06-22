@@ -1,8 +1,8 @@
-# Production Docker Compose — staging / on-prem deployment
+# Production Docker Compose — on-prem / Uzbekistan infrastructure
 # Usage:
 #   cp .env.production.example .env.production  # fill secrets
-#   ./infra/nginx/generate-dev-certs.sh          # staging TLS only
-#   docker compose -f docker-compose.prod.yml --env-file .env.production up -d
+#   Install CA-signed certs to infra/nginx/tls/
+#   ./scripts/go-live.sh
 
 services:
   postgres:
@@ -48,14 +48,36 @@ services:
       ENVIRONMENT: production
       DEBUG: "false"
     volumes:
-      - jwt_secrets:/secrets:ro
+      - jwt_secrets:/secrets
     depends_on:
       postgres:
         condition: service_healthy
       redis:
         condition: service_healthy
     command: >
-      sh -c "alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port 8000 --workers 4"
+      sh -c "
+        for i in $$(seq 1 30); do
+          if alembic upgrade head; then
+            exec uvicorn app.main:app --host 0.0.0.0 --port 8000 --workers 4 --proxy-headers --forwarded-allow-ips='*';
+          fi;
+          echo \"Migration attempt $$i failed, retrying in 2s...\";
+          sleep 2;
+        done;
+        echo 'ERROR: migrations failed after 30 attempts';
+        exit 1
+      "
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=3)",
+        ]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 60s
     networks:
       - internal
 
@@ -65,9 +87,10 @@ services:
       dockerfile: Dockerfile
     restart: unless-stopped
     environment:
-      NEXT_PUBLIC_API_URL: https://${PUBLIC_HOST:-tamor.local}
+      NEXT_PUBLIC_API_URL: https://${PUBLIC_HOST:-tamor.toyloq.uz}
     depends_on:
-      - backend
+      backend:
+        condition: service_healthy
     networks:
       - internal
 

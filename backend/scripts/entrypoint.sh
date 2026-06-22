@@ -5,6 +5,17 @@ SECRETS_DIR="${SECRETS_DIR:-/secrets}"
 mkdir -p "$SECRETS_DIR"
 
 ENVIRONMENT="${ENVIRONMENT:-development}"
+SECRETS_BACKEND="${SECRETS_BACKEND:-file}"
+
+if [ "$SECRETS_BACKEND" = "vault" ]; then
+  echo "Bootstrapping JWT keys from Vault (${SECRETS_BACKEND})..."
+  python - <<'PY'
+import asyncio
+from app.core.secrets_provider import bootstrap_secrets
+
+asyncio.run(bootstrap_secrets())
+PY
+fi
 
 if [ "$ENVIRONMENT" = "production" ]; then
   if [ ! -f "$SECRETS_DIR/jwt_private.pem" ] || [ ! -f "$SECRETS_DIR/jwt_public.pem" ]; then

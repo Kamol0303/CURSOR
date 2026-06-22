@@ -25,6 +25,7 @@ from app.core.security import encrypt_totp_secret, hash_password
 from app.core.pinfl import encrypt_pinfl
 from app.models.education import Guardian, Mahalla, Region, Student, Subject, Teacher, TeacherSubject
 from app.models.identity import Permission, Role, RolePermission, TrainingCenter, User
+from scripts.totp_qr_terminal import print_totp_qr
 
 
 DEMO_USERS = [
@@ -311,11 +312,14 @@ async def seed() -> None:
                 user.mfa_method = "totp"
                 user.mfa_secret_encrypted = encrypt_totp_secret(secret)
                 totp = pyotp.TOTP(secret)
+                uri = totp.provisioning_uri(name=username, issuer_name="TMB")
                 print(f"Role: {role_code}")
                 print(f"  Username: {username}")
                 print(f"  Password: {password}")
                 print(f"  TOTP Secret: {secret}")
-                print(f"  TOTP URI: {totp.provisioning_uri(name=username, issuer_name='TMB')}")
+                print(f"  TOTP URI: {uri}")
+                print()
+                print_totp_qr(uri, username=username)
                 print()
             else:
                 print(f"Role: {role_code}")

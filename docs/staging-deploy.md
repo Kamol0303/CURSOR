@@ -64,7 +64,14 @@ docker compose -f docker-compose.staging.yml --env-file .env.staging exec -T bac
 ```
 
 Quick login (no MFA): `admin.aspect` / `CenterAdmin#26!`  
-MFA admin: `admin.tmb` / `Tmb#2026Admin!` → complete MFA setup in browser
+MFA admin: `admin.tmb` / `Tmb#2026Admin!` → scan QR from seed output or:
+
+```bash
+chmod +x scripts/show-mfa-qr.sh
+./scripts/show-mfa-qr.sh admin.tmb
+```
+
+Seed prints an ASCII QR in the terminal for each MFA user — scan with Google Authenticator.
 
 ## 5. Seed demo users (staging only)
 

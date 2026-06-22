@@ -49,7 +49,18 @@
     "certificates": "Сертификаты",
     "analytics": "AI аналитика",
     "security": "Безопасность",
-    "logout": "Выйти"
+    "logout": "Выйти",
+    "groups": "Группы",
+    "attendance": "Посещаемость",
+    "payments": "Платежи",
+    "roles": {
+      "super_admin": "Супер админ",
+      "hokimiyat_operator": "Оператор хокимията",
+      "center_director": "Директор",
+      "center_admin": "Менеджер",
+      "teacher": "Учитель",
+      "auditor": "Аудитор"
+    }
   },
   "dashboard": {
     "welcome": "Панель хокимията",

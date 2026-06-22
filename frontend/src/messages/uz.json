@@ -49,7 +49,18 @@
     "certificates": "Sertifikatlar",
     "analytics": "AI tahlil",
     "security": "Xavfsizlik",
-    "logout": "Chiqish"
+    "logout": "Chiqish",
+    "groups": "Guruhlar",
+    "attendance": "Davomat",
+    "payments": "To'lovlar",
+    "roles": {
+      "super_admin": "Super admin",
+      "hokimiyat_operator": "Hokimiyat operatori",
+      "center_director": "Direktor",
+      "center_admin": "Menejer",
+      "teacher": "O'qituvchi",
+      "auditor": "Auditor"
+    }
   },
   "dashboard": {
     "welcome": "Hokimiyat dashboard",
@@ -83,7 +94,19 @@
     "grade": "Sinf",
     "school": "Maktab",
     "pinfl": "JSHSHIR",
-    "empty": "O'quvchilar topilmadi"
+    "phone": "Telefon",
+    "address": "Manzil",
+    "guardianName": "Ota-ona F.I.Sh",
+    "guardianPhone": "Ota-ona telefoni",
+    "empty": "O'quvchilar topilmadi",
+    "add": "Qo'shish",
+    "edit": "Tahrirlash",
+    "addTitle": "Yangi o'quvchi",
+    "editTitle": "O'quvchini tahrirlash",
+    "save": "Saqlash",
+    "saving": "Saqlanmoqda...",
+    "cancel": "Bekor qilish",
+    "saveError": "Saqlashda xatolik"
   },
   "teachers": {
     "title": "O'qituvchilar",
@@ -95,6 +118,38 @@
     "active": "Faol",
     "inactive": "Nofaol",
     "empty": "O'qituvchilar topilmadi"
+  },
+  "groups": {
+    "title": "Guruhlar",
+    "loading": "Yuklanmoqda...",
+    "name": "Guruh nomi",
+    "room": "Auditoriya",
+    "students": "O'quvchilar",
+    "add": "Guruh yaratish",
+    "save": "Saqlash",
+    "cancel": "Bekor qilish",
+    "empty": "Guruhlar yo'q",
+    "selectSubject": "Fanni tanlang",
+    "noTeacher": "O'qituvchi biriktirilmagan"
+  },
+  "attendance": {
+    "title": "Davomat",
+    "student": "O'quvchi",
+    "status": "Holat",
+    "actions": "Amallar",
+    "qrSession": "QR sessiya yaratish",
+    "qrCode": "QR kod (skanerlang)"
+  },
+  "payments": {
+    "title": "To'lovlar",
+    "loading": "Yuklanmoqda...",
+    "student": "O'quvchi",
+    "amount": "Summa",
+    "status": "Holat",
+    "dueDate": "Muddat",
+    "empty": "To'lovlar yo'q",
+    "markPaid": "To'langan deb belgilash",
+    "clickPaymeNote": "Click va Payme integratsiyasi keyingi bosqichda qo'shiladi."
   },
   "common": {
     "language": "Til"

@@ -49,7 +49,18 @@
     "certificates": "Certificates",
     "analytics": "AI analytics",
     "security": "Security",
-    "logout": "Sign out"
+    "logout": "Sign out",
+    "groups": "Groups",
+    "attendance": "Attendance",
+    "payments": "Payments",
+    "roles": {
+      "super_admin": "Super admin",
+      "hokimiyat_operator": "District operator",
+      "center_director": "Director",
+      "center_admin": "Manager",
+      "teacher": "Teacher",
+      "auditor": "Auditor"
+    }
   },
   "dashboard": {
     "welcome": "Hokimiyat Dashboard",

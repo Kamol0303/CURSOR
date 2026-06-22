@@ -38,6 +38,7 @@ from app.models.identity import (
 )
 
 from app.models.integrations import TelegramSubscription
+from app.models.operations import AttendanceRecord, AttendanceSession, StudentPayment
 from app.models.ratings_certs import (
     Certificate,
     CertificateVerification,
@@ -54,6 +55,9 @@ __all__ = [
     "NotificationPreference",
     "SmsLog",
     "TelegramSubscription",
+    "AttendanceSession",
+    "AttendanceRecord",
+    "StudentPayment",
     "Region",
     "Mahalla",
     "Subject",

@@ -77,7 +77,7 @@ async def get_student(db: AsyncSession, user: User, student_id: UUID) -> Student
 
 async def create_student(db: AsyncSession, user: User, data: StudentCreate) -> Student:
     assert_center_access(user, data.center_id)
-    if user.role.code not in {"super_admin", "center_director", "center_admin"}:
+    if user.role.code not in {"super_admin", "center_director", "center_admin", "teacher"}:
         raise HTTPException(status_code=403, detail={"code": "FORBIDDEN"})
 
     encrypted = None
@@ -117,7 +117,7 @@ async def update_student(
     db: AsyncSession, user: User, student_id: UUID, data: StudentUpdate
 ) -> Student:
     student = await get_student(db, user, student_id)
-    if user.role.code not in {"super_admin", "center_director", "center_admin"}:
+    if user.role.code not in {"super_admin", "center_director", "center_admin", "teacher"}:
         raise HTTPException(status_code=403, detail={"code": "FORBIDDEN"})
     for key, value in data.model_dump(exclude_unset=True).items():
         setattr(student, key, value)

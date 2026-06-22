@@ -6,21 +6,26 @@ import { useTranslations } from "next-intl";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { NotificationBell } from "@/components/NotificationBell";
 import { getApiBaseUrl } from "@/lib/api";
+import { usePermissions } from "@/hooks/usePermissions";
 
 const NAV = [
-  { href: "/dashboard", key: "dashboard" },
-  { href: "/dashboard/centers", key: "centers" },
-  { href: "/dashboard/students", key: "students" },
-  { href: "/dashboard/teachers", key: "teachers" },
-  { href: "/dashboard/ratings", key: "ratings" },
-  { href: "/dashboard/certificates", key: "certificates" },
-  { href: "/dashboard/analytics", key: "analytics" },
-  { href: "/dashboard/security", key: "security" },
+  { href: "/dashboard", key: "dashboard", permission: "dashboard.view" },
+  { href: "/dashboard/centers", key: "centers", permission: "centers.read" },
+  { href: "/dashboard/students", key: "students", permission: "students.read" },
+  { href: "/dashboard/teachers", key: "teachers", permission: "teachers.read" },
+  { href: "/dashboard/groups", key: "groups", permission: "groups.read" },
+  { href: "/dashboard/attendance", key: "attendance", permission: "attendance.read" },
+  { href: "/dashboard/payments", key: "payments", permission: "payments.read" },
+  { href: "/dashboard/ratings", key: "ratings", permission: "ratings.view" },
+  { href: "/dashboard/certificates", key: "certificates", permission: "students.read" },
+  { href: "/dashboard/analytics", key: "analytics", permission: "analytics.view" },
+  { href: "/dashboard/security", key: "security", permission: "dashboard.view" },
 ] as const;
 
 export function DashboardLayout({ children }: { children: React.ReactNode }) {
   const t = useTranslations("nav");
   const pathname = usePathname();
+  const { can, me, loading } = usePermissions();
 
   const logout = async () => {
     await fetch(`${getApiBaseUrl()}/api/v1/auth/logout`, {
@@ -31,20 +36,25 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
     window.location.href = "/";
   };
 
+  const roleLabel = me?.role ? t(`roles.${me.role}` as "roles.super_admin") : "";
+
   return (
     <div className="min-h-screen bg-gray-50 flex">
       <aside className="w-56 bg-naqsh-primary text-white flex flex-col shrink-0">
         <div className="p-4 border-b border-white/10">
           <div className="font-bold text-lg">TMB</div>
           <div className="text-xs text-white/70">{t("subtitle")}</div>
+          {!loading && roleLabel && <div className="text-xs text-white/50 mt-1">{roleLabel}</div>}
         </div>
-        <nav className="flex-1 p-3 space-y-1">
-          {NAV.map(({ href, key }) => (
+        <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
+          {NAV.filter((item) => can(item.permission)).map(({ href, key }) => (
             <Link
               key={href}
               href={href}
               className={`block px-3 py-2 rounded-lg text-sm transition-colors ${
-                pathname === href ? "bg-white/20 font-medium" : "hover:bg-white/10"
+                pathname === href || pathname.startsWith(href + "/")
+                  ? "bg-white/20 font-medium"
+                  : "hover:bg-white/10"
               }`}
             >
               {t(key)}

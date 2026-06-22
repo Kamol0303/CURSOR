@@ -73,6 +73,14 @@ chmod +x scripts/show-mfa-qr.sh
 
 Seed prints an ASCII QR in the terminal for each MFA user — scan with Google Authenticator.
 
+If QR does not appear after seed, rebuild backend so the container has the latest scripts:
+
+```bash
+git pull origin CURSOR/fix-postgres-staging-ccd9
+docker compose -f docker-compose.staging.yml --env-file .env.staging up -d --build backend
+./scripts/show-mfa-qr.sh admin.tmb
+```
+
 ## 5. Seed demo users (staging only)
 
 See commands in step 4 above if you skipped seeding after deploy.

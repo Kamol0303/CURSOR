@@ -12,8 +12,19 @@ echo "=== Backend last 40 log lines ==="
 $COMPOSE logs backend --tail 40 2>&1 || true
 
 echo ""
-echo "=== Postgres last 10 log lines ==="
-$COMPOSE logs postgres --tail 10 2>&1 || true
+echo "=== Postgres last 30 log lines ==="
+$COMPOSE logs postgres --tail 30 2>&1 || true
+
+POSTGRES_STATE=$($COMPOSE ps postgres --format '{{.State}}' 2>/dev/null || echo "unknown")
+if echo "$POSTGRES_STATE" | grep -qiE 'unhealthy|exited|restarting'; then
+  echo ""
+  echo "!!! Postgres is NOT healthy — common fixes:"
+  echo "  1) Fresh volume init failed — check logs above for GRANT/relation errors."
+  echo "     After git pull: docker compose -f docker-compose.staging.yml --env-file .env.staging down -v"
+  echo "     Then: docker compose -f docker-compose.staging.yml --env-file .env.staging up -d --build"
+  echo "  2) POSTGRES_PASSWORD missing in .env.staging (compose requires it)."
+  echo "  3) DATABASE_URL password must match POSTGRES_PASSWORD exactly."
+fi
 
 echo ""
 echo "=== Nginx last 10 log lines ==="

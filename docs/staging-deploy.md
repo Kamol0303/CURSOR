@@ -75,6 +75,40 @@ Login: `admin.tmb` / `Tmb#2026Admin!` → MFA setup → dashboard
 
 ## Troubleshooting
 
+### Postgres unhealthy / backend not running
+
+After `down -v`, postgres must re-initialize. If you see:
+
+```
+dependency failed to start: container cursor-postgres-1 is unhealthy
+```
+
+1. Check postgres logs:
+
+```bash
+docker compose -f docker-compose.staging.yml --env-file .env.staging logs postgres --tail 50
+```
+
+2. Ensure `.env.staging` has `POSTGRES_PASSWORD` and `DATABASE_URL` uses the **same** password.
+
+3. Pull latest code (init script + migration fix), wipe volumes, rebuild:
+
+```bash
+git pull origin CURSOR/fix-postgres-staging-ccd9
+docker compose -f docker-compose.staging.yml --env-file .env.staging down -v
+docker compose -f docker-compose.staging.yml --env-file .env.staging up -d --build
+```
+
+4. Wait until postgres is healthy, then seed:
+
+```bash
+docker compose -f docker-compose.staging.yml --env-file .env.staging ps
+docker compose -f docker-compose.staging.yml --env-file .env.staging exec -T backend \
+  python scripts/seed_demo_users.py --i-understand-this-creates-demo-credentials
+```
+
+5. Run diagnostics: `./scripts/diagnose-staging.sh`
+
 ### Nginx welcome page
 
 Rebuild custom image:

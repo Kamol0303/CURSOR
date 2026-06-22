@@ -16,10 +16,11 @@ services:
       - postgres_data:/var/lib/postgresql/data
       - ./infra/postgres/init-analytics-role.sql:/docker-entrypoint-initdb.d/02-analytics-role.sql
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-tamor}"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-tamor} -d ${POSTGRES_DB:-tamor}"]
       interval: 10s
       timeout: 5s
-      retries: 5
+      retries: 15
+      start_period: 30s
     networks:
       - internal
 

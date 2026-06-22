@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+import { getApiBaseUrl } from "@/lib/api";
 
 type SetupData = {
   provisioning_uri: string;
@@ -31,7 +31,7 @@ export function MfaSetupForm({ setupToken, accessToken, onComplete, onError }: P
         const headers: Record<string, string> = { "Content-Type": "application/json" };
         if (accessToken) headers.Authorization = `Bearer ${accessToken}`;
 
-        const res = await fetch(`${API_URL}/api/v1/auth/mfa/setup/init`, {
+        const res = await fetch(`${getApiBaseUrl()}/api/v1/auth/mfa/setup/init`, {
           method: "POST",
           headers,
           credentials: "include",
@@ -60,7 +60,7 @@ export function MfaSetupForm({ setupToken, accessToken, onComplete, onError }: P
       const headers: Record<string, string> = { "Content-Type": "application/json" };
       if (accessToken) headers.Authorization = `Bearer ${accessToken}`;
 
-      const res = await fetch(`${API_URL}/api/v1/auth/mfa/setup/confirm`, {
+      const res = await fetch(`${getApiBaseUrl()}/api/v1/auth/mfa/setup/confirm`, {
         method: "POST",
         headers,
         credentials: "include",

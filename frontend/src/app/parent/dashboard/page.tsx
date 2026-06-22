@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
-import { apiFetch } from "@/lib/api";
+import { apiFetch, getApiBaseUrl } from "@/lib/api";
 
 type Child = {
   id: string;
@@ -47,7 +47,7 @@ export default function ParentDashboardPage() {
   }, [selected]);
 
   const logout = async () => {
-    await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}/api/v1/auth/logout`, {
+    await fetch(`${getApiBaseUrl()}/api/v1/auth/logout`, {
       method: "POST",
       credentials: "include",
     });

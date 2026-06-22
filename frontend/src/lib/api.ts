@@ -1,4 +1,13 @@
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+/**
+ * Browser: same-origin (nginx proxies /api/ → backend).
+ * SSR / dev without nginx: NEXT_PUBLIC_API_URL or localhost fallback.
+ */
+export function getApiBaseUrl(): string {
+  if (typeof window !== "undefined") {
+    return "";
+  }
+  return process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+}
 
 export function getToken(): string | null {
   if (typeof window === "undefined") return null;
@@ -16,7 +25,7 @@ export async function apiFetch<T = unknown>(
   };
   if (token) headers.Authorization = `Bearer ${token}`;
 
-  const res = await fetch(`${API_URL}/api/v1${path}`, {
+  const res = await fetch(`${getApiBaseUrl()}/api/v1${path}`, {
     ...options,
     headers,
     credentials: "include",

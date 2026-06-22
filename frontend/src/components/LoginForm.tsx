@@ -5,9 +5,7 @@ import { useTranslations } from "next-intl";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { MfaSetupForm } from "@/components/MfaSetupForm";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
-
-type Step = "login" | "mfa" | "mfa_setup";
+import { getApiBaseUrl } from "@/lib/api";
 
 export function LoginForm() {
   const t = useTranslations("auth");
@@ -34,7 +32,7 @@ export function LoginForm() {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch(`${API_URL}/api/v1/auth/login`, {
+      const res = await fetch(`${getApiBaseUrl()}/api/v1/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -69,7 +67,7 @@ export function LoginForm() {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch(`${API_URL}/api/v1/auth/mfa/verify`, {
+      const res = await fetch(`${getApiBaseUrl()}/api/v1/auth/mfa/verify`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",

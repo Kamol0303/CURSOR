@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { NotificationBell } from "@/components/NotificationBell";
+import { getApiBaseUrl } from "@/lib/api";
 
 const NAV = [
   { href: "/dashboard", key: "dashboard" },
@@ -22,7 +23,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
 
   const logout = async () => {
-    await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}/api/v1/auth/logout`, {
+    await fetch(`${getApiBaseUrl()}/api/v1/auth/logout`, {
       method: "POST",
       credentials: "include",
     });

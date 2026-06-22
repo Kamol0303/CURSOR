@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { DashboardLayout } from "@/components/DashboardLayout";
-import { apiFetch } from "@/lib/api";
+import { apiFetch, getApiBaseUrl } from "@/lib/api";
 
 type Cert = {
   certificate_number: string;
@@ -30,13 +30,13 @@ export default function CertificatesPage() {
 
   const downloadReport = (format: "pdf" | "excel") => {
     const token = localStorage.getItem("tmb_access_token");
-    const url = `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}/api/v1/reports/ratings?format=${format === "excel" ? "excel" : "pdf"}`;
+    const url = `${getApiBaseUrl()}/api/v1/reports/ratings?format=${format === "excel" ? "excel" : "pdf"}`;
     fetch(url, { headers: { Authorization: `Bearer ${token}` } })
       .then((r) => r.blob())
       .then((blob) => {
         const a = document.createElement("a");
         a.href = URL.createObjectURL(blob);
-        a.download = `tamor-ratings.${format === "excel" ? "xlsx" : "pdf"}`;
+        a.download = `tmb-ratings.${format === "excel" ? "xlsx" : "pdf"}`;
         a.click();
       });
   };

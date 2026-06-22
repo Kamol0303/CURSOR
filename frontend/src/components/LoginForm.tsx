@@ -7,6 +7,8 @@ import { MfaSetupForm } from "@/components/MfaSetupForm";
 
 import { getApiBaseUrl } from "@/lib/api";
 
+type Step = "login" | "mfa" | "mfa_setup";
+
 export function LoginForm() {
   const t = useTranslations("auth");
   const [username, setUsername] = useState("");

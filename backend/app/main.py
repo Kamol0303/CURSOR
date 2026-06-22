@@ -43,9 +43,10 @@ async def security_headers(request: Request, call_next):
     response.headers["X-Frame-Options"] = "DENY"
     response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
     response.headers["Permissions-Policy"] = "camera=(), microphone=(), geolocation=()"
-    if settings.ENVIRONMENT == "production":
-        response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains; preload"
-        response.headers["Content-Security-Policy"] = "default-src 'self'; frame-ancestors 'none'"
+    if settings.ENVIRONMENT in ("production", "staging"):
+        response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
+        if settings.ENVIRONMENT == "production":
+            response.headers["Content-Security-Policy"] = "default-src 'self'; frame-ancestors 'none'"
     return response
 
 

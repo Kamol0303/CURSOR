@@ -1,33 +1,33 @@
 #!/usr/bin/env bash
-# Quick staging stack verification after docker compose up
+# Verify staging HTTPS stack
 set -euo pipefail
 
 COMPOSE="docker compose -f docker-compose.staging.yml --env-file .env.staging"
 HOST="${PUBLIC_HOST:-tamor.staging.local}"
 
+if [ ! -f infra/nginx/tls/fullchain.pem ]; then
+  echo "ERROR: Missing infra/nginx/tls/fullchain.pem — run ./infra/nginx/generate-mkcert.sh" >&2
+  exit 1
+fi
+
 echo "=== Container status ==="
 $COMPOSE ps
 
 echo ""
-echo "=== Nginx config (first 15 lines) ==="
-$COMPOSE exec nginx head -n 15 /etc/nginx/nginx.conf
+echo "=== Nginx server_name ==="
+$COMPOSE exec nginx nginx -T 2>/dev/null | grep -E "server_name|listen " | head -10
 
 echo ""
-echo "=== Nginx test ==="
-$COMPOSE exec nginx nginx -t
+echo "=== HTTPS health ==="
+curl -fsSk "https://${HOST}/health" && echo ""
 
 echo ""
-echo "=== HTTP health ==="
-curl -fsS "http://${HOST}/health" && echo ""
+echo "=== HTTPS frontend ==="
+curl -fsSk -o /dev/null -w "HTTPS %{http_code}\n" "https://${HOST}/"
 
 echo ""
-echo "=== HTTP frontend (status code) ==="
-curl -sS -o /dev/null -w "HTTP %{http_code}\n" "http://${HOST}/"
+echo "=== HTTP redirects to HTTPS ==="
+curl -sI "http://${HOST}/" | grep -i "^location:"
 
 echo ""
-echo "=== API login endpoint (expect 422 without body) ==="
-curl -sS -o /dev/null -w "HTTP %{http_code}\n" -X POST "http://${HOST}/api/v1/auth/login" \
-  -H "Content-Type: application/json" -d '{}'
-
-echo ""
-echo "OK — if health returns JSON and frontend is not 502, nginx proxy is working."
+echo "OK — use https://${HOST} in the browser"

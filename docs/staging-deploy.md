@@ -1,111 +1,104 @@
-# TaMoR Staging Deployment Guide
+# TaMoR Staging Deployment Guide (HTTPS / production-like)
 
-> Production-like verification environment before go-live
+> Use **mkcert** for trusted local HTTPS on `tamor.staging.local`
 
-## 1. Server prerequisites
+## 1. Hosts file
 
-- Ubuntu 22.04+ VM (Uzbekistan-hosted recommended)
-- Docker Engine 24+ and Docker Compose v2
-- DNS A record: `tamor.staging.local` → server IP (or `/etc/hosts` for internal testing)
-- Ports 80 and 443 open to your test network only (not public internet)
+**Windows** (`C:\Windows\System32\drivers\etc\hosts` as Administrator):
 
-## 2. Prepare TLS certificates
-
-```bash
-./infra/nginx/generate-dev-certs.sh
-# For staging with a real hostname, replace infra/nginx/tls/*.pem with CA-signed certs
+```
+127.0.0.1   tamor.staging.local
 ```
 
-## 3. Configure environment
+**WSL** (`/etc/hosts`):
+
+```
+127.0.0.1   tamor.staging.local
+```
+
+## 2. Environment
 
 ```bash
 cp .env.staging.example .env.staging
-# Edit all CHANGE_ME values — use strong random passwords (32+ chars for encryption keys)
+# Set POSTGRES_PASSWORD, TOTP_ENCRYPTION_KEY, PINFL_ENCRYPTION_KEY (32+ chars each)
+# PUBLIC_HOST=tamor.staging.local
 ```
 
-Required values:
-- `POSTGRES_PASSWORD` — unique staging password
-- `TOTP_ENCRYPTION_KEY`, `PINFL_ENCRYPTION_KEY` — 32+ random characters each
-- `PUBLIC_HOST` — hostname users will access (e.g. `tamor.staging.local`)
+## 3. TLS certificates (required)
 
-## 4. Deploy stack
+### Option A — mkcert (recommended, trusted in browser)
+
+```bash
+chmod +x infra/nginx/generate-mkcert.sh
+./infra/nginx/generate-mkcert.sh
+```
+
+Creates `infra/nginx/tls/fullchain.pem` and `privkey.pem`.
+
+### Option B — self-signed (browser warning)
+
+```bash
+./infra/nginx/generate-dev-certs.sh
+```
+
+## 4. Deploy
 
 ```bash
 docker compose -f docker-compose.staging.yml --env-file .env.staging up -d --build
-```
-
-Nginx uses a **custom image** (`infra/nginx/Dockerfile`) that removes the default welcome page and proxies to `frontend:3000` and `backend:8000`. TLS certs are auto-generated on first start if missing.
-
-Wait for health:
-
-```bash
 chmod +x scripts/verify-staging.sh
 PUBLIC_HOST=tamor.staging.local ./scripts/verify-staging.sh
-# or manually:
-curl -fsS http://tamor.staging.local/health
 ```
 
-Use **HTTP** for local staging: `http://tamor.staging.local` (not HTTPS redirect-only).
+Open: **https://tamor.staging.local**
 
-### Troubleshooting: nginx welcome page
-
-If you see the default nginx page, the old stock image was used. Rebuild:
+## 5. Seed demo users (staging only)
 
 ```bash
-docker compose -f docker-compose.staging.yml --env-file .env.staging down
-docker compose -f docker-compose.staging.yml --env-file .env.staging up -d --build
-docker compose -f docker-compose.staging.yml exec nginx head /etc/nginx/nginx.conf
-```
-
-You should see `upstream backend` and `upstream frontend`, not `root /usr/share/nginx/html`.
-
-## 5. Seed test users (staging only)
-
-```bash
-docker compose -f docker-compose.staging.yml exec backend \
+docker compose -f docker-compose.staging.yml --env-file .env.staging exec backend \
   python scripts/seed_demo_users.py --i-understand-this-creates-demo-credentials
 ```
 
-## 6. Automated verification
+Login: `admin.tamor` / `Tamor#2026Admin!` → MFA setup → dashboard
 
-### GitHub Actions (recommended)
+## Architecture
 
-Run workflow **staging-verify** with `staging_url=https://tamor.staging.local`
+| Layer | Config |
+|-------|--------|
+| Nginx | `server_name tamor.staging.local localhost` |
+| HTTP :80 | 301 → HTTPS |
+| HTTPS :443 | Proxy → `frontend:3000`, `backend:8000` |
+| Cookies | `Secure` + `HttpOnly` (ENVIRONMENT=staging) |
+| API URL | `https://tamor.staging.local` |
 
-### Manual
+## Troubleshooting
 
-```bash
-# From repo checkout on CI runner or admin laptop with VPN access
-python3 scripts/red_team_verify.py --url https://tamor.staging.local --production
+### Nginx welcome page
 
-cd backend
-export DATABASE_URL=postgresql+asyncpg://tamor:PASSWORD@localhost:5432/tamor
-export REDIS_URL=redis://localhost:6379/0
-export ENVIRONMENT=test
-pytest tests/security/ -v
-```
-
-## 7. Manual smoke tests
-
-| Test | Steps |
-|------|-------|
-| Admin MFA first login | Login as `admin.tamor` → MFA setup screen → scan TOTP → dashboard |
-| Parent OTP | `/parent/login` → `+998901234567` → OTP from backend logs (if eskiz not configured) |
-| Certificate verify | `/verify/TAMOR-...` public page |
-| Backup | `POSTGRES_PASSWORD=... ./scripts/backup_postgres.sh` |
-| Restore drill | `CONFIRM_RESTORE=yes ./scripts/restore_postgres.sh backups/tamor_*.sql.gz` |
-
-## 8. Before promoting to production
-
-- [ ] `pre_deploy_check.py` passes against production config
-- [ ] `purge_demo_data.py` dry-run reviewed
-- [ ] `docs/red-team-checklist.md` signed off
-- [ ] Vault secrets provisioned (`docs/go-live-runbook.md`)
-- [ ] Demo seed **not** run on production
-
-## Rollback
+Rebuild custom image:
 
 ```bash
-docker compose -f docker-compose.staging.yml --env-file .env.staging down
-# Restore volume from backup if needed
+docker compose -f docker-compose.staging.yml --env-file .env.staging up -d --build nginx
+docker compose -f docker-compose.staging.yml exec nginx nginx -T | grep server_name
 ```
+
+### Nginx won't start — TLS missing
+
+```bash
+ls -la infra/nginx/tls/
+./infra/nginx/generate-mkcert.sh
+docker compose -f docker-compose.staging.yml --env-file .env.staging restart nginx
+```
+
+### Login works but session lost
+
+- Use **https://** not http://
+- Check `NEXT_PUBLIC_API_URL` matches `https://tamor.staging.local`
+- Rebuild frontend after env change: `docker compose ... up -d --build frontend`
+
+### mkcert on Windows
+
+Run `generate-mkcert.sh` inside **WSL** from the project directory.
+
+## Before production
+
+See `docs/go-live-runbook.md` — CA-signed certs, Vault, no demo seed.

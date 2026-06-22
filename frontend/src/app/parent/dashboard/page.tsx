@@ -51,7 +51,7 @@ export default function ParentDashboardPage() {
       method: "POST",
       credentials: "include",
     });
-    localStorage.removeItem("tamor_access_token");
+    localStorage.removeItem("tmb_access_token");
     window.location.href = "/parent/login";
   };
 

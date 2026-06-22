@@ -5,13 +5,13 @@ import { ServiceWorkerRegister } from "@/components/ServiceWorkerRegister";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "TaMoR — Education Monitoring Platform",
-  description: "Toyloq District education monitoring and rating platform",
+  title: "TMB — Ta'lim Monitoringi Boshqaruvi",
+  description: "Toyloq tumani ta'lim markazlari monitoring va boshqaruv platformasi",
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "TaMoR",
+    title: "TMB",
   },
 };
 

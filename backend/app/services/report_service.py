@@ -46,7 +46,7 @@ async def generate_ratings_report(
         width, height = A4
         c.setFillColor(colors.HexColor("#1B4D3E"))
         c.setFont("Helvetica-Bold", 18)
-        c.drawString(30 * mm, height - 30 * mm, "TaMoR — Center Ratings Report")
+        c.drawString(30 * mm, height - 30 * mm, "TMB — Center Ratings Report")
         c.setFont("Helvetica", 10)
         c.drawString(30 * mm, height - 38 * mm, datetime.now(UTC).strftime("%d.%m.%Y"))
         y = height - 55 * mm

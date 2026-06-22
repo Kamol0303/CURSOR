@@ -29,7 +29,7 @@ export default function CertificatesPage() {
   }, []);
 
   const downloadReport = (format: "pdf" | "excel") => {
-    const token = localStorage.getItem("tamor_access_token");
+    const token = localStorage.getItem("tmb_access_token");
     const url = `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}/api/v1/reports/ratings?format=${format === "excel" ? "excel" : "pdf"}`;
     fetch(url, { headers: { Authorization: `Bearer ${token}` } })
       .then((r) => r.blob())

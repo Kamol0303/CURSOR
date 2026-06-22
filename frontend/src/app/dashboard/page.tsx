@@ -13,7 +13,7 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const token = localStorage.getItem("tamor_access_token");
+    const token = localStorage.getItem("tmb_access_token");
     if (!token) {
       window.location.href = "/";
       return;

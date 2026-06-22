@@ -1,4 +1,4 @@
-# TaMoR Incident Response Runbook
+# TMB Incident Response Runbook
 
 > Section 17A deliverable — operational response for security events
 
@@ -43,7 +43,7 @@ Blameless review within 5 business days: timeline, root cause, action items with
 |------|----------------|-------------------------------|
 | Incident Commander (on-call) | First responder, coordinates containment | District IT on-call rotation |
 | Data Protection Lead | PINFL incident notification decisions | Hokimlik legal / DPO |
-| Super Admin (district IT) | Credential/key rotation | `admin.tamor` successor account |
+| Super Admin (district IT) | Credential/key rotation | `admin.tmb` successor account |
 | Hokimlik liaison | External communication if disclosure warranted | Press office / hokimiyat operator lead |
 
 > Template: replace generic titles with named individuals and phone numbers before production launch.

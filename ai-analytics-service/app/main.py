@@ -70,7 +70,7 @@ async def lifespan(app: FastAPI):
         scheduler.shutdown()
 
 
-app = FastAPI(title="TaMoR AI Analytics", version="0.3.0-phase3", lifespan=lifespan)
+app = FastAPI(title="TMB AI Analytics", version="0.3.0-phase3", lifespan=lifespan)
 
 
 @app.get("/health")

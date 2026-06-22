@@ -31,7 +31,7 @@ from app.core.permissions import MANDATORY_MFA_ROLES
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
-REFRESH_COOKIE = "tamor_refresh"
+REFRESH_COOKIE = "tmb_refresh"
 
 
 def _set_refresh_cookie(response: Response, token: str) -> None:

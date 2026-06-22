@@ -28,7 +28,7 @@ from app.models.identity import Permission, Role, RolePermission, TrainingCenter
 
 
 DEMO_USERS = [
-    ("super_admin", "admin.tamor", "Tamor#2026Admin!", True),
+    ("super_admin", "admin.tmb", "Tmb#2026Admin!", True),
     ("hokimiyat_operator", "operator.hokimiyat", "Hokim#Op2026!", True),
     ("center_director", "director.aspect", "Direktor#2026!", True),
     ("center_admin", "admin.aspect", "CenterAdmin#26!", False),
@@ -184,7 +184,7 @@ async def seed_education_data(session: AsyncSession, center: TrainingCenter, rol
 
 
 def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Seed TaMoR demo users (non-production only)")
+    parser = argparse.ArgumentParser(description="Seed TMB demo users (non-production only)")
     parser.add_argument(
         "--i-understand-this-creates-demo-credentials",
         action="store_true",
@@ -304,7 +304,7 @@ async def seed() -> None:
                 print(f"  Username: {username}")
                 print(f"  Password: {password}")
                 print(f"  TOTP Secret: {secret}")
-                print(f"  TOTP URI: {totp.provisioning_uri(name=username, issuer_name='TaMoR')}")
+                print(f"  TOTP URI: {totp.provisioning_uri(name=username, issuer_name='TMB')}")
                 print()
             else:
                 print(f"Role: {role_code}")
@@ -346,7 +346,7 @@ async def seed() -> None:
         from app.services import notification_service
 
         admin_user = (
-            await session.execute(select(User).where(User.username == "admin.tamor"))
+            await session.execute(select(User).where(User.username == "admin.tmb"))
         ).scalar_one_or_none()
         operator_user = (
             await session.execute(select(User).where(User.username == "operator.hokimiyat"))

@@ -1,4 +1,4 @@
-# TaMoR Red-Team Checklist (Section 24A)
+# TMB Red-Team Checklist (Section 24A)
 
 > Execute before production go-live. Automated checks: `python scripts/red_team_verify.py --offline` (CI) or against staging URL.
 

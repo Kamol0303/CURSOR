@@ -1,6 +1,6 @@
-# TaMoR — Education Monitoring & Rating Platform
+# TMB — Ta'lim Monitoringi Boshqaruvi
 
-Government-grade education monitoring system for Toyloq District, Samarkand Region, Uzbekistan.
+Government-grade education management monitoring platform for Toyloq District, Samarkand Region, Uzbekistan.
 
 ## Phase 0 Status (Complete)
 
@@ -120,7 +120,7 @@ Demo credentials are printed to the console only. **Never run in production.**
 
 | Role | Username | Password | MFA |
 |------|----------|----------|-----|
-| Super Admin | `admin.tamor` | `Tamor#2026Admin!` | TOTP (QR in console) |
+| Super Admin | `admin.tmb` | `Tmb#2026Admin!` | TOTP (QR in console) |
 | Hokimiyat Operator | `operator.hokimiyat` | `Hokim#Op2026!` | TOTP |
 | Center Director | `director.aspect` | `Direktor#2026!` | TOTP |
 | Center Admin | `admin.aspect` | `CenterAdmin#26!` | — |

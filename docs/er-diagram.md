@@ -1,4 +1,4 @@
-# TaMoR Entity-Relationship Diagram
+# TMB Entity-Relationship Diagram
 
 ```mermaid
 erDiagram

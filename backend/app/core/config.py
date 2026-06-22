@@ -6,7 +6,7 @@ class Settings(BaseSettings):
 
     ENVIRONMENT: str = "development"
     DEBUG: bool = False
-    APP_NAME: str = "TaMoR API"
+    APP_NAME: str = "TMB API"
     API_V1_PREFIX: str = "/api/v1"
 
     DATABASE_URL: str = "postgresql+asyncpg://tamor:tamor_dev@localhost:5432/tamor"
@@ -35,6 +35,10 @@ class Settings(BaseSettings):
     SMS_WEBHOOK_SECRET: str = "dev-sms-webhook-secret-change-me"
     ESKIZ_API_TOKEN: str = ""
     SMTP_HOST: str = ""
+    SMTP_PORT: int = 587
+    SMTP_USER: str = ""
+    SMTP_PASSWORD: str = ""
+    SMTP_FROM: str = ""
     TELEGRAM_BOT_TOKEN: str = ""
     TELEGRAM_WEBHOOK_SECRET: str = "dev-telegram-webhook-secret"
     PARENT_OTP_EXPIRE_SECONDS: int = 300
@@ -44,7 +48,7 @@ class Settings(BaseSettings):
     VAULT_ADDR: str = ""
     VAULT_TOKEN: str = ""
     VAULT_MOUNT: str = "secret"
-    VAULT_SECRET_PREFIX: str = "tamor"
+    VAULT_SECRET_PREFIX: str = "tmb"
 
     ESKIZ_EMAIL: str = ""
     ESKIZ_PASSWORD: str = ""

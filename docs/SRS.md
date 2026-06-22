@@ -1,4 +1,4 @@
-# TaMoR System Requirements Specification (SRS) — Phase 0
+# TMB System Requirements Specification (SRS) — Phase 0
 
 ## 1. Authentication (Section 2)
 - RS256 JWT access tokens (15 min)

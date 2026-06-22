@@ -75,7 +75,7 @@ async def verify(base_url: str, production: bool, offline: bool) -> Report:
 
                 statuses = []
                 for _ in range(12):
-                    r = await client.get("/api/v1/public/verify/TAMOR-NOTFOUND-XXXX")
+                    r = await client.get("/api/v1/public/verify/TMB-NOTFOUND-XXXX")
                     statuses.append(r.status_code)
                 report.add(
                     "RT-17",
@@ -161,7 +161,7 @@ async def verify(base_url: str, production: bool, offline: bool) -> Report:
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="TaMoR red-team automated verification")
+    parser = argparse.ArgumentParser(description="TMB red-team automated verification")
     parser.add_argument("--url", default="http://localhost:8000")
     parser.add_argument("--production", action="store_true")
     parser.add_argument("--offline", action="store_true", help="Skip live HTTP checks (CI)")
@@ -173,7 +173,7 @@ def main() -> None:
         print(json.dumps([r.__dict__ for r in report.results], indent=2))
     else:
         mode = "offline" if args.offline else args.url
-        print(f"TaMoR Red-Team Verification — {mode}\n")
+        print(f"TMB Red-Team Verification — {mode}\n")
         report.print_report()
     sys.exit(1 if report.failed else 0)
 

@@ -1,7 +1,7 @@
 {
   "auth": {
-    "title": "TaMoR — Ta'lim monitoring tizimi",
-    "subtitle": "Toyloq tumani ta'lim markazlari monitoring va reyting platformasi",
+    "title": "TMB — Ta'lim Monitoringi Boshqaruvi",
+    "subtitle": "Toyloq tumani ta'lim markazlari monitoring va boshqaruv platformasi",
     "username": "Foydalanuvchi nomi",
     "password": "Parol",
     "login": "Kirish",
@@ -39,7 +39,7 @@
     }
   },
   "nav": {
-    "platform": "TaMoR Platforma",
+    "platform": "TMB Platforma",
     "subtitle": "Toyloq tumani",
     "dashboard": "Bosh sahifa",
     "centers": "Markazlar",
@@ -115,7 +115,7 @@
   "verify": {
     "title": "Sertifikatni tekshirish",
     "subtitle": "Sertifikat raqamini kiriting yoki QR kodni skanerlang",
-    "placeholder": "TAMOR-2026-XXXXXXXX",
+    "placeholder": "TMB-2026-XXXXXXXX",
     "check": "Tekshirish",
     "checking": "Tekshirilmoqda...",
     "valid": "Sertifikat haqiqiy",

@@ -38,7 +38,7 @@ class AuthError(Exception):
         super().__init__(code)
 
 
-MFA_ISSUER = "TaMoR"
+MFA_ISSUER = "TMB"
 MFA_SETUP_TTL_SECONDS = 600
 
 
@@ -614,7 +614,7 @@ async def request_parent_otp(db: AsyncSession, *, phone: str, ip: str | None) ->
         {"otp": otp, "attempts": 0},
         settings.PARENT_OTP_EXPIRE_SECONDS,
     )
-    await send_sms(phone, f"TaMoR tasdiqlash kodi: {otp}")
+    await send_sms(phone, f"TMB tasdiqlash kodi: {otp}")
     return {"sent": True, "expires_in": settings.PARENT_OTP_EXPIRE_SECONDS}
 
 

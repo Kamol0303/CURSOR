@@ -55,7 +55,7 @@ export function LoginForm() {
         setStep("mfa");
         return;
       }
-      localStorage.setItem("tamor_access_token", data.data.access_token);
+      localStorage.setItem("tmb_access_token", data.data.access_token);
       window.location.href = "/dashboard";
     } catch {
       setError(t("errors.INVALID_CREDENTIALS"));
@@ -80,7 +80,7 @@ export function LoginForm() {
         handleError(data.detail?.code || "MFA_INVALID");
         return;
       }
-      localStorage.setItem("tamor_access_token", data.data.access_token);
+      localStorage.setItem("tmb_access_token", data.data.access_token);
       window.location.href = "/dashboard";
     } catch {
       setError(t("errors.MFA_INVALID"));
@@ -159,7 +159,7 @@ export function LoginForm() {
               setupToken={setupToken}
               onComplete={(accessToken) => {
                 if (accessToken) {
-                  localStorage.setItem("tamor_access_token", accessToken);
+                  localStorage.setItem("tmb_access_token", accessToken);
                   window.location.href = "/dashboard";
                 }
               }}

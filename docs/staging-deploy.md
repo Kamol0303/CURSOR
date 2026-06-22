@@ -1,4 +1,4 @@
-# TaMoR Staging Deployment Guide (HTTPS / production-like)
+# TMB Staging Deployment Guide (HTTPS / production-like)
 
 > Use **mkcert** for trusted local HTTPS on `tamor.staging.local`
 
@@ -20,9 +20,12 @@
 
 ```bash
 cp .env.staging.example .env.staging
-# Set POSTGRES_PASSWORD, TOTP_ENCRYPTION_KEY, PINFL_ENCRYPTION_KEY (32+ chars each)
-# PUBLIC_HOST=tamor.staging.local
 ```
+
+`.env.staging` faylini to'ldiring (gitga kirmaydi):
+- `POSTGRES_PASSWORD`, `TOTP_ENCRYPTION_KEY`, `PINFL_ENCRYPTION_KEY` (32+ belgi)
+- `TELEGRAM_BOT_TOKEN`, `SMTP_*` (ixtiyoriy)
+- `PUBLIC_HOST=tamor.staging.local`
 
 ## 3. TLS certificates (required)
 
@@ -58,7 +61,7 @@ docker compose -f docker-compose.staging.yml --env-file .env.staging exec backen
   python scripts/seed_demo_users.py --i-understand-this-creates-demo-credentials
 ```
 
-Login: `admin.tamor` / `Tamor#2026Admin!` → MFA setup → dashboard
+Login: `admin.tmb` / `Tmb#2026Admin!` → MFA setup → dashboard
 
 ## Architecture
 

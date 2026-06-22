@@ -37,7 +37,7 @@ export function ParentLoginForm() {
     });
     setLoading(false);
     if (res.success && res.data?.access_token) {
-      localStorage.setItem("tamor_access_token", res.data.access_token);
+      localStorage.setItem("tmb_access_token", res.data.access_token);
       window.location.href = "/parent/dashboard";
     } else {
       setError(t(`errors.${res.error?.code || "UNKNOWN"}`));

@@ -1,4 +1,4 @@
-# TaMoR External Integrations
+# TMB External Integrations
 
 ## SMS — eskiz.uz
 
@@ -9,17 +9,24 @@
 
 Configure in `.env.production` or `.env.staging`. See `backend/app/integrations/sms_adapter.py`.
 
-## Email — not yet implemented
+## Email — SMTP (Gmail va boshqalar)
 
-Email notifications are **stub-only**. `send_email()` returns success in dev/test and fails in production/staging:
+| Environment | Behavior |
+|-------------|----------|
+| `development`, `test` | Stub — logga yoziladi |
+| `staging`, `production` | `SMTP_HOST`, `SMTP_USER`, `SMTP_PASSWORD` bo'lsa yuboradi |
+
+`.env.staging` misoli:
 
 ```
-SMTP integration not enabled
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_USER=your@gmail.com
+SMTP_PASSWORD=your-app-password
+SMTP_FROM="TMB <your@gmail.com>"
 ```
 
-**Workaround until SMTP is built:** rely on in-app notifications and SMS for critical alerts.
-
-To implement later: configure `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASSWORD` and complete `email_adapter.py`.
+Gmail uchun [App Password](https://myaccount.google.com/apppasswords) ishlating.
 
 ## Telegram bot
 

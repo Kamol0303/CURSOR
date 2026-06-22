@@ -1,10 +1,10 @@
-# TaMoR Business Requirements Document (BRD) — Phase 0 Summary
+# TMB Business Requirements Document (BRD) — Phase 0 Summary
 
 ## Client
 Toyloq District Administration (Hokimlik), Samarkand Region, Uzbekistan
 
 ## Project
-Education Monitoring & Rating Platform (TaMoR)
+Education Monitoring & Rating Platform (TMB)
 
 ## Objectives
 1. 100% digitalization of non-budget education sector

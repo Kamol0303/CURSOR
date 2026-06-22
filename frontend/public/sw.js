@@ -1,4 +1,4 @@
-const CACHE_NAME = "tamor-v1";
+const CACHE_NAME = "tmb-v1";
 const PRECACHE = ["/", "/manifest.json", "/icons/icon-192.svg"];
 
 self.addEventListener("install", (event) => {

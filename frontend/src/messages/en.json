@@ -1,7 +1,7 @@
 {
   "auth": {
-    "title": "TaMoR — Education Monitoring System",
-    "subtitle": "Toyloq District education centers monitoring and rating platform",
+    "title": "TMB — Education Management Monitoring",
+    "subtitle": "Toyloq District education centers monitoring and management platform",
     "username": "Username",
     "password": "Password",
     "login": "Sign in",
@@ -39,7 +39,7 @@
     }
   },
   "nav": {
-    "platform": "TaMoR Platform",
+    "platform": "TMB Platform",
     "subtitle": "Toyloq District",
     "dashboard": "Dashboard",
     "centers": "Centers",
@@ -115,7 +115,7 @@
   "verify": {
     "title": "Certificate verification",
     "subtitle": "Enter certificate number or scan QR code",
-    "placeholder": "TAMOR-2026-XXXXXXXX",
+    "placeholder": "TMB-2026-XXXXXXXX",
     "check": "Verify",
     "checking": "Checking...",
     "valid": "Certificate is valid",

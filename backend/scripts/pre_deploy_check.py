@@ -69,7 +69,7 @@ async def run_checks(skip_demo: bool = False) -> int:
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="TaMoR pre-deployment safety gate")
+    parser = argparse.ArgumentParser(description="TMB pre-deployment safety gate")
     parser.add_argument("--skip-demo-data-check", action="store_true", help="Only check is_demo_account users")
     args = parser.parse_args()
     if settings.ENVIRONMENT != "production":

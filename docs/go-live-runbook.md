@@ -1,18 +1,18 @@
-# TaMoR Go-Live Runbook
+# TMB Go-Live Runbook
 
 > Phase 5 deliverable — production deployment checklist for Toyloq District IT
 
 ## Prerequisites
 
 - [ ] Uzbekistan-hosted infrastructure provisioned (VMs or K8s)
-- [ ] HashiCorp Vault cluster operational with `tamor/prod` KV path
+- [ ] HashiCorp Vault cluster operational with `tmb/prod` KV path
 - [ ] CA-signed TLS certificates (not self-signed)
 - [ ] PostgreSQL 15 and Redis 7 on private network
 - [ ] DNS: `tamor.toyloq.uz` → Nginx edge
 
 ## 1. Secrets Provisioning (Vault)
 
-Store in `secret/tamor/prod/`:
+Store in `secret/tmb/prod/`:
 
 | Key | Description |
 |-----|-------------|

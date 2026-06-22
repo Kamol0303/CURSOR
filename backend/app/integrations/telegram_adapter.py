@@ -52,9 +52,9 @@ async def handle_update(db: AsyncSession, update: dict) -> TelegramResponse | No
         return TelegramResponse(
             chat_id=chat_id,
             text=(
-                "TaMoR botiga xush kelibsiz!\n"
+                "TMB botiga xush kelibsiz!\n"
                 "Buyruqlar:\n"
-                "/verify TAMOR-XXXX — sertifikatni tekshirish\n"
+                "/verify TMB-XXXX — sertifikatni tekshirish\n"
                 "/status — bot holati"
             ),
         )
@@ -62,7 +62,7 @@ async def handle_update(db: AsyncSession, update: dict) -> TelegramResponse | No
     if text.startswith("/verify"):
         parts = text.split(maxsplit=1)
         if len(parts) < 2:
-            return TelegramResponse(chat_id=chat_id, text="Sertifikat raqamini kiriting: /verify TAMOR-2026-XXX")
+            return TelegramResponse(chat_id=chat_id, text="Sertifikat raqamini kiriting: /verify TMB-2026-XXX")
         cert_number = parts[1].strip()
         from app.core.rls import apply_rls_context, set_rls_role
         from app.services import certificate_service
@@ -78,6 +78,6 @@ async def handle_update(db: AsyncSession, update: dict) -> TelegramResponse | No
         return TelegramResponse(chat_id=chat_id, text="❌ Sertifikat topilmadi yoki haqiqiy emas")
 
     if text.startswith("/status"):
-        return TelegramResponse(chat_id=chat_id, text="TaMoR bot faol. Toyloq tumani ta'lim monitoringi.")
+        return TelegramResponse(chat_id=chat_id, text="TMB bot faol. Toyloq tumani ta'lim monitoringi.")
 
     return TelegramResponse(chat_id=chat_id, text="Noma'lum buyruq. /start yordam uchun.")

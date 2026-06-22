@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Simple load test for TaMoR public and health endpoints."""
+"""Simple load test for TMB public and health endpoints."""
 
 from __future__ import annotations
 
@@ -26,7 +26,7 @@ async def run_load(base_url: str, concurrency: int, requests_per_worker: int) ->
                     if i % 3 == 0:
                         res = await client.get("/health")
                     else:
-                        res = await client.get("/api/v1/public/verify/TAMOR-DEMO-NOTFOUND")
+                        res = await client.get("/api/v1/public/verify/TMB-DEMO-NOTFOUND")
                     res.raise_for_status()
                     latencies.append((time.perf_counter() - start) * 1000)
                 except Exception:
@@ -47,7 +47,7 @@ async def run_load(base_url: str, concurrency: int, requests_per_worker: int) ->
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="TaMoR load test")
+    parser = argparse.ArgumentParser(description="TMB load test")
     parser.add_argument("--url", default=DEFAULT_URL)
     parser.add_argument("-c", "--concurrency", type=int, default=10)
     parser.add_argument("-n", "--requests", type=int, default=20, help="Requests per worker")

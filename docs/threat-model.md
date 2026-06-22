@@ -1,4 +1,4 @@
-# TaMoR Threat Model (STRIDE)
+# TMB Threat Model (STRIDE)
 
 > Education Monitoring & Rating Platform — Toyloq District, Samarkand Region  
 > Version: 4.0 | Phase 0 deliverable

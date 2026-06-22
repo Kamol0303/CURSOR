@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# PostgreSQL backup for TaMoR (RT-26)
+# PostgreSQL backup for TMB (RT-26)
 # Usage: ./scripts/backup_postgres.sh [output_dir]
 set -euo pipefail
 

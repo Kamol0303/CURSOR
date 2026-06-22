@@ -1,7 +1,7 @@
 {
-  "name": "TaMoR — Ta'lim monitoring",
-  "short_name": "TaMoR",
-  "description": "Toyloq tumani ta'lim markazlari monitoring va reyting platformasi",
+  "name": "TMB — Ta'lim Monitoringi Boshqaruvi",
+  "short_name": "TMB",
+  "description": "Toyloq tumani ta'lim markazlari monitoring va boshqaruv platformasi",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#f9fafb",

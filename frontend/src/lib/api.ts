@@ -2,7 +2,7 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 export function getToken(): string | null {
   if (typeof window === "undefined") return null;
-  return localStorage.getItem("tamor_access_token");
+  return localStorage.getItem("tmb_access_token");
 }
 
 export async function apiFetch<T = unknown>(

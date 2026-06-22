@@ -26,7 +26,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
       method: "POST",
       credentials: "include",
     });
-    localStorage.removeItem("tamor_access_token");
+    localStorage.removeItem("tmb_access_token");
     window.location.href = "/";
   };
 
@@ -34,7 +34,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
     <div className="min-h-screen bg-gray-50 flex">
       <aside className="w-56 bg-naqsh-primary text-white flex flex-col shrink-0">
         <div className="p-4 border-b border-white/10">
-          <div className="font-bold text-lg">TaMoR</div>
+          <div className="font-bold text-lg">TMB</div>
           <div className="text-xs text-white/70">{t("subtitle")}</div>
         </div>
         <nav className="flex-1 p-3 space-y-1">

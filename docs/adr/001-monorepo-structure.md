@@ -4,7 +4,7 @@
 Accepted
 
 ## Context
-TaMoR consists of backend API, frontend SPA, AI analytics microservice, and shared documentation. We need a repository layout that supports coordinated releases and shared CI/CD.
+TMB consists of backend API, frontend SPA, AI analytics microservice, and shared documentation. We need a repository layout that supports coordinated releases and shared CI/CD.
 
 ## Decision
 Use a **monorepo** with top-level directories: `backend/`, `frontend/`, `ai-analytics-service/`, `docs/`, `infra/`.

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# PostgreSQL restore for TaMoR (RT-26) — DESTRUCTIVE
+# PostgreSQL restore for TMB (RT-26) — DESTRUCTIVE
 # Usage: ./scripts/restore_postgres.sh backups/tamor_YYYYMMDD.sql.gz
 set -euo pipefail
 

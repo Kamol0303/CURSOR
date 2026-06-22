@@ -24,7 +24,7 @@ from app.models.ratings_certs import Certificate
 
 
 def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Purge TaMoR demo data")
+    parser = argparse.ArgumentParser(description="Purge TMB demo data")
     parser.add_argument(
         "--i-understand-this-deletes-demo-data",
         action="store_true",

@@ -33,7 +33,7 @@ async def get_or_create_formula(db: AsyncSession, user_id: UUID | None = None) -
         version=1,
         weights=DEFAULT_WEIGHTS,
         created_by=user_id,
-        notes="Default TaMoR v4.0 formula",
+        notes="Default TMB v4.0 formula",
     )
     db.add(formula)
     await db.flush()

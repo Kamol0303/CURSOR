@@ -34,12 +34,30 @@ Required values:
 docker compose -f docker-compose.staging.yml --env-file .env.staging up -d --build
 ```
 
+Nginx uses a **custom image** (`infra/nginx/Dockerfile`) that removes the default welcome page and proxies to `frontend:3000` and `backend:8000`. TLS certs are auto-generated on first start if missing.
+
 Wait for health:
 
 ```bash
-docker compose -f docker-compose.staging.yml ps
-curl -k https://tamor.staging.local/health
+chmod +x scripts/verify-staging.sh
+PUBLIC_HOST=tamor.staging.local ./scripts/verify-staging.sh
+# or manually:
+curl -fsS http://tamor.staging.local/health
 ```
+
+Use **HTTP** for local staging: `http://tamor.staging.local` (not HTTPS redirect-only).
+
+### Troubleshooting: nginx welcome page
+
+If you see the default nginx page, the old stock image was used. Rebuild:
+
+```bash
+docker compose -f docker-compose.staging.yml --env-file .env.staging down
+docker compose -f docker-compose.staging.yml --env-file .env.staging up -d --build
+docker compose -f docker-compose.staging.yml exec nginx head /etc/nginx/nginx.conf
+```
+
+You should see `upstream backend` and `upstream frontend`, not `root /usr/share/nginx/html`.
 
 ## 5. Seed test users (staging only)
 

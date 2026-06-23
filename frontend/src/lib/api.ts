@@ -1,12 +1,15 @@
 /**
- * Browser: same-origin (nginx proxies /api/ → backend).
- * SSR / dev without nginx: NEXT_PUBLIC_API_URL or localhost fallback.
+ * API base URL resolution:
+ * - Staging/prod behind nginx: NEXT_PUBLIC_API_URL = https://your-host (or empty + /api rewrite)
+ * - Local dev (docker): NEXT_PUBLIC_API_URL = http://localhost:8000 (REQUIRED for browser)
  */
 export function getApiBaseUrl(): string {
-  if (typeof window !== "undefined") {
-    return "";
+  const configured = process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "");
+  if (configured) {
+    return configured;
   }
-  return process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+  // Same-origin when nginx or Next.js rewrites proxy /api/*
+  return "";
 }
 
 export function getToken(): string | null {
@@ -25,12 +28,30 @@ export async function apiFetch<T = unknown>(
   };
   if (token) headers.Authorization = `Bearer ${token}`;
 
-  const res = await fetch(`${getApiBaseUrl()}/api/v1${path}`, {
-    ...options,
-    headers,
-    credentials: "include",
-  });
-  return res.json();
+  let res: Response;
+  try {
+    res = await fetch(`${getApiBaseUrl()}/api/v1${path}`, {
+      ...options,
+      headers,
+      credentials: "include",
+    });
+  } catch {
+    return {
+      success: false,
+      data: null as T,
+      error: { code: "NETWORK_ERROR" },
+    };
+  }
+
+  try {
+    return await res.json();
+  } catch {
+    return {
+      success: false,
+      data: null as T,
+      error: { code: res.ok ? "PARSE_ERROR" : "HTTP_ERROR" },
+    };
+  }
 }
 
 export async function getMe() {

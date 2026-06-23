@@ -39,7 +39,7 @@ services:
       JWT_PUBLIC_KEY_PATH: /secrets/jwt_public.pem
       TOTP_ENCRYPTION_KEY: dev-only-change-in-production-32bytes!!
       PINFL_ENCRYPTION_KEY: dev-pinfl-key-change-in-prod!!
-      CORS_ORIGINS: '["http://localhost:3000"]'
+      CORS_ORIGINS: '["http://localhost:3000","http://127.0.0.1:3000"]'
       AI_ANALYTICS_URL: http://ai-analytics:8001
       SMS_WEBHOOK_SECRET: dev-sms-webhook-secret
     volumes:
@@ -62,15 +62,7 @@ services:
       timeout: 5s
       retries: 8
       start_period: 60s
-    command: >
-      sh -c "
-        for i in $$(seq 1 30); do
-          if alembic upgrade head; then break; fi;
-          echo \"Migration attempt $$i failed, retrying...\";
-          sleep 2;
-        done;
-        exec uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
-      "
+    command: ["./scripts/dev_bootstrap.sh"]
 
   frontend:
     build: ./frontend
@@ -78,6 +70,7 @@ services:
       - "3000:3000"
     environment:
       NEXT_PUBLIC_API_URL: http://localhost:8000
+      INTERNAL_API_URL: http://backend:8000
       HOSTNAME: "0.0.0.0"
       NEXT_PUBLIC_SHOW_DEMO_HINT: "true"
     volumes:

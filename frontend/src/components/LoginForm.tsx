@@ -38,27 +38,49 @@ export function LoginForm() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify({ username, password }),
+        body: JSON.stringify({ username: username.trim(), password }),
       });
-      const data = await res.json();
-      if (!res.ok) {
-        handleError(data.detail?.code || "INVALID_CREDENTIALS");
+      let data: {
+        success?: boolean;
+        data?: {
+          access_token?: string;
+          requires_mfa?: boolean;
+          requires_mfa_setup?: boolean;
+          mfa_token?: string;
+          setup_token?: string;
+        };
+        detail?: { code?: string };
+        error?: { code?: string };
+      };
+      try {
+        data = await res.json();
+      } catch {
+        setError(t("errors.NETWORK_ERROR"));
+        return;
+      }
+      if (!res.ok || data.success === false) {
+        const code = data.detail?.code || data.error?.code || "INVALID_CREDENTIALS";
+        handleError(code);
         return;
       }
       if (data.data?.requires_mfa_setup) {
-        setSetupToken(data.data.setup_token);
+        setSetupToken(data.data.setup_token ?? null);
         setStep("mfa_setup");
         return;
       }
       if (data.data?.requires_mfa) {
-        setMfaToken(data.data.mfa_token);
+        setMfaToken(data.data.mfa_token ?? null);
         setStep("mfa");
         return;
       }
-      localStorage.setItem("tmb_access_token", data.data.access_token);
-      window.location.href = "/dashboard";
+      if (data.data?.access_token) {
+        localStorage.setItem("tmb_access_token", data.data.access_token);
+        window.location.href = "/dashboard";
+        return;
+      }
+      handleError("INVALID_CREDENTIALS");
     } catch {
-      setError(t("errors.INVALID_CREDENTIALS"));
+      setError(t("errors.NETWORK_ERROR"));
     } finally {
       setLoading(false);
     }

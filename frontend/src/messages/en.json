@@ -21,7 +21,8 @@
       "MFA_ALREADY_ENABLED": "MFA is already enabled",
       "RATE_LIMIT_EXCEEDED": "Too many attempts. Please try again later",
       "ACCOUNT_LOCKED": "Account temporarily locked. Reset: ./scripts/reset-demo-login.sh",
-      "PASSWORD_CHANGE_REQUIRED": "You must change your password first"
+      "PASSWORD_CHANGE_REQUIRED": "You must change your password first",
+      "NETWORK_ERROR": "Cannot reach server. Is backend running? (localhost:8000)"
     },
     "demoHint": "Demo login (no MFA)",
     "demoUser": "admin.aspect",

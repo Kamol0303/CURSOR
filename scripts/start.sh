@@ -59,6 +59,17 @@ case "$MODE" in
     docker compose up -d --build
     wait_backend docker compose
     seed_users docker compose
+    yellow "Login tekshiruvi..."
+    RESP=$(curl -sS -X POST http://localhost:8000/api/v1/auth/login \
+      -H 'Content-Type: application/json' \
+      -d '{"username":"admin.aspect","password":"CenterAdmin#26!"}')
+    if ! echo "$RESP" | grep -q access_token; then
+      red "Login testi muvaffaqiyatsiz!"
+      echo "$RESP"
+      red "Log: docker compose logs backend --tail 50"
+      exit 1
+    fi
+    green "Login testi OK."
     echo ""
     green "Tayyor!"
     echo "  Frontend:  http://localhost:3000"

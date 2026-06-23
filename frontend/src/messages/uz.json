@@ -21,7 +21,8 @@
       "MFA_ALREADY_ENABLED": "MFA allaqachon yoqilgan",
       "RATE_LIMIT_EXCEEDED": "Juda ko'p urinish. Keyinroq qaytadan urinib ko'ring",
       "ACCOUNT_LOCKED": "Hisob vaqtincha bloklangan. Parolni tiklang: ./scripts/reset-demo-login.sh",
-      "PASSWORD_CHANGE_REQUIRED": "Avval parolni yangilashingiz kerak"
+      "PASSWORD_CHANGE_REQUIRED": "Avval parolni yangilashingiz kerak",
+      "NETWORK_ERROR": "Serverga ulanib bo'lmadi. Backend ishlayaptimi? (localhost:8000)"
     },
     "demoHint": "Demo kirish (MFA yo'q)",
     "demoUser": "admin.aspect",

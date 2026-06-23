@@ -21,7 +21,8 @@
       "MFA_ALREADY_ENABLED": "MFA уже включена",
       "RATE_LIMIT_EXCEEDED": "Слишком много попыток. Попробуйте позже",
       "ACCOUNT_LOCKED": "Аккаунт заблокирован. Сброс: ./scripts/reset-demo-login.sh",
-      "PASSWORD_CHANGE_REQUIRED": "Сначала смените пароль"
+      "PASSWORD_CHANGE_REQUIRED": "Сначала смените пароль",
+      "NETWORK_ERROR": "Сервер недоступен. Backend запущен? (localhost:8000)"
     },
     "demoHint": "Демо вход (без MFA)",
     "demoUser": "admin.aspect",

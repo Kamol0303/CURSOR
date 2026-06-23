@@ -79,6 +79,8 @@ services:
     restart: unless-stopped
     environment:
       NEXT_PUBLIC_API_URL: https://${PUBLIC_HOST:-tamor.staging.local}
+      INTERNAL_API_URL: http://backend:8000
+      NEXT_PUBLIC_SHOW_DEMO_HINT: "true"
     depends_on: [backend]
     networks: [internal]
 

@@ -9,7 +9,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-RUN chmod +x scripts/entrypoint.sh
+RUN chmod +x scripts/entrypoint.sh scripts/dev_bootstrap.sh
 
 ENV PYTHONPATH=/app
 ENV JWT_PRIVATE_KEY_PATH=/secrets/jwt_private.pem

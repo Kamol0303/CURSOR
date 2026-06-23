@@ -65,6 +65,9 @@ case "$MODE" in
     echo "  Backend:   http://localhost:8000"
     echo "  API docs:  http://localhost:8000/docs"
     echo ""
+    yellow "MUHIM: Brauzerda faqat http://localhost:3000 oching!"
+    yellow "Cursor/Cloud preview URL (agent.cvm.dev) ishlamaydi — u mahalliy Docker ga ulanmaydi."
+    echo ""
     echo "Login (MFA yo'q):"
     echo "  admin.aspect / CenterAdmin#26!"
     ;;

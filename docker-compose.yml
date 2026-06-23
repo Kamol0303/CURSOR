@@ -50,10 +50,26 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=3)",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 8
+      start_period: 60s
     command: >
       sh -c "
-        alembic upgrade head &&
-        uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+        for i in $$(seq 1 30); do
+          if alembic upgrade head; then break; fi;
+          echo \"Migration attempt $$i failed, retrying...\";
+          sleep 2;
+        done;
+        exec uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
       "
 
   frontend:
@@ -62,11 +78,13 @@ services:
       - "3000:3000"
     environment:
       NEXT_PUBLIC_API_URL: http://localhost:8000
+      HOSTNAME: "0.0.0.0"
     volumes:
       - ./frontend:/app
       - /app/node_modules
     depends_on:
-      - backend
+      backend:
+        condition: service_healthy
 
   ai-analytics:
     build: ./ai-analytics-service

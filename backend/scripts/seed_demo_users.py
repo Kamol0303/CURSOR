@@ -309,6 +309,9 @@ async def seed() -> None:
                 user.is_locked = False
                 user.failed_login_attempts = 0
                 user.password_changed_at = datetime.now(UTC)
+                user.login_state = None
+                user.login_state_expires_at = None
+                user.must_change_password = False
             await session.flush()
 
             if mfa:
@@ -338,9 +341,16 @@ async def seed() -> None:
                 print_totp_qr(uri, username=username)
                 print()
             else:
+                user.mfa_enabled = False
+                user.mfa_method = None
+                user.mfa_secret_encrypted = None
+                user.login_state = None
+                user.login_state_expires_at = None
+                user.must_change_password = False
                 print(f"Role: {role_code}")
                 print(f"  Username: {username}")
                 print(f"  Password: {password}")
+                print(f"  MFA: yo'q")
                 print()
 
         parent_role = roles["parent"]

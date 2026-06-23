@@ -153,6 +153,15 @@ export function LoginForm() {
               >
                 {t("login")}
               </button>
+              {process.env.NEXT_PUBLIC_SHOW_DEMO_HINT === "true" && (
+                <div className="mt-4 p-3 bg-amber-50 border border-amber-200 rounded-lg text-xs text-amber-900">
+                  <p className="font-semibold mb-1">{t("demoHint")}</p>
+                  <p>
+                    <span className="font-mono">{t("demoUser")}</span> /{" "}
+                    <span className="font-mono">{t("demoPass")}</span>
+                  </p>
+                </div>
+              )}
             </form>
           ) : step === "mfa_setup" && setupToken ? (
             <MfaSetupForm

@@ -19,8 +19,13 @@
       "MFA_INVALID": "Неверный TOTP код",
       "MFA_SETUP_EXPIRED": "Сессия настройки MFA истекла. Войдите снова.",
       "MFA_ALREADY_ENABLED": "MFA уже включена",
-      "RATE_LIMIT_EXCEEDED": "Слишком много попыток. Попробуйте позже"
-    }
+      "RATE_LIMIT_EXCEEDED": "Слишком много попыток. Попробуйте позже",
+      "ACCOUNT_LOCKED": "Аккаунт заблокирован. Сброс: ./scripts/reset-demo-login.sh",
+      "PASSWORD_CHANGE_REQUIRED": "Сначала смените пароль"
+    },
+    "demoHint": "Демо вход (без MFA)",
+    "demoUser": "admin.aspect",
+    "demoPass": "CenterAdmin#26!"
   },
   "security": {
     "title": "Безопасность",

@@ -79,6 +79,7 @@ services:
     environment:
       NEXT_PUBLIC_API_URL: http://localhost:8000
       HOSTNAME: "0.0.0.0"
+      NEXT_PUBLIC_SHOW_DEMO_HINT: "true"
     volumes:
       - ./frontend:/app
       - /app/node_modules

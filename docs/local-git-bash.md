@@ -1,5 +1,8 @@
 # TMB — Git Bash orqali (Docker siz)
 
+> **CMD (qora oyna) ishlatyapsizmi?** → [windows-cmd.md](./windows-cmd.md)  
+> `chmod` va `/e/...` yo'llar faqat Git Bash uchun. CMD da: `scripts\local\setup.cmd`
+
 ## Talablar
 
 | Dastur | O'rnatish (Windows) |

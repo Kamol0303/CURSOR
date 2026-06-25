@@ -1,5 +1,7 @@
 # Windows — dasturlarni o'rnatish (Git Bash, Docker siz)
 
+> **CMD ishlatyapsizmi?** Buyruqlar: `scripts\local\check-prereqs.cmd` — [windows-cmd.md](./windows-cmd.md)
+
 Sizda quyidagi xatolar chiqsa, dasturlar o'rnatilmagan yoki PATH ga qo'shilmagan:
 
 ```
@@ -86,13 +88,26 @@ psql -U postgres -f scripts/local/init-db.sql
 
 ## 5. To'liq o'rnatish tartibi
 
+**CMD (Windows qora oyna):**
+
+```cmd
+cd /d "E:\kamol sayt\CURSOR"
+git pull origin main
+scripts\local\check-prereqs.cmd
+scripts\local\init-db.cmd
+scripts\local\setup.cmd
+scripts\local\start.cmd
+```
+
+**Git Bash:**
+
 ```bash
 git pull origin main
 chmod +x scripts/local/*.sh
-./scripts/local/check-prereqs.sh    # hammasi OK bo'lguncha
-./scripts/local/init-db.sh          # PostgreSQL
-./scripts/local/setup.sh            # venv, migration, npm
-./scripts/local/start.sh            # ishga tushirish
+./scripts/local/check-prereqs.sh
+./scripts/local/init-db.sh
+./scripts/local/setup.sh
+./scripts/local/start.sh
 ```
 
 Brauzer: http://localhost:3000

@@ -1,7 +1,16 @@
 #!/usr/bin/env bash
 set -euo pipefail
-ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
+# shellcheck disable=SC1091
+source "$SCRIPT_DIR/win-path.sh"
+setup_win_paths
 cd "$ROOT/frontend"
+
+if ! command -v npm >/dev/null 2>&1; then
+  echo "XATO: npm topilmadi. ./scripts/local/check-prereqs.sh"
+  exit 1
+fi
 
 if [ -f .env.local ]; then
   set -a

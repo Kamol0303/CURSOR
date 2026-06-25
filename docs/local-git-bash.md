@@ -12,19 +12,30 @@
 
 Redis **shart emas** — lokal rejimda xotira ichida ishlaydi (`USE_MEMORY_REDIS=true`).
 
+**Node yoki psql topilmasa:** [windows-install-prereqs.md](./windows-install-prereqs.md)
+
 ---
 
-## 1. Bir marta sozlash
-
-Git Bash da:
+## 0. Talablarni tekshirish
 
 ```bash
 cd "/e/kamol sayt/CURSOR"
 chmod +x scripts/local/*.sh
-./scripts/local/setup.sh
+./scripts/local/check-prereqs.sh
 ```
 
-PostgreSQL birinchi marta (postgres paroli so'raladi):
+Barcha qatorlar `[OK]` bo'lguncha o'rnatishni davom ettiring.
+
+---
+
+## 1. Bir marta sozlash
+
+```bash
+./scripts/local/init-db.sh    # PostgreSQL (postgres paroli so'raladi)
+./scripts/local/setup.sh      # venv, migration, npm install
+```
+
+`init-db.sh` o'rniga qo'lda:
 
 ```bash
 psql -U postgres -f scripts/local/init-db.sql
@@ -70,8 +81,8 @@ http://localhost:3000
 
 | Muammo | Yechim |
 |--------|--------|
-| `psql: command not found` | PostgreSQL bin ni PATH ga qo'shing |
-| DB ulanish xatosi | `psql -U postgres -f scripts/local/init-db.sql` |
+| `node topilmadi` / `psql: command not found` | `./scripts/local/check-prereqs.sh` va [windows-install-prereqs.md](./windows-install-prereqs.md) |
+| DB ulanish xatosi | `./scripts/local/init-db.sh` |
 | Login 401 | `cd backend && source .venv/Scripts/activate && python scripts/seed_demo_users.py --i-understand-this-creates-demo-credentials` |
 | Port band | 8000/3000 band portni bo'shating |
 
@@ -81,6 +92,8 @@ http://localhost:3000
 
 | Fayl | Vazifa |
 |------|--------|
+| `scripts/local/check-prereqs.sh` | Dasturlar tekshiruvi |
+| `scripts/local/init-db.sh` | PostgreSQL DB yaratish |
 | `backend/.env` | DB va JWT sozlamalari |
 | `frontend/.env.local` | API URL |
 | `backend/secrets/` | JWT kalitlar |

@@ -2,45 +2,57 @@
 # Bir marta: lokal muhit (Git Bash, Docker siz)
 set -euo pipefail
 
-ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 cd "$ROOT"
+
+# shellcheck disable=SC1091
+source "$SCRIPT_DIR/win-path.sh"
+setup_win_paths
 
 echo "=== TMB local setup (Docker siz) ==="
 
 need_cmd() {
   if ! command -v "$1" >/dev/null 2>&1; then
-    echo "XATO: $1 topilmadi. O'rnating va PATH ga qo'shing."
+    echo ""
+    echo "XATO: $1 topilmadi."
+    echo ""
+    echo "Avval tekshiring:"
+    echo "  ./scripts/local/check-prereqs.sh"
+    echo ""
+    echo "O'rnatish qo'llanmasi: docs/windows-install-prereqs.md"
     exit 1
   fi
 }
 
-need_cmd python
-need_cmd pip
+if ! PYTHON="$(resolve_python)"; then
+  echo "XATO: Python 3.12+ kerak"
+  echo "O'rnatish: https://www.python.org/downloads/ (Add to PATH)"
+  exit 1
+fi
+PIP="$(resolve_pip "$PYTHON")"
+
 need_cmd node
 need_cmd npm
 need_cmd openssl
 
-PYTHON=python
-if ! $PYTHON -c "import sys; exit(0 if sys.version_info >= (3,12) else 1)" 2>/dev/null; then
-  if command -v py >/dev/null 2>&1; then
-    PYTHON="py -3.12"
-  else
-    echo "XATO: Python 3.12+ kerak"
-    exit 1
-  fi
-fi
-
 if ! command -v psql >/dev/null 2>&1; then
-  echo "OGOHLANTIRISH: psql topilmadi."
-  echo "PostgreSQL o'rnating: https://www.postgresql.org/download/windows/"
-  echo "Keyin: psql -U postgres -f scripts/local/init-db.sql"
+  echo ""
+  echo "OGOHLANTIRISH: psql topilmadi — DB avtomatik yaratilmaydi."
+  echo "PostgreSQL o'rnating, keyin:"
+  echo "  ./scripts/local/init-db.sh"
+  echo ""
 else
   echo "PostgreSQL tekshiruvi..."
   if psql -U postgres -d tamor -c "SELECT 1" >/dev/null 2>&1; then
     echo "DB tamor mavjud."
   else
     echo "DB yaratilmoqda (postgres parol so'ralishi mumkin)..."
-    psql -U postgres -f scripts/local/init-db.sql || true
+    if psql -U postgres -f scripts/local/init-db.sql; then
+      echo "DB tamor yaratildi."
+    else
+      echo "OGOHLANTIRISH: DB yaratilmadi. Keyinroq: ./scripts/local/init-db.sh"
+    fi
   fi
 fi
 
@@ -63,7 +75,7 @@ if [ ! -d backend/.venv ]; then
 fi
 # shellcheck disable=SC1091
 source backend/.venv/Scripts/activate 2>/dev/null || source backend/.venv/bin/activate
-pip install -q -r backend/requirements.txt
+$PIP install -q -r backend/requirements.txt
 
 echo "=== Migration + seed ==="
 cd backend

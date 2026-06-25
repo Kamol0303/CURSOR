@@ -11,6 +11,7 @@ class Settings(BaseSettings):
 
     DATABASE_URL: str = "postgresql+asyncpg://tamor:tamor_dev@localhost:5432/tamor"
     REDIS_URL: str = "redis://localhost:6379/0"
+    USE_MEMORY_REDIS: bool = False
 
     JWT_PRIVATE_KEY_PATH: str = "/secrets/jwt_private.pem"
     JWT_PUBLIC_KEY_PATH: str = "/secrets/jwt_public.pem"

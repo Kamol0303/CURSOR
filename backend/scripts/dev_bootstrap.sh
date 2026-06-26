@@ -1,5 +1,5 @@
-#!/bin/bash
-set -euo pipefail
+#!/bin/sh
+set -eu
 
 echo "[bootstrap] JWT keys..."
 SECRETS_DIR="${SECRETS_DIR:-/secrets}"
@@ -11,7 +11,8 @@ if [ ! -f "$SECRETS_DIR/jwt_private.pem" ]; then
 fi
 
 echo "[bootstrap] Running migrations..."
-for i in $(seq 1 30); do
+i=1
+while [ "$i" -le 30 ]; do
   if alembic upgrade head; then
     break
   fi
@@ -21,6 +22,7 @@ for i in $(seq 1 30); do
     echo "[bootstrap] ERROR: migrations failed"
     exit 1
   fi
+  i=$((i + 1))
 done
 
 if [ "${ENVIRONMENT:-development}" = "development" ]; then

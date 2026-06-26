@@ -32,9 +32,22 @@ function Wait-Backend([string[]]$ComposeArgs) {
             Write-Host "Backend tayyor." -ForegroundColor Green
             return
         }
+        $status = docker @ComposeArgs ps backend --format "{{.Status}}" 2>$null
+        if ($status -match "Exited") {
+            Write-Host "Backend konteyner to'xtadi. Oxirgi loglar:" -ForegroundColor Red
+            docker @ComposeArgs logs backend --tail 80
+            Write-Host ""
+            Write-Host "Ko'pincha sabab: Windows CRLF yoki eski image. Yechim:" -ForegroundColor Yellow
+            Write-Host "  git pull origin main"
+            Write-Host "  docker compose down -v"
+            Write-Host "  docker compose build --no-cache backend"
+            Write-Host "  scripts\start.cmd"
+            exit 1
+        }
         Start-Sleep -Seconds 2
     }
-    Write-Host "Backend tayyor bo'lmadi." -ForegroundColor Red
+    Write-Host "Backend tayyor bo'lmadi. Loglar:" -ForegroundColor Red
+    docker @ComposeArgs logs backend --tail 80
     exit 1
 }
 

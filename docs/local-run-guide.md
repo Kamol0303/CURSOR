@@ -146,6 +146,7 @@ docker compose down -v
 | Login 401 | `./scripts/start.sh dev` qayta ishga tushiring (seed avtomatik) |
 | 502 nginx | `docker compose logs backend` — migration xatosi |
 | Postgres unhealthy | `docker compose down -v` keyin qayta `start.sh` |
+| Backend `exited (127)` | Windows CRLF — `git pull`, `docker compose build --no-cache backend`, qayta start |
 | Brauzer sertifikat ogohlantirishi | Staging self-signed — "Advanced → Proceed" |
 
 Diagnostika:

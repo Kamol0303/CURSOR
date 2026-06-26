@@ -1,5 +1,12 @@
-#!/bin/bash
-set -euo pipefail
+#!/bin/sh
+set -eu
+
+# Windows bind-mount: CRLF in .sh files causes "exit 127" (bad shebang)
+for f in ./scripts/*.sh; do
+  if [ -f "$f" ]; then
+    sed -i 's/\r$//' "$f" 2>/dev/null || true
+  fi
+done
 
 SECRETS_DIR="${SECRETS_DIR:-/secrets}"
 mkdir -p "$SECRETS_DIR"

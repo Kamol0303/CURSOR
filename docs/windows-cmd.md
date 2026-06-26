@@ -90,4 +90,13 @@ To'xtatish:
 docker compose down
 ```
 
+**Backend `exited (127)` bo'lsa:**
+
+```cmd
+git pull origin main
+docker compose down -v
+docker compose build --no-cache backend
+scripts\start.cmd
+```
+
 Batafsil: [local-run-guide.md](./local-run-guide.md)

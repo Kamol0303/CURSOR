@@ -20,7 +20,7 @@ export const DASHBOARD_NAV_ROUTES: readonly DashboardNavItem[] = [
   { href: "/dashboard/exams", key: "exams", permission: "exams.read" },
   { href: "/dashboard/grades", key: "grades", permission: "grades.read" },
   { href: "/dashboard/ratings", key: "ratings", permission: "ratings.view" },
-  { href: "/dashboard/certificates", key: "certificates", permission: "students.read" },
+  { href: "/dashboard/certificates", key: "certificates", permission: "ratings.view" },
   { href: "/dashboard/analytics", key: "analytics", permission: "analytics.view" },
   { href: "/dashboard/security", key: "security", permission: "users.password_reset" },
 ] as const;

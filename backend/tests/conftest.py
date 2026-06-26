@@ -142,7 +142,27 @@ async def security_fixtures(db_session: AsyncSession) -> dict:
         role_id=roles["parent"].id,
         is_active=True,
     )
-    db_session.add_all([director_a, teacher_a, admin_a, auditor, hokimiyat, parent])
+    super_admin = User(
+        username=f"super_{suffix}",
+        password_hash=hash_password("Test#SuperAdmin1!"),
+        role_id=roles["super_admin"].id,
+        is_active=True,
+    )
+    accountant = User(
+        username=f"acct_{suffix}",
+        password_hash=hash_password("Test#Accountant1!"),
+        role_id=roles["accountant"].id,
+        center_id=center_a.id,
+        is_active=True,
+    )
+    student_user = User(
+        username=f"student_u_{suffix}",
+        password_hash=hash_password("Test#StudentUser1!"),
+        role_id=roles["student"].id,
+        center_id=center_a.id,
+        is_active=True,
+    )
+    db_session.add_all([director_a, teacher_a, admin_a, auditor, hokimiyat, parent, super_admin, accountant, student_user])
     await db_session.flush()
 
     teacher_record_a = Teacher(
@@ -180,7 +200,7 @@ async def security_fixtures(db_session: AsyncSession) -> dict:
     db_session.add_all([group_a, group_b])
     await db_session.flush()
 
-    student_a = Student(center_id=center_a.id, full_name="SecTest Student A", grade="9")
+    student_a = Student(center_id=center_a.id, full_name="SecTest Student A", grade="9", user_id=student_user.id)
     student_b = Student(
         center_id=center_b.id,
         full_name="SecTest Student B",
@@ -206,7 +226,9 @@ async def security_fixtures(db_session: AsyncSession) -> dict:
     await db_session.refresh(admin_a, attribute_names=["role"])
     await db_session.refresh(auditor, attribute_names=["role"])
     await db_session.refresh(hokimiyat, attribute_names=["role"])
-    await db_session.refresh(parent, attribute_names=["role"])
+    await db_session.refresh(super_admin, attribute_names=["role"])
+    await db_session.refresh(accountant, attribute_names=["role"])
+    await db_session.refresh(student_user, attribute_names=["role"])
 
     def token_for(user: User) -> str:
         perms = ROLE_PERMISSIONS.get(user.role.code, [])
@@ -231,6 +253,9 @@ async def security_fixtures(db_session: AsyncSession) -> dict:
         "auditor": auditor,
         "hokimiyat": hokimiyat,
         "parent": parent,
+        "student_user": student_user,
+        "super_admin": super_admin,
+        "accountant": accountant,
         "student_a": student_a,
         "student_b": student_b,
         "token_director_a": token_for(director_a),
@@ -239,6 +264,9 @@ async def security_fixtures(db_session: AsyncSession) -> dict:
         "token_auditor": token_for(auditor),
         "token_hokimiyat": token_for(hokimiyat),
         "token_parent": token_for(parent),
+        "token_super_admin": token_for(super_admin),
+        "token_accountant": token_for(accountant),
+        "token_student": token_for(student_user),
     }
 
 

@@ -22,6 +22,10 @@ def test_accountant_cannot_access_teachers():
     assert "teachers.read" not in ROLE_PERMISSIONS["accountant"]
 
 
+def test_accountant_cannot_access_certificates_nav():
+    assert "ratings.view" not in ROLE_PERMISSIONS["accountant"]
+
+
 def test_center_admin_cannot_reset_passwords():
     assert "users.password_reset" not in ROLE_PERMISSIONS["center_admin"]
 

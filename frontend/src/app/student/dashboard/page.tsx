@@ -20,6 +20,7 @@ type GradeRow = {
 };
 
 type ExamRow = {
+  id: string;
   title: string;
   pass_score: number;
   duration_minutes: number;
@@ -101,9 +102,11 @@ export default function StudentDashboardPage() {
                 <p className="text-sm text-gray-400">{t("emptyExams")}</p>
               ) : (
                 <ul className="space-y-2 text-sm">
-                  {exams.map((e, i) => (
-                    <li key={`${e.title}-${i}`} className="border-b pb-1">
-                      <div className="font-medium">{e.title}</div>
+                  {exams.map((e) => (
+                    <li key={e.id} className="border-b pb-1">
+                      <a href={`/student/exams/${e.id}`} className="font-medium text-naqsh-primary hover:underline">
+                        {e.title}
+                      </a>
                       <div className="text-gray-500">
                         {t("passScore")}: {e.pass_score}% · {e.duration_minutes} min
                       </div>

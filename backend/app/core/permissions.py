@@ -122,6 +122,7 @@ ROLE_PERMISSIONS: dict[str, list[str]] = {
         "dashboard.view",
         "exams.read",
         "exams.create",
+        "exams.update",
         "grades.read",
         "grades.create",
         "courses.read",

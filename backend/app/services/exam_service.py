@@ -15,7 +15,15 @@ from app.core.tenant import (
 )
 from app.models.academics import Exam, ExamQuestion, ExamResult
 from app.models.identity import User
-from app.schemas.exams import ExamCreate, ExamResponse, ExamResultResponse, ExamSubmitRequest, ExamUpdate
+from app.schemas.exams import (
+    ExamCreate,
+    ExamDetailResponse,
+    ExamQuestionResponse,
+    ExamResponse,
+    ExamResultResponse,
+    ExamSubmitRequest,
+    ExamUpdate,
+)
 
 logger = get_logger(__name__)
 
@@ -33,6 +41,25 @@ def exam_to_response(exam: Exam, *, question_count: int | None = None) -> ExamRe
         duration_minutes=exam.duration_minutes,
         is_published=exam.is_published,
         question_count=count,
+    )
+
+
+def exam_to_detail(exam: Exam, *, include_answers: bool) -> ExamDetailResponse:
+    base = exam_to_response(exam)
+    questions = sorted(exam.questions, key=lambda q: q.order_index)
+    return ExamDetailResponse(
+        **base.model_dump(),
+        questions=[
+            ExamQuestionResponse(
+                id=q.id,
+                question_text=q.question_text,
+                options_json=q.options_json,
+                correct_answer=q.correct_answer if include_answers else None,
+                points=q.points,
+                order_index=q.order_index,
+            )
+            for q in questions
+        ],
     )
 
 
@@ -101,6 +128,23 @@ async def create_exam(db: AsyncSession, user: User, body: ExamCreate) -> ExamRes
     return exam_to_response(exam)
 
 
+async def get_exam_detail(db: AsyncSession, user: User, exam_id: UUID) -> ExamDetailResponse:
+    published_only = user.role.code == "student"
+    exam = await _get_exam(db, user, exam_id, published_only=published_only)
+    include_answers = user.role.code != "student"
+    return exam_to_detail(exam, include_answers=include_answers)
+
+
+async def delete_exam(db: AsyncSession, user: User, exam_id: UUID) -> None:
+    from datetime import UTC, datetime
+
+    if user.role.code not in {"super_admin", "center_director", "teacher"}:
+        raise HTTPException(status_code=403, detail={"code": "FORBIDDEN"})
+    exam = await _get_exam(db, user, exam_id)
+    exam.deleted_at = datetime.now(UTC)
+    await db.flush()
+
+
 async def update_exam(db: AsyncSession, user: User, exam_id: UUID, body: ExamUpdate) -> ExamResponse:
     exam = await _get_exam(db, user, exam_id)
     if body.title is not None:
@@ -128,6 +172,8 @@ async def submit_exam(db: AsyncSession, user: User, exam_id: UUID, body: ExamSub
 
         student = await student_service.get_linked_student(db, user)
         student_id = student.id
+    if not student_id:
+        raise HTTPException(status_code=422, detail={"code": "STUDENT_REQUIRED"})
 
     answers_map = {str(a.question_id): a.answer for a in body.answers}
     score = 0.0

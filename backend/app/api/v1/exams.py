@@ -1,14 +1,14 @@
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, Query, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
 from app.core.deps import requires_permission
 from app.models.identity import User
 from app.schemas.common import ApiResponse
-from app.schemas.exams import ExamCreate, ExamSubmitRequest, ExamUpdate
-from app.services import exam_service
+from app.schemas.exams import ExamCreate, ExamGenerateRequest, ExamSubmitRequest, ExamUpdate
+from app.services import exam_generation_service, exam_service
 
 router = APIRouter(prefix="/exams", tags=["exams"])
 
@@ -24,6 +24,23 @@ async def list_exams(
     return ApiResponse(success=True, data=[e.model_dump() for e in exams], meta={"page": page, "per_page": per_page, "total": total})
 
 
+@router.post("/generate", response_model=ApiResponse, status_code=201)
+async def generate_exam(
+    body: ExamGenerateRequest,
+    request: Request,
+    user: User = Depends(requires_permission("exams.create")),
+    db: AsyncSession = Depends(get_db),
+):
+    exam = await exam_generation_service.generate_exam(
+        db,
+        user,
+        body,
+        ip_address=request.client.host if request.client else None,
+    )
+    await db.commit()
+    return ApiResponse(success=True, data=exam.model_dump())
+
+
 @router.post("", response_model=ApiResponse, status_code=201)
 async def create_exam(
     body: ExamCreate,
@@ -32,6 +49,16 @@ async def create_exam(
 ):
     exam = await exam_service.create_exam(db, user, body)
     await db.commit()
+    return ApiResponse(success=True, data=exam.model_dump())
+
+
+@router.get("/{exam_id}", response_model=ApiResponse)
+async def get_exam(
+    exam_id: UUID,
+    user: User = Depends(requires_permission("exams.read")),
+    db: AsyncSession = Depends(get_db),
+):
+    exam = await exam_service.get_exam_detail(db, user, exam_id)
     return ApiResponse(success=True, data=exam.model_dump())
 
 
@@ -45,6 +72,17 @@ async def update_exam(
     exam = await exam_service.update_exam(db, user, exam_id, body)
     await db.commit()
     return ApiResponse(success=True, data=exam.model_dump())
+
+
+@router.delete("/{exam_id}", response_model=ApiResponse)
+async def delete_exam(
+    exam_id: UUID,
+    user: User = Depends(requires_permission("exams.delete")),
+    db: AsyncSession = Depends(get_db),
+):
+    await exam_service.delete_exam(db, user, exam_id)
+    await db.commit()
+    return ApiResponse(success=True, data={"deleted": True})
 
 
 @router.post("/{exam_id}/submit", response_model=ApiResponse)

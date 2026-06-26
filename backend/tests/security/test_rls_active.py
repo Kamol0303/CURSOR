@@ -12,12 +12,34 @@ async def test_rls_force_enabled(db_session):
             FROM pg_class c
             JOIN pg_namespace n ON n.oid = c.relnamespace
             WHERE n.nspname = 'public'
-              AND c.relname IN ('students', 'enrollments', 'certificates', 'guardians')
+              AND c.relname IN (
+                'students', 'enrollments', 'certificates', 'guardians',
+                'courses', 'lessons', 'exams', 'exam_results', 'grades', 'files',
+                'groups', 'teachers', 'attendance_sessions', 'attendance_records',
+                'student_payments'
+              )
             ORDER BY c.relname
         """)
     )
     rows = result.mappings().all()
-    assert len(rows) == 4, f"Expected 4 tables, got {rows}"
+    expected = {
+        "students",
+        "enrollments",
+        "certificates",
+        "guardians",
+        "courses",
+        "lessons",
+        "exams",
+        "exam_results",
+        "grades",
+        "files",
+        "groups",
+        "teachers",
+        "attendance_sessions",
+        "attendance_records",
+        "student_payments",
+    }
+    assert len(rows) == len(expected), f"Expected {len(expected)} tables, got {rows}"
     for row in rows:
         assert row["relrowsecurity"] is True, f"{row['relname']} missing RLS"
         assert row["relforcerowsecurity"] is True, f"{row['relname']} missing FORCE RLS"

@@ -5,7 +5,7 @@ from __future__ import annotations
 from contextvars import ContextVar
 from typing import TYPE_CHECKING
 
-from sqlalchemy import text
+from sqlalchemy import select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 if TYPE_CHECKING:
@@ -36,15 +36,28 @@ async def apply_rls_context(session: AsyncSession) -> None:
         role = override
         center_id = ""
         phone = ""
+        student_id = ""
     elif user:
         role = user.role.code
         center_id = str(user.center_id) if user.center_id else ""
         phone = user.phone or ""
+        student_id = ""
+        if role == "student":
+            from app.models.education import Student
+
+            result = await session.execute(
+                select(Student.id).where(Student.user_id == user.id, Student.deleted_at.is_(None))
+            )
+            sid = result.scalar_one_or_none()
+            if sid:
+                student_id = str(sid)
     else:
         role = "anonymous"
         center_id = ""
         phone = ""
+        student_id = ""
 
     await session.execute(text("SELECT set_config('app.role', :role, true)"), {"role": role})
     await session.execute(text("SELECT set_config('app.center_id', :cid, true)"), {"cid": center_id})
     await session.execute(text("SELECT set_config('app.phone', :phone, true)"), {"phone": phone})
+    await session.execute(text("SELECT set_config('app.student_id', :sid, true)"), {"sid": student_id})

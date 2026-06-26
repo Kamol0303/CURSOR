@@ -11,7 +11,7 @@ from app.core.database import Base
 from app.models.identity import TimestampMixin
 
 if TYPE_CHECKING:
-    from app.models.identity import TrainingCenter
+    from app.models.identity import TrainingCenter, User
     from app.models.ratings_certs import Certificate
 
 import uuid
@@ -121,6 +121,8 @@ class Student(Base, TimestampMixin):
     graduation_date: Mapped[date | None] = mapped_column(Date, nullable=True)
     consent_given_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     is_demo_data: Mapped[bool] = mapped_column(Boolean, default=False)
+    user_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=True)
+    photo_file_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), ForeignKey("files.id"), nullable=True)
 
     center: Mapped[TrainingCenter] = relationship(back_populates="students")
     guardians: Mapped[list["Guardian"]] = relationship(back_populates="student")

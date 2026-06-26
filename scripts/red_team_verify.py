@@ -128,6 +128,41 @@ async def verify(base_url: str, production: bool, offline: bool) -> Report:
     report.add("RT-22", "Cosign workflow exists", (repo / ".github/workflows/cosign.yml").exists())
     report.add("RT-23", "Vault secrets ADR documented", (repo / "docs/adr/008-vault-secrets.md").exists())
 
+    from app.integrations.payment_gateways import verify_click_signature, verify_payme_signature
+
+    fake_click = {
+        "click_trans_id": "1",
+        "merchant_trans_id": "order-1",
+        "amount": "1000",
+        "action": 0,
+        "sign_time": "2026-01-01 00:00:00",
+        "sign_string": "deadbeef",
+    }
+    report.add(
+        "RT-29",
+        "Payment webhook rejects invalid Click signature",
+        not verify_click_signature(fake_click),
+    )
+    report.add(
+        "RT-29b",
+        "Payment webhook rejects invalid Payme auth",
+        not verify_payme_signature({}, authorization="Basic d3Jvbmc="),
+    )
+
+    auth_src = (repo / "backend/app/services/auth_service.py").read_text()
+    report.add(
+        "RT-30",
+        "JWT deny_jti wired on logout",
+        "revoke_access_token_jti" in auth_src and "access_jti" in auth_src,
+    )
+
+    pgw_src = (repo / "backend/app/integrations/payment_gateways.py").read_text()
+    report.add(
+        "RT-29c",
+        "Payment gateway stub removed",
+        "click_signature_stub" not in pgw_src and "payme_signature_stub" not in pgw_src,
+    )
+
     backup = repo / "scripts/backup_postgres.sh"
     restore = repo / "scripts/restore_postgres.sh"
     report.add(

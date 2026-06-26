@@ -26,10 +26,17 @@ PUBLIC_HOST=tamor.toyloq.uz ./scripts/verify-prod.sh
 | CI | RT-10 | RLS FORCE on students, enrollments, certificates, guardians |
 | CI | RT-11 | Auditor PINFL reveal returns decrypted value |
 | CI | RT-17/18 | Verify rate limit + certificate tamper detection |
-| script | RT-03–05, RT-19, RT-21–23 | `red_team_verify.py --offline` |
+| script | RT-03–05, RT-19, RT-21–23, RT-29–30 | `red_team_verify.py --offline` |
 | script | RT-16, RT-27 | `pre_deploy_check.py` + `purge_demo_data.py` |
 | script | RT-26 | `scripts/backup_postgres.sh`, `scripts/restore_postgres.sh` |
 | manual | RT-07, RT-13–15, RT-20, RT-24–25, RT-28 | Human verification / external pentest |
+
+- [ ] **RT-29** Click/Payme webhooks reject invalid signatures — *automated*
+- [ ] **RT-30** JWT access token revoked on logout — *automated + P-05 pentest*
+
+## External pentest
+
+Full scenario list: `docs/pentest-checklist.md`
 
 ## Authentication & Session
 

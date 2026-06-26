@@ -106,6 +106,7 @@
     "groups": "Группы",
     "courses": "Курсы",
     "messages": "Сообщения",
+    "messagesMonitor": "Аудит сообщений",
     "attendance": "Посещаемость",
     "payments": "Платежи",
     "exams": "Экзамены",
@@ -270,11 +271,40 @@
     "inbox": "Входящие",
     "sent": "Отправленные",
     "compose": "Новое сообщение",
-    "recipientId": "ID получателя (UUID)",
+    "searchRecipient": "Поиск получателя по имени",
+    "clearRecipient": "Очистить",
+    "searching": "Поиск...",
+    "centerOnlyHint": "Сообщения можно отправлять только сотрудникам вашего центра.",
     "subject": "Тема",
     "body": "Текст сообщения",
     "send": "Отправить",
-    "empty": "Сообщений нет"
+    "empty": "Сообщений нет",
+    "roles": {
+      "teacher": "Учитель",
+      "center_admin": "Менеджер",
+      "center_director": "Директор",
+      "accountant": "Бухгалтер"
+    },
+    "errors": {
+      "CROSS_CENTER_FORBIDDEN": "Получатель должен принадлежать вашему центру",
+      "RECIPIENT_NOT_FOUND": "Получатель не найден",
+      "SELF_MESSAGE_FORBIDDEN": "Нельзя отправить сообщение себе",
+      "CENTER_REQUIRED": "Учётная запись должна быть привязана к центру",
+      "UNKNOWN": "Произошла ошибка"
+    }
+  },
+  "messagesMonitor": {
+    "title": "Мониторинг сообщений",
+    "privacyNotice": "Сообщения хранятся для аудита. Доступ Super Admin только для просмотра.",
+    "allCenters": "Все центры",
+    "readOnly": "Только просмотр",
+    "loading": "Загрузка...",
+    "center": "Центр",
+    "sender": "Отправитель",
+    "recipient": "Получатель",
+    "subject": "Тема",
+    "sentAt": "Отправлено",
+    "empty": "Сообщений не найдено"
   },
   "studentCabinet": {
     "title": "Личный кабинет",

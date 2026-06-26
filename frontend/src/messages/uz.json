@@ -106,6 +106,7 @@
     "groups": "Guruhlar",
     "courses": "Kurslar",
     "messages": "Xabarlar",
+    "messagesMonitor": "Xabarlar auditi",
     "attendance": "Davomat",
     "payments": "To'lovlar",
     "exams": "Imtihonlar",
@@ -282,11 +283,40 @@
     "inbox": "Kiruvchi",
     "sent": "Yuborilgan",
     "compose": "Yangi xabar",
-    "recipientId": "Qabul qiluvchi ID (UUID)",
+    "searchRecipient": "Qabul qiluvchini ism bo'yicha qidiring",
+    "clearRecipient": "Tozalash",
+    "searching": "Qidirilmoqda...",
+    "centerOnlyHint": "Xabarlar faqat o'z markazingiz xodimlariga yuboriladi.",
     "subject": "Mavzu",
     "body": "Xabar matni",
     "send": "Yuborish",
-    "empty": "Xabarlar yo'q"
+    "empty": "Xabarlar yo'q",
+    "roles": {
+      "teacher": "O'qituvchi",
+      "center_admin": "Menejer",
+      "center_director": "Direktor",
+      "accountant": "Buxgalter"
+    },
+    "errors": {
+      "CROSS_CENTER_FORBIDDEN": "Qabul qiluvchi sizning markazingizga tegishli bo'lishi kerak",
+      "RECIPIENT_NOT_FOUND": "Qabul qiluvchi topilmadi",
+      "SELF_MESSAGE_FORBIDDEN": "O'zingizga xabar yubora olmaysiz",
+      "CENTER_REQUIRED": "Hisobingiz markazga bog'langan bo'lishi kerak",
+      "UNKNOWN": "Xatolik yuz berdi"
+    }
+  },
+  "messagesMonitor": {
+    "title": "Xabarlar monitoringi",
+    "privacyNotice": "Xabarlar audit maqsadida saqlanadi. Super Admin faqat ko'rish huquqiga ega.",
+    "allCenters": "Barcha markazlar",
+    "readOnly": "Faqat ko'rish",
+    "loading": "Yuklanmoqda...",
+    "center": "Markaz",
+    "sender": "Yuboruvchi",
+    "recipient": "Qabul qiluvchi",
+    "subject": "Mavzu",
+    "sentAt": "Yuborilgan vaqt",
+    "empty": "Xabarlar topilmadi"
   },
   "studentCabinet": {
     "title": "Shaxsiy kabinet",

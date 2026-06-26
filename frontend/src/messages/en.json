@@ -106,6 +106,7 @@
     "groups": "Groups",
     "courses": "Courses",
     "messages": "Messages",
+    "messagesMonitor": "Messages audit",
     "attendance": "Attendance",
     "payments": "Payments",
     "exams": "Exams",
@@ -270,11 +271,40 @@
     "inbox": "Inbox",
     "sent": "Sent",
     "compose": "Compose",
-    "recipientId": "Recipient ID (UUID)",
+    "searchRecipient": "Search recipient by name",
+    "clearRecipient": "Clear",
+    "searching": "Searching...",
+    "centerOnlyHint": "Messages can only be sent to staff within your center.",
     "subject": "Subject",
     "body": "Message body",
     "send": "Send",
-    "empty": "No messages"
+    "empty": "No messages",
+    "roles": {
+      "teacher": "Teacher",
+      "center_admin": "Manager",
+      "center_director": "Director",
+      "accountant": "Accountant"
+    },
+    "errors": {
+      "CROSS_CENTER_FORBIDDEN": "Recipient must belong to your center",
+      "RECIPIENT_NOT_FOUND": "Recipient not found",
+      "SELF_MESSAGE_FORBIDDEN": "You cannot message yourself",
+      "CENTER_REQUIRED": "Your account must be linked to a center",
+      "UNKNOWN": "An error occurred"
+    }
+  },
+  "messagesMonitor": {
+    "title": "Messages monitoring",
+    "privacyNotice": "Messages are stored for audit purposes. Super Admin access is read-only.",
+    "allCenters": "All centers",
+    "readOnly": "Read-only",
+    "loading": "Loading...",
+    "center": "Center",
+    "sender": "Sender",
+    "recipient": "Recipient",
+    "subject": "Subject",
+    "sentAt": "Sent at",
+    "empty": "No messages found"
   },
   "studentCabinet": {
     "title": "Student portal",

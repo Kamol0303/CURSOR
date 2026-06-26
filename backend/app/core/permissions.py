@@ -47,6 +47,7 @@ ROLE_PERMISSIONS: dict[str, list[str]] = {
         "files.upload",
         "files.read",
         *_MESSAGE_PERMS,
+        "messages.monitor",
     ],
     "hokimiyat_operator": [
         "centers.create",
@@ -206,4 +207,5 @@ NAV_PERMISSIONS: dict[str, str] = {
     "analytics": "analytics.view",
     "security": "users.password_reset",
     "messages": "messages.read",
+    "messagesMonitor": "messages.monitor",
 }

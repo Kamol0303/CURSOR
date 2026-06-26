@@ -25,3 +25,23 @@ class MessageResponse(BaseModel):
     sent_at: datetime
     sender_name: str | None = None
     recipient_name: str | None = None
+
+
+class MessageRecipientResponse(BaseModel):
+    id: str
+    display_name: str
+    role: str
+    username: str | None = None
+
+
+class MessageMonitorResponse(BaseModel):
+    id: UUID
+    center_id: UUID
+    center_name: str
+    sender_id: UUID | None
+    recipient_id: UUID | None
+    sender_name: str | None
+    recipient_name: str | None
+    title: str
+    body: str
+    sent_at: datetime

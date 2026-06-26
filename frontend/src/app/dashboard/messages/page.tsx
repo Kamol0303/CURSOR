@@ -3,6 +3,8 @@
 import { useCallback, useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { apiFetch } from "@/lib/api";
+import { MessageRecipientSelect, type RecipientOption } from "@/components/MessageRecipientSelect";
+import { PermissionGate } from "@/components/PermissionGate";
 
 type Message = {
   id: string;
@@ -19,9 +21,10 @@ export default function MessagesPage() {
   const [box, setBox] = useState<"inbox" | "sent">("inbox");
   const [items, setItems] = useState<Message[]>([]);
   const [loading, setLoading] = useState(true);
-  const [recipientId, setRecipientId] = useState("");
+  const [recipient, setRecipient] = useState<RecipientOption | null>(null);
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
+  const [error, setError] = useState<string | null>(null);
 
   const load = useCallback(() => {
     setLoading(true);
@@ -38,12 +41,20 @@ export default function MessagesPage() {
 
   const send = async (e: React.FormEvent) => {
     e.preventDefault();
-    await apiFetch("/messages", {
+    if (!recipient) return;
+    setError(null);
+    const res = await apiFetch("/messages", {
       method: "POST",
-      body: JSON.stringify({ recipient_id: recipientId, title, body }),
+      body: JSON.stringify({ recipient_id: recipient.id, title, body }),
     });
+    if (!res.success) {
+      const code = (res as { error?: { code?: string } }).error?.code || "UNKNOWN";
+      setError(t(`errors.${code}` as "errors.UNKNOWN"));
+      return;
+    }
     setTitle("");
     setBody("");
+    setRecipient(null);
     setBox("sent");
     load();
   };
@@ -70,26 +81,46 @@ export default function MessagesPage() {
         </div>
       </div>
 
-      <form onSubmit={send} className="bg-white p-4 rounded-xl border space-y-3">
-        <h3 className="font-semibold text-naqsh-primary">{t("compose")}</h3>
-        <input
-          className="w-full border rounded-lg px-3 py-2 font-mono text-sm"
-          placeholder={t("recipientId")}
-          value={recipientId}
-          onChange={(e) => setRecipientId(e.target.value)}
-          required
-        />
-        <input className="w-full border rounded-lg px-3 py-2" placeholder={t("subject")} value={title} onChange={(e) => setTitle(e.target.value)} required />
-        <textarea className="w-full border rounded-lg px-3 py-2" rows={3} placeholder={t("body")} value={body} onChange={(e) => setBody(e.target.value)} required />
-        <button type="submit" className="px-4 py-2 bg-naqsh-primary text-white rounded-lg">{t("send")}</button>
-      </form>
+      <PermissionGate permission="messages.send">
+        <form onSubmit={send} className="bg-white p-4 rounded-xl border space-y-3">
+          <h3 className="font-semibold text-naqsh-primary">{t("compose")}</h3>
+          <p className="text-xs text-gray-500">{t("centerOnlyHint")}</p>
+          <MessageRecipientSelect value={recipient} onChange={setRecipient} />
+          <input
+            className="w-full border rounded-lg px-3 py-2"
+            placeholder={t("subject")}
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            required
+          />
+          <textarea
+            className="w-full border rounded-lg px-3 py-2"
+            rows={3}
+            placeholder={t("body")}
+            value={body}
+            onChange={(e) => setBody(e.target.value)}
+            required
+          />
+          {error && <p className="text-sm text-red-600">{error}</p>}
+          <button
+            type="submit"
+            disabled={!recipient}
+            className="px-4 py-2 bg-naqsh-primary text-white rounded-lg disabled:opacity-50"
+          >
+            {t("send")}
+          </button>
+        </form>
+      </PermissionGate>
 
       {loading ? (
         <p className="text-gray-400">{t("loading")}</p>
       ) : (
         <div className="space-y-2">
           {items.map((m) => (
-            <div key={m.id} className={`bg-white border rounded-xl p-4 ${!m.is_read && box === "inbox" ? "border-naqsh-accent" : ""}`}>
+            <div
+              key={m.id}
+              className={`bg-white border rounded-xl p-4 ${!m.is_read && box === "inbox" ? "border-naqsh-accent" : ""}`}
+            >
               <div className="flex justify-between text-sm mb-1">
                 <span className="font-semibold">{m.title}</span>
                 <span className="text-gray-400">{new Date(m.sent_at).toLocaleString()}</span>

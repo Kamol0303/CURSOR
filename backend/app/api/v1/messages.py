@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
@@ -24,6 +24,28 @@ async def list_messages(
     return ApiResponse(success=True, data=[i.model_dump() for i in items])
 
 
+@router.get("/recipients", response_model=ApiResponse)
+async def list_message_recipients(
+    search: str | None = None,
+    limit: int = Query(30, ge=1, le=100),
+    user: User = Depends(requires_permission("messages.send")),
+    db: AsyncSession = Depends(get_db),
+):
+    items = await message_service.list_recipients(db, user, search=search, limit=limit)
+    return ApiResponse(success=True, data=[i.model_dump() for i in items])
+
+
+@router.get("/monitor", response_model=ApiResponse)
+async def monitor_messages(
+    center_id: UUID | None = None,
+    limit: int = Query(100, ge=1, le=500),
+    user: User = Depends(requires_permission("messages.monitor")),
+    db: AsyncSession = Depends(get_db),
+):
+    items = await message_service.monitor_messages(db, user, center_id=center_id, limit=limit)
+    return ApiResponse(success=True, data=[i.model_dump() for i in items])
+
+
 @router.post("", response_model=ApiResponse, status_code=201)
 async def send_message(
     body: MessageCreate,
@@ -43,8 +65,6 @@ async def mark_message_read(
 ):
     ok = await message_service.mark_read(db, user, message_id)
     if not ok:
-        from fastapi import HTTPException
-
         raise HTTPException(status_code=404, detail={"code": "NOT_FOUND"})
     await db.commit()
     return ApiResponse(success=True, data={"read": True})

@@ -15,6 +15,7 @@ export const DASHBOARD_NAV_ROUTES: readonly DashboardNavItem[] = [
   { href: "/dashboard/groups", key: "groups", permission: "groups.read" },
   { href: "/dashboard/courses", key: "courses", permission: "courses.read" },
   { href: "/dashboard/messages", key: "messages", permission: "messages.read" },
+  { href: "/dashboard/messages/monitor", key: "messagesMonitor", permission: "messages.monitor" },
   { href: "/dashboard/attendance", key: "attendance", permission: "attendance.read" },
   { href: "/dashboard/payments", key: "payments", permission: "payments.read" },
   { href: "/dashboard/exams", key: "exams", permission: "exams.read" },

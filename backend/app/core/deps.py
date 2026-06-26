@@ -11,6 +11,7 @@ from app.core.redis_client import is_jti_denied
 from app.core.rls import apply_rls_context, set_rls_user
 from app.core.security import verify_access_token
 from app.models.identity import User
+from app.services.auth_service import get_user_permissions
 
 bearer_scheme = HTTPBearer(auto_error=False)
 
@@ -81,11 +82,9 @@ async def get_current_user_optional(
 
 def requires_permission(permission: str):
     async def checker(
-        request: Request,
         user: User = Depends(get_current_user),
     ) -> User:
-        payload = getattr(request.state, "token_payload", {})
-        permissions: list[str] = payload.get("permissions", [])
+        permissions = await get_user_permissions(user)
         if permission not in permissions:
             raise HTTPException(status_code=403, detail={"code": "FORBIDDEN"})
         return user

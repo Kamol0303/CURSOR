@@ -34,6 +34,8 @@ def validate_production_settings() -> list[str]:
         ("PINFL_ENCRYPTION_KEY", settings.PINFL_ENCRYPTION_KEY),
         ("SMS_WEBHOOK_SECRET", settings.SMS_WEBHOOK_SECRET),
         ("TELEGRAM_WEBHOOK_SECRET", settings.TELEGRAM_WEBHOOK_SECRET),
+        ("CLICK_SECRET_KEY", settings.CLICK_SECRET_KEY),
+        ("PAYME_SECRET_KEY", settings.PAYME_SECRET_KEY),
     ]:
         if len(value) < 32:
             errors.append(f"{name} must be at least 32 characters in production")
@@ -48,6 +50,11 @@ def validate_production_settings() -> list[str]:
 
     if any("localhost" in o for o in settings.CORS_ORIGINS):
         errors.append("CORS_ORIGINS must not include localhost in production")
+
+    if not settings.CLICK_SERVICE_ID:
+        errors.append("CLICK_SERVICE_ID is required in production")
+    if settings.PAYMENT_WEBHOOK_ALLOW_UNSIGNED_DEV:
+        errors.append("PAYMENT_WEBHOOK_ALLOW_UNSIGNED_DEV must be False in production")
 
     return errors
 

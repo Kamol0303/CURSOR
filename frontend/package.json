@@ -1,5 +1,31 @@
 {
   "name": "tamor-frontend",
+<<<<<<< HEAD
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "next": "^16.2.9",
+    "next-intl": "^4.13.0",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.3.1",
+    "@types/node": "^26.0.0",
+    "@types/react": "^19.2.17",
+    "autoprefixer": "^10.5.0",
+    "eslint": "^9.39.4",
+    "eslint-config-next": "^16.2.9",
+    "postcss": "^8.5.15",
+    "tailwindcss": "^4.3.1",
+    "typescript": "^6.0.3"
+=======
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -9,7 +35,7 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "next": "14.2.21",
+    "next": "14.2.35",
     "next-intl": "^3.26.3",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
@@ -23,9 +49,10 @@
     "@types/react-dom": "^18.3.5",
     "autoprefixer": "^10.4.20",
     "eslint": "^8.57.1",
-    "eslint-config-next": "14.2.21",
+    "eslint-config-next": "14.2.35",
     "postcss": "^8.4.49",
     "tailwindcss": "^3.4.17",
     "typescript": "^5.7.2"
+>>>>>>> main
   }
 }

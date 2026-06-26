@@ -22,10 +22,30 @@ Store in `secret/tmb/prod/` (KV v2, field name `value`):
 
 Environment variables (not in Vault):
 
-- `TOTP_ENCRYPTION_KEY` (32+ random bytes)
+- `TOTP_ENCRYPTION_KEY` (32+ random bytes) — `openssl rand -base64 32`
 - `PINFL_ENCRYPTION_KEY` (32+ random bytes)
+- `CLICK_SERVICE_ID`, `CLICK_SECRET_KEY` — from Click merchant cabinet
+- `PAYME_SECRET_KEY` — from Payme Merchant API
 - `DATABASE_URL`, `REDIS_URL`
 - `ESKIZ_EMAIL` / `ESKIZ_PASSWORD` or `ESKIZ_API_TOKEN`
+
+**Never set** `PAYMENT_WEBHOOK_ALLOW_UNSIGNED_DEV=true` in production.
+
+## 2a. CA TLS certificates
+
+1. Obtain CA-signed certificate for `PUBLIC_HOST` (district CA or approved provider).
+2. Install to `infra/nginx/tls/`:
+   - `fullchain.pem`
+   - `privkey.pem`
+3. Verify: `openssl x509 -in infra/nginx/tls/fullchain.pem -noout -dates`
+4. Do **not** use `generate-dev-certs.sh` in production.
+
+## 2b. Vault checklist
+
+- [ ] Vault cluster reachable from app network only
+- [ ] KV path `secret/tmb/prod/jwt_private_key` and `jwt_public_key` populated
+- [ ] App role/token with read-only access to `tmb/prod/*`
+- [ ] Token rotation procedure documented with district IT
 
 Backend entrypoint bootstraps JWT PEMs from Vault into `/secrets` on first start.
 

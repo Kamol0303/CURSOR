@@ -23,6 +23,10 @@ def prod_settings(monkeypatch, tmp_path: Path):
     monkeypatch.setattr(config.settings, "PINFL_ENCRYPTION_KEY", "production-grade-key-32-chars-ok!")
     monkeypatch.setattr(config.settings, "SMS_WEBHOOK_SECRET", "production-grade-key-32-chars-ok!!")
     monkeypatch.setattr(config.settings, "TELEGRAM_WEBHOOK_SECRET", "production-grade-key-32-chars-ok!")
+    monkeypatch.setattr(config.settings, "CLICK_SERVICE_ID", "12345")
+    monkeypatch.setattr(config.settings, "CLICK_SECRET_KEY", "production-grade-click-secret-32chars!")
+    monkeypatch.setattr(config.settings, "PAYME_SECRET_KEY", "production-grade-payme-secret-32chars!")
+    monkeypatch.setattr(config.settings, "PAYMENT_WEBHOOK_ALLOW_UNSIGNED_DEV", False)
     monkeypatch.setattr(config.settings, "CORS_ORIGINS", ["https://tamor.toyloq.uz"])
     return config.settings
 

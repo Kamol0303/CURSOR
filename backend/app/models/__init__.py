@@ -1,3 +1,14 @@
+<<<<<<< HEAD
+from app.models.auth import (
+    APIKey,
+    APIKeyScope,
+    Locale,
+    LoginAuditLog,
+    MFARecoveryCode,
+    MFAMethod,
+    OTPChallenge,
+    PasswordHistory,
+=======
 from app.models.analytics_notifications import (
     AiAnalysisLog,
     AiPrediction,
@@ -24,11 +35,48 @@ from app.models.identity import (
     DeviceFingerprint,
     LoginAuditLog,
     MfaBackupCode,
+>>>>>>> main
     PasswordResetToken,
     Permission,
     RefreshToken,
     Role,
     RolePermission,
+<<<<<<< HEAD
+    Session,
+    User,
+)
+from app.models.base import Base
+from app.models.education import AuditLog, File, Guardian, Student, Subject, SystemSetting, TrainingCenter, Translation
+from app.models.location import Mahalla, Region
+
+__all__ = [
+    "APIKey",
+    "APIKeyScope",
+    "AuditLog",
+    "Base",
+    "File",
+    "Guardian",
+    "Locale",
+    "LoginAuditLog",
+    "MFARecoveryCode",
+    "MFAMethod",
+    "Mahalla",
+    "OTPChallenge",
+    "PasswordHistory",
+    "PasswordResetToken",
+    "Permission",
+    "RefreshToken",
+    "Region",
+    "Role",
+    "RolePermission",
+    "Session",
+    "Student",
+    "Subject",
+    "SystemSetting",
+    "TrainingCenter",
+    "Translation",
+    "User",
+=======
     SecurityEvent,
     Session,
     SigningKey,
@@ -101,4 +149,5 @@ __all__ = [
     "ApiKeyScope",
     "SystemSetting",
     "AuditLog",
+>>>>>>> main
 ]

@@ -1,0 +1,46 @@
+[build-system]
+requires = ["setuptools>=80", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "tamor-backend"
+version = "0.1.0"
+description = "TaMoR backend foundation"
+requires-python = ">=3.12"
+dependencies = [
+  "aiosqlite>=0.21.0",
+  "alembic>=1.16.0",
+  "argon2-cffi>=23.1.0",
+  "cryptography>=45.0.0",
+  "email-validator>=2.2.0",
+  "fastapi>=0.116.0",
+  "httpx>=0.28.0",
+  "itsdangerous>=2.2.0",
+  "psycopg[binary]>=3.2.0",
+  "pydantic-settings>=2.10.0",
+  "pyjwt[crypto]>=2.10.0",
+  "pyotp>=2.9.0",
+  "qrcode>=8.2.0",
+  "python-multipart>=0.0.20",
+  "redis>=6.2.0",
+  "sqlalchemy>=2.0.41",
+  "uvicorn[standard]>=0.35.0",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8.4.0",
+  "pytest-asyncio>=1.0.0",
+  "ruff>=0.12.0",
+]
+
+[tool.setuptools.packages.find]
+include = ["app*"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"

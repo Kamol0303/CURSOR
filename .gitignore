@@ -1,3 +1,31 @@
+<<<<<<< HEAD
+.DS_Store
+.env
+.env.*
+!.env.example
+.venv/
+venv/
+__pycache__/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+*.egg-info/
+*.tsbuildinfo
+dist/
+build/
+.next/
+node_modules/
+coverage/
+*.pyc
+*.pyo
+*.pyd
+*.sqlite3
+backend/.venv/
+frontend/.turbo/
+frontend/out/
+=======
 .git/
 __pycache__/
 *.pyc
@@ -12,3 +40,4 @@ dist/
 build/
 *.pem
 secrets/
+>>>>>>> main

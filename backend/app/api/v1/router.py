@@ -9,6 +9,7 @@ from app.api.v1.courses import router as courses_router
 from app.api.v1.dashboard import router as dashboard_router
 from app.api.v1.external import router as external_router
 from app.api.v1.exams import router as exams_router
+from app.api.v1.geography import router as geography_router
 from app.api.v1.files import router as files_router
 from app.api.v1.grades import router as grades_router
 from app.api.v1.groups import groups_router, payments_router
@@ -38,6 +39,7 @@ api_router.include_router(dashboard_router)
 api_router.include_router(exams_router)
 api_router.include_router(grades_router)
 api_router.include_router(courses_router)
+api_router.include_router(geography_router)
 api_router.include_router(files_router)
 api_router.include_router(ratings_router)
 api_router.include_router(certificates_router)

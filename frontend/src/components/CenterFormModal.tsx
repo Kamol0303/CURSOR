@@ -13,9 +13,14 @@ type Center = {
   email: string | null;
   address: string | null;
   license_number: string | null;
+  license_expiry: string | null;
   center_type: string;
   is_active: boolean;
+  mahalla_id: string | null;
 };
+
+type Region = { id: string; name_uz: string };
+type Mahalla = { id: string; region_id: string; name_uz: string };
 
 type Props = {
   center?: Center | null;
@@ -33,8 +38,15 @@ export function CenterFormModal({ center, onClose, onSaved }: Props) {
   const [email, setEmail] = useState(center?.email || "");
   const [address, setAddress] = useState(center?.address || "");
   const [licenseNumber, setLicenseNumber] = useState(center?.license_number || "");
+  const [licenseExpiry, setLicenseExpiry] = useState(
+    center?.license_expiry ? center.license_expiry.slice(0, 10) : "",
+  );
   const [centerType, setCenterType] = useState(center?.center_type || "private");
   const [isActive, setIsActive] = useState(center?.is_active ?? true);
+  const [regions, setRegions] = useState<Region[]>([]);
+  const [mahallas, setMahallas] = useState<Mahalla[]>([]);
+  const [regionId, setRegionId] = useState("");
+  const [mahallaId, setMahallaId] = useState(center?.mahalla_id || "");
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
 
@@ -45,6 +57,34 @@ export function CenterFormModal({ center, onClose, onSaved }: Props) {
     };
   }, []);
 
+  useEffect(() => {
+    apiFetch<Region[]>("/regions").then((res) => {
+      if (res.success && Array.isArray(res.data)) setRegions(res.data);
+    });
+  }, []);
+
+  useEffect(() => {
+    if (!regionId) {
+      setMahallas([]);
+      return;
+    }
+    apiFetch<Mahalla[]>(`/mahallas?region_id=${regionId}`).then((res) => {
+      if (res.success && Array.isArray(res.data)) setMahallas(res.data);
+    });
+  }, [regionId]);
+
+  useEffect(() => {
+    if (!center?.mahalla_id || regions.length === 0) return;
+    apiFetch<Mahalla[]>("/mahallas").then((res) => {
+      if (!res.success || !Array.isArray(res.data)) return;
+      const match = res.data.find((m) => m.id === center.mahalla_id);
+      if (match) {
+        setRegionId(match.region_id);
+        setMahallaId(match.id);
+      }
+    });
+  }, [center?.mahalla_id, regions.length]);
+
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
@@ -52,28 +92,19 @@ export function CenterFormModal({ center, onClose, onSaved }: Props) {
     try {
       const path = isEdit ? `/centers/${center!.id}` : "/centers";
       const method = isEdit ? "PATCH" : "POST";
-      const body = isEdit
-        ? {
-            name,
-            stir: stir || null,
-            director_name: directorName || null,
-            phone: phone || null,
-            email: email || null,
-            address: address || null,
-            license_number: licenseNumber || null,
-            center_type: centerType,
-            is_active: isActive,
-          }
-        : {
-            name,
-            stir: stir || null,
-            director_name: directorName || null,
-            phone: phone || null,
-            email: email || null,
-            address: address || null,
-            license_number: licenseNumber || null,
-            center_type: centerType,
-          };
+      const shared = {
+        name,
+        stir: stir || null,
+        director_name: directorName || null,
+        phone: phone || null,
+        email: email || null,
+        address: address || null,
+        license_number: licenseNumber || null,
+        license_expiry: licenseExpiry ? `${licenseExpiry}T00:00:00Z` : null,
+        center_type: centerType,
+        mahalla_id: mahallaId || null,
+      };
+      const body = isEdit ? { ...shared, is_active: isActive } : shared;
       const res = await apiFetch(path, { method, body: JSON.stringify(body) });
       if (!res.success) {
         setError(t("saveError"));
@@ -127,6 +158,42 @@ export function CenterFormModal({ center, onClose, onSaved }: Props) {
               </select>
             </div>
           </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="block text-sm font-medium mb-1">{t("region")}</label>
+              <select
+                className="w-full border rounded-lg px-3 py-2"
+                value={regionId}
+                onChange={(e) => {
+                  setRegionId(e.target.value);
+                  setMahallaId("");
+                }}
+              >
+                <option value="">{t("selectRegion")}</option>
+                {regions.map((r) => (
+                  <option key={r.id} value={r.id}>
+                    {r.name_uz}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1">{t("mahalla")}</label>
+              <select
+                className="w-full border rounded-lg px-3 py-2"
+                value={mahallaId}
+                onChange={(e) => setMahallaId(e.target.value)}
+                disabled={!regionId}
+              >
+                <option value="">{t("selectMahalla")}</option>
+                {mahallas.map((m) => (
+                  <option key={m.id} value={m.id}>
+                    {m.name_uz}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
           <div>
             <label className="block text-sm font-medium mb-1">{t("director")}</label>
             <input
@@ -154,13 +221,24 @@ export function CenterFormModal({ center, onClose, onSaved }: Props) {
             <label className="block text-sm font-medium mb-1">{t("address")}</label>
             <textarea className="w-full border rounded-lg px-3 py-2" rows={2} value={address} onChange={(e) => setAddress(e.target.value)} />
           </div>
-          <div>
-            <label className="block text-sm font-medium mb-1">{t("license")}</label>
-            <input
-              className="w-full border rounded-lg px-3 py-2"
-              value={licenseNumber}
-              onChange={(e) => setLicenseNumber(e.target.value)}
-            />
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="block text-sm font-medium mb-1">{t("license")}</label>
+              <input
+                className="w-full border rounded-lg px-3 py-2"
+                value={licenseNumber}
+                onChange={(e) => setLicenseNumber(e.target.value)}
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1">{t("licenseExpiry")}</label>
+              <input
+                type="date"
+                className="w-full border rounded-lg px-3 py-2"
+                value={licenseExpiry}
+                onChange={(e) => setLicenseExpiry(e.target.value)}
+              />
+            </div>
           </div>
           {isEdit && (
             <label className="flex items-center gap-2 text-sm">

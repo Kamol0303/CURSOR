@@ -30,7 +30,7 @@ async def list_centers(
     centers, total = await center_service.list_centers(db, user, page=page, per_page=per_page)
     return ApiResponse(
         success=True,
-        data=[CenterResponse.model_validate(c).model_dump() for c in centers],
+        data=[center_service.center_to_response(c) for c in centers],
         meta={"page": page, "per_page": per_page, "total": total},
     )
 
@@ -42,7 +42,7 @@ async def get_center(
     db: AsyncSession = Depends(get_db),
 ):
     center = await center_service.get_center(db, user, center_id)
-    return ApiResponse(success=True, data=CenterResponse.model_validate(center).model_dump())
+    return ApiResponse(success=True, data=center_service.center_to_response(center))
 
 
 @router.post("/onboard", response_model=ApiResponse, status_code=201)
@@ -63,7 +63,10 @@ async def onboard_center(
         director_username=body.director_username,
         temporary_password=temp_password,
     )
-    return ApiResponse(success=True, data=payload.model_dump())
+    await db.refresh(center, ["mahalla"])
+    payload_dict = payload.model_dump()
+    payload_dict["center"] = center_service.center_to_response(center)
+    return ApiResponse(success=True, data=payload_dict)
 
 
 @router.get("/onboarding/status", response_model=ApiResponse)
@@ -82,7 +85,8 @@ async def complete_onboarding(
     db: AsyncSession = Depends(get_db),
 ):
     center = await center_service.complete_center_profile(db, user, body)
-    return ApiResponse(success=True, data=CenterResponse.model_validate(center).model_dump())
+    await db.refresh(center, ["mahalla"])
+    return ApiResponse(success=True, data=center_service.center_to_response(center))
 
 
 @router.post("", response_model=ApiResponse, status_code=201)
@@ -92,7 +96,8 @@ async def create_center(
     db: AsyncSession = Depends(get_db),
 ):
     center = await center_service.create_center(db, user, body)
-    return ApiResponse(success=True, data=CenterResponse.model_validate(center).model_dump())
+    await db.refresh(center, ["mahalla"])
+    return ApiResponse(success=True, data=center_service.center_to_response(center))
 
 
 @router.patch("/{center_id}", response_model=ApiResponse)
@@ -103,7 +108,8 @@ async def update_center(
     db: AsyncSession = Depends(get_db),
 ):
     center = await center_service.update_center(db, user, center_id, body)
-    return ApiResponse(success=True, data=CenterResponse.model_validate(center).model_dump())
+    await db.refresh(center, ["mahalla"])
+    return ApiResponse(success=True, data=center_service.center_to_response(center))
 
 
 @router.delete("/{center_id}", response_model=ApiResponse)

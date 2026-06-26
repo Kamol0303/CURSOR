@@ -6,6 +6,8 @@ from fastapi import HTTPException
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from sqlalchemy.orm import selectinload
+
 from app.core.security import hash_password
 from app.core.tenant import assert_center_access, can_modify_center, get_user_center_filter
 from app.models.identity import Role, TrainingCenter, User
@@ -15,6 +17,34 @@ from app.services.audit_service import write_audit_log
 PROFILE_REQUIRED_FIELDS = ("stir", "phone", "address", "director_name", "center_type")
 
 CENTER_CREATE_ROLES = frozenset({"super_admin", "hokimiyat_operator"})
+
+
+def center_to_response(center: TrainingCenter) -> dict:
+    mahalla_name_uz = center.mahalla.name_uz if getattr(center, "mahalla", None) else None
+    return {
+        "id": str(center.id),
+        "name": center.name,
+        "stir": center.stir,
+        "director_name": center.director_name,
+        "phone": center.phone,
+        "email": center.email,
+        "address": center.address,
+        "license_number": center.license_number,
+        "license_expiry": center.license_expiry.isoformat() if center.license_expiry else None,
+        "center_type": center.center_type,
+        "is_active": center.is_active,
+        "mahalla_id": str(center.mahalla_id) if center.mahalla_id else None,
+        "mahalla_name_uz": mahalla_name_uz,
+        "profile_completed": center.profile_completed,
+    }
+
+
+async def _validate_mahalla_id(db: AsyncSession, mahalla_id: UUID | None) -> None:
+    if mahalla_id is None:
+        return
+    from app.services import geography_service
+
+    await geography_service.get_mahalla(db, mahalla_id)
 
 
 def _generate_temporary_password(length: int = 16) -> str:
@@ -53,14 +83,19 @@ async def list_centers(
     total = (await db.execute(count_q)).scalar() or 0
 
     result = await db.execute(
-        query.order_by(TrainingCenter.name).offset((page - 1) * per_page).limit(per_page)
+        query.options(selectinload(TrainingCenter.mahalla))
+        .order_by(TrainingCenter.name)
+        .offset((page - 1) * per_page)
+        .limit(per_page)
     )
     return list(result.scalars().all()), total
 
 
 async def get_center(db: AsyncSession, user: User, center_id: UUID) -> TrainingCenter:
     result = await db.execute(
-        select(TrainingCenter).where(TrainingCenter.id == center_id, TrainingCenter.deleted_at.is_(None))
+        select(TrainingCenter)
+        .options(selectinload(TrainingCenter.mahalla))
+        .where(TrainingCenter.id == center_id, TrainingCenter.deleted_at.is_(None))
     )
     center = result.scalar_one_or_none()
     if not center:
@@ -78,6 +113,7 @@ async def get_own_center(db: AsyncSession, user: User) -> TrainingCenter:
 async def create_center(db: AsyncSession, user: User, data: CenterCreate) -> TrainingCenter:
     if user.role.code not in CENTER_CREATE_ROLES:
         raise HTTPException(status_code=403, detail={"code": "FORBIDDEN"})
+    await _validate_mahalla_id(db, data.mahalla_id)
     center = TrainingCenter(**data.model_dump(), profile_completed=False)
     db.add(center)
     await db.flush()
@@ -192,7 +228,10 @@ async def update_center(
     center = await get_center(db, user, center_id)
     if not can_modify_center(user, center_id):
         raise HTTPException(status_code=403, detail={"code": "FORBIDDEN"})
-    for key, value in data.model_dump(exclude_unset=True).items():
+    payload = data.model_dump(exclude_unset=True)
+    if "mahalla_id" in payload:
+        await _validate_mahalla_id(db, payload.get("mahalla_id"))
+    for key, value in payload.items():
         setattr(center, key, value)
     if not center.profile_completed and not missing_profile_fields(center):
         center.profile_completed = True

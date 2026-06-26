@@ -3,12 +3,7 @@ from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field
 
-
-class ApiResponse(BaseModel):
-    success: bool
-    data: dict | list | None = None
-    meta: dict | None = None
-    error: dict | None = None
+from app.schemas.common import ApiResponse
 
 
 class LoginRequest(BaseModel):

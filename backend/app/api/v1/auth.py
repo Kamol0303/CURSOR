@@ -5,8 +5,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.database import get_db
 from app.core.deps import bearer_scheme, get_current_user, get_current_user_optional, requires_permission
 from app.models.identity import User
+from app.schemas.common import ApiResponse
 from app.schemas.auth import (
-    ApiResponse,
     LoginRequest,
     MfaSetupConfirmRequest,
     MfaSetupInitRequest,

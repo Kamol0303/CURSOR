@@ -54,6 +54,19 @@ class EnrollmentCreate(BaseModel):
     student_id: UUID
 
 
+class EnrollmentBatchCreate(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    student_ids: list[UUID] = Field(min_length=1, max_length=50)
+
+
+class EnrollmentMemberResponse(BaseModel):
+    enrollment_id: UUID
+    student_id: UUID
+    full_name: str
+    grade: str | None = None
+
+
 class SubjectResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 

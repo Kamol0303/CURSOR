@@ -7,7 +7,7 @@ from app.core.database import get_db
 from app.core.deps import requires_permission
 from app.models.identity import User
 from app.schemas.common import ApiResponse
-from app.schemas.groups import EnrollmentCreate, GroupCreate, GroupUpdate
+from app.schemas.groups import EnrollmentBatchCreate, EnrollmentCreate, GroupCreate, GroupUpdate
 from app.schemas.payments import PaymentCreate, PaymentUpdate
 from app.services import group_service, payment_service
 
@@ -58,6 +58,16 @@ async def delete_group(
     return ApiResponse(success=True, data={"deleted": True})
 
 
+@groups_router.get("/{group_id}/enrollments", response_model=ApiResponse)
+async def list_group_enrollments(
+    group_id: UUID,
+    user: User = Depends(requires_permission("groups.read")),
+    db: AsyncSession = Depends(get_db),
+):
+    members = await group_service.list_group_enrollments(db, user, group_id)
+    return ApiResponse(success=True, data=members)
+
+
 @groups_router.post("/{group_id}/enroll", response_model=ApiResponse)
 async def enroll_student(
     group_id: UUID,
@@ -67,6 +77,31 @@ async def enroll_student(
 ):
     enrollment = await group_service.enroll_student(db, user, group_id, body.student_id)
     return ApiResponse(success=True, data={"enrollment_id": str(enrollment.id)})
+
+
+@groups_router.post("/{group_id}/enroll/batch", response_model=ApiResponse)
+async def enroll_students_batch(
+    group_id: UUID,
+    body: EnrollmentBatchCreate,
+    user: User = Depends(requires_permission("groups.enroll")),
+    db: AsyncSession = Depends(get_db),
+):
+    enrollments = await group_service.enroll_students_batch(db, user, group_id, body.student_ids)
+    return ApiResponse(
+        success=True,
+        data={"enrolled": len(enrollments), "enrollment_ids": [str(e.id) for e in enrollments]},
+    )
+
+
+@groups_router.delete("/{group_id}/enroll/{student_id}", response_model=ApiResponse)
+async def unenroll_student(
+    group_id: UUID,
+    student_id: UUID,
+    user: User = Depends(requires_permission("groups.enroll")),
+    db: AsyncSession = Depends(get_db),
+):
+    await group_service.unenroll_student(db, user, group_id, student_id)
+    return ApiResponse(success=True, data={"unenrolled": True})
 
 
 subjects_router = APIRouter(prefix="/subjects", tags=["subjects"])

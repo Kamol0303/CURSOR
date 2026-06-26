@@ -111,7 +111,7 @@ export default function GroupsPage() {
                     onClick={() => setEnrollGroup(g)}
                     className="mt-3 text-sm text-naqsh-accent hover:underline"
                   >
-                    {t("enroll")}
+                    {t("manageStudents")}
                   </button>
                 </PermissionGate>
               </div>
@@ -125,7 +125,7 @@ export default function GroupsPage() {
           groupId={enrollGroup.id}
           groupName={enrollGroup.name}
           onClose={() => setEnrollGroup(null)}
-          onEnrolled={load}
+          onChanged={load}
         />
       )}
     </>

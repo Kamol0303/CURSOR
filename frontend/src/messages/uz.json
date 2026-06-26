@@ -233,7 +233,18 @@
     "enrollTitle": "Guruhga o'quvchi qo'shish",
     "selectStudent": "O'quvchini tanlang",
     "enrolling": "Qo'shilmoqda...",
-    "enrollError": "O'quvchini qo'shishda xatolik"
+    "enrollError": "O'quvchini qo'shishda xatolik",
+    "manageStudents": "O'quvchilarni boshqarish",
+    "currentMembers": "Guruh a'zolari",
+    "noMembers": "Hali o'quvchi yo'q",
+    "addStudents": "Yangi o'quvchi qo'shish",
+    "searchStudent": "Qidirish (ism yoki sinf)...",
+    "noAvailableStudents": "Qo'shish uchun o'quvchi topilmadi",
+    "selectedCount": "Tanlangan: {count}",
+    "enrollSelected": "Tanlanganlarni qo'shish",
+    "unenroll": "Chiqarish",
+    "unenrollConfirm": "O'quvchini guruhdan chiqarishni tasdiqlaysizmi?",
+    "unenrollError": "Chiqarishda xatolik"
   },
   "courses": {
     "title": "Kurslar",

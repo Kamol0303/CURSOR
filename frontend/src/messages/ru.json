@@ -221,7 +221,18 @@
     "enrollTitle": "Запись ученика в группу",
     "selectStudent": "Выберите ученика",
     "enrolling": "Запись...",
-    "enrollError": "Ошибка записи ученика"
+    "enrollError": "Ошибка записи ученика",
+    "manageStudents": "Управление учениками",
+    "currentMembers": "Участники группы",
+    "noMembers": "Учеников пока нет",
+    "addStudents": "Добавить учеников",
+    "searchStudent": "Поиск по имени или классу...",
+    "noAvailableStudents": "Нет доступных учеников",
+    "selectedCount": "Выбрано: {count}",
+    "enrollSelected": "Добавить выбранных",
+    "unenroll": "Исключить",
+    "unenrollConfirm": "Исключить ученика из группы?",
+    "unenrollError": "Ошибка исключения"
   },
   "courses": {
     "title": "Курсы",

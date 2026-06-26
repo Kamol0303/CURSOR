@@ -132,9 +132,16 @@ async def delete_group(db: AsyncSession, user: User, group_id: UUID) -> None:
 
 async def enroll_student(db: AsyncSession, user: User, group_id: UUID, student_id: UUID) -> Enrollment:
     group = await get_group(db, user, group_id)
+    _assert_can_enroll(user)
+    return await _enroll_one(db, user, group, student_id)
+
+
+def _assert_can_enroll(user: User) -> None:
     if user.role.code not in {"super_admin", "center_director", "center_admin"}:
         raise HTTPException(status_code=403, detail={"code": "FORBIDDEN"})
 
+
+async def _enroll_one(db: AsyncSession, user: User, group: Group, student_id: UUID) -> Enrollment:
     student = (
         await db.execute(select(Student).where(Student.id == student_id, Student.deleted_at.is_(None)))
     ).scalar_one_or_none()
@@ -147,23 +154,85 @@ async def enroll_student(db: AsyncSession, user: User, group_id: UUID, student_i
     existing = (
         await db.execute(
             select(Enrollment).where(
-                Enrollment.group_id == group_id,
+                Enrollment.group_id == group.id,
                 Enrollment.student_id == student_id,
-                Enrollment.status == "active",
+                Enrollment.deleted_at.is_(None),
             )
         )
     ).scalar_one_or_none()
     if existing:
+        if existing.status != "active":
+            existing.status = "active"
+            await db.flush()
         return existing
 
     enrollment = Enrollment(
         student_id=student_id,
-        group_id=group_id,
+        group_id=group.id,
         center_id=group.center_id,
     )
     db.add(enrollment)
     await db.flush()
     return enrollment
+
+
+async def enroll_students_batch(
+    db: AsyncSession, user: User, group_id: UUID, student_ids: list[UUID]
+) -> list[Enrollment]:
+    group = await get_group(db, user, group_id)
+    _assert_can_enroll(user)
+    results: list[Enrollment] = []
+    for student_id in student_ids:
+        results.append(await _enroll_one(db, user, group, student_id))
+    return results
+
+
+async def list_group_enrollments(db: AsyncSession, user: User, group_id: UUID) -> list[dict]:
+    group = await get_group(db, user, group_id)
+    result = await db.execute(
+        select(Enrollment, Student.full_name, Student.grade)
+        .join(Student, Student.id == Enrollment.student_id)
+        .where(
+            Enrollment.group_id == group.id,
+            Enrollment.status == "active",
+            Enrollment.deleted_at.is_(None),
+            Student.deleted_at.is_(None),
+        )
+        .order_by(Student.full_name)
+    )
+    return [
+        {
+            "enrollment_id": str(row[0].id),
+            "student_id": str(row[0].student_id),
+            "full_name": row[1],
+            "grade": row[2],
+        }
+        for row in result.all()
+    ]
+
+
+async def unenroll_student(db: AsyncSession, user: User, group_id: UUID, student_id: UUID) -> None:
+    group = await get_group(db, user, group_id)
+    _assert_can_enroll(user)
+
+    enrollment = (
+        await db.execute(
+            select(Enrollment).where(
+                Enrollment.group_id == group.id,
+                Enrollment.student_id == student_id,
+                Enrollment.status == "active",
+                Enrollment.deleted_at.is_(None),
+            )
+        )
+    ).scalar_one_or_none()
+    if not enrollment:
+        raise HTTPException(status_code=404, detail={"code": "NOT_FOUND"})
+
+    from datetime import UTC, datetime
+
+    enrollment.status = "inactive"
+    enrollment.deleted_at = datetime.now(UTC)
+    await db.flush()
 
 
 async def list_subjects(db: AsyncSession) -> list[Subject]:

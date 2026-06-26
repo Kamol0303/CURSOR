@@ -221,7 +221,18 @@
     "enrollTitle": "Enroll student in group",
     "selectStudent": "Select student",
     "enrolling": "Enrolling...",
-    "enrollError": "Failed to enroll student"
+    "enrollError": "Failed to enroll student",
+    "manageStudents": "Manage students",
+    "currentMembers": "Group members",
+    "noMembers": "No students yet",
+    "addStudents": "Add new students",
+    "searchStudent": "Search by name or grade...",
+    "noAvailableStudents": "No available students to add",
+    "selectedCount": "Selected: {count}",
+    "enrollSelected": "Add selected",
+    "unenroll": "Remove",
+    "unenrollConfirm": "Remove this student from the group?",
+    "unenrollError": "Failed to remove student"
   },
   "courses": {
     "title": "Courses",

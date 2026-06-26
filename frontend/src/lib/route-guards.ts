@@ -13,6 +13,7 @@ export const DASHBOARD_NAV_ROUTES: readonly DashboardNavItem[] = [
   { href: "/dashboard/students", key: "students", permission: "students.read" },
   { href: "/dashboard/teachers", key: "teachers", permission: "teachers.read" },
   { href: "/dashboard/groups", key: "groups", permission: "groups.read" },
+  { href: "/dashboard/subjects", key: "subjects", permission: "subjects.read" },
   { href: "/dashboard/courses", key: "courses", permission: "courses.read" },
   { href: "/dashboard/messages", key: "messages", permission: "messages.read" },
   { href: "/dashboard/messages/monitor", key: "messagesMonitor", permission: "messages.monitor" },

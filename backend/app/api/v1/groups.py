@@ -128,24 +128,6 @@ async def unenroll_student(
     return ApiResponse(success=True, data={"unenrolled": True})
 
 
-subjects_router = APIRouter(prefix="/subjects", tags=["subjects"])
-
-
-@subjects_router.get("", response_model=ApiResponse)
-async def list_subjects(
-    user: User = Depends(requires_permission("groups.read")),
-    db: AsyncSession = Depends(get_db),
-):
-    subjects = await group_service.list_subjects(db)
-    return ApiResponse(
-        success=True,
-        data=[
-            {"id": str(s.id), "name_uz": s.name_uz, "name_ru": s.name_ru, "name_en": s.name_en}
-            for s in subjects
-        ],
-    )
-
-
 payments_router = APIRouter(prefix="/payments", tags=["payments"])
 
 

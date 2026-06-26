@@ -4,6 +4,7 @@ MANDATORY_MFA_ROLES = {"super_admin", "hokimiyat_operator", "center_director"}
 
 _EXAM_PERMS = ["exams.create", "exams.read", "exams.update", "exams.delete", "exams.submit"]
 _GRADE_PERMS = ["grades.create", "grades.read", "grades.update", "grades.delete"]
+_SUBJECT_PERMS = ["subjects.create", "subjects.read", "subjects.update", "subjects.delete"]
 _COURSE_PERMS = ["courses.create", "courses.read", "courses.update", "courses.delete"]
 
 _MESSAGE_PERMS = ["messages.read", "messages.send"]
@@ -44,6 +45,7 @@ ROLE_PERMISSIONS: dict[str, list[str]] = {
         *_EXAM_PERMS,
         *_GRADE_PERMS,
         *_COURSE_PERMS,
+        *_SUBJECT_PERMS,
         "files.upload",
         "files.read",
         *_MESSAGE_PERMS,
@@ -65,6 +67,7 @@ ROLE_PERMISSIONS: dict[str, list[str]] = {
         "exams.read",
         "grades.read",
         "courses.read",
+        *_SUBJECT_PERMS,
     ],
     "center_director": [
         "centers.read",
@@ -95,6 +98,7 @@ ROLE_PERMISSIONS: dict[str, list[str]] = {
         *_EXAM_PERMS,
         *_GRADE_PERMS,
         *_COURSE_PERMS,
+        "subjects.read",
         "files.upload",
         "files.read",
         *_MESSAGE_PERMS,
@@ -121,6 +125,10 @@ ROLE_PERMISSIONS: dict[str, list[str]] = {
         "grades.read",
         "grades.create",
         "courses.read",
+        "courses.create",
+        "courses.update",
+        "courses.delete",
+        "subjects.read",
         "files.upload",
         "files.read",
         "certificates.create",
@@ -136,6 +144,7 @@ ROLE_PERMISSIONS: dict[str, list[str]] = {
         "grades.read",
         "grades.create",
         "courses.read",
+        "subjects.read",
         "messages.read",
         "messages.send",
     ],
@@ -160,6 +169,7 @@ ROLE_PERMISSIONS: dict[str, list[str]] = {
         "analytics.view",
         "exams.read",
         "grades.read",
+        "subjects.read",
     ],
     "student": [
         "students.read",
@@ -200,6 +210,7 @@ NAV_PERMISSIONS: dict[str, str] = {
     "students": "students.read",
     "teachers": "teachers.read",
     "groups": "groups.read",
+    "subjects": "subjects.read",
     "courses": "courses.read",
     "attendance": "attendance.read",
     "payments": "payments.read",

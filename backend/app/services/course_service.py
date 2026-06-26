@@ -107,6 +107,15 @@ async def create_course(db: AsyncSession, user: User, body: CourseCreate) -> Cou
 async def update_course(db: AsyncSession, user: User, course_id: UUID, body: CourseUpdate) -> CourseResponse:
     course = await get_course(db, user, course_id)
     data = body.model_dump(exclude_unset=True)
+    if "subject_id" in data and data["subject_id"] is not None:
+        subject = (
+            await db.execute(
+                select(Subject).where(Subject.id == data["subject_id"], Subject.deleted_at.is_(None))
+            )
+        ).scalar_one_or_none()
+        if not subject:
+            raise HTTPException(status_code=404, detail={"code": "SUBJECT_NOT_FOUND"})
+        course.subject = subject
     for key, value in data.items():
         setattr(course, key, value)
     await db.flush()

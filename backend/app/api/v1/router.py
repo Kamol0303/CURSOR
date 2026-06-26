@@ -11,7 +11,8 @@ from app.api.v1.external import router as external_router
 from app.api.v1.exams import router as exams_router
 from app.api.v1.files import router as files_router
 from app.api.v1.grades import router as grades_router
-from app.api.v1.groups import groups_router, payments_router, subjects_router
+from app.api.v1.groups import groups_router, payments_router
+from app.api.v1.subjects import router as subjects_router
 from app.api.v1.integrations import router as integrations_router
 from app.api.v1.messages import router as messages_router
 from app.api.v1.notifications import router as notifications_router

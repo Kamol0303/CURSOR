@@ -275,7 +275,3 @@ async def unenroll_student(db: AsyncSession, user: User, group_id: UUID, student
     enrollment.deleted_at = datetime.now(UTC)
     await db.flush()
 
-
-async def list_subjects(db: AsyncSession) -> list[Subject]:
-    result = await db.execute(select(Subject).where(Subject.is_active.is_(True)).order_by(Subject.name_uz))
-    return list(result.scalars().all())

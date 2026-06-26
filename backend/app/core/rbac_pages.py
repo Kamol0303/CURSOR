@@ -25,6 +25,7 @@ ADMIN_DASHBOARD_PAGES: tuple[PageDef, ...] = (
     PageDef("students", "/dashboard/students", NAV_PERMISSIONS["students"], "GET", "/api/v1/students"),
     PageDef("teachers", "/dashboard/teachers", NAV_PERMISSIONS["teachers"], "GET", "/api/v1/teachers"),
     PageDef("groups", "/dashboard/groups", NAV_PERMISSIONS["groups"], "GET", "/api/v1/groups"),
+    PageDef("subjects", "/dashboard/subjects", NAV_PERMISSIONS["subjects"], "GET", "/api/v1/subjects"),
     PageDef("courses", "/dashboard/courses", NAV_PERMISSIONS["courses"], "GET", "/api/v1/courses"),
     PageDef("messages", "/dashboard/messages", NAV_PERMISSIONS["messages"], "GET", "/api/v1/messages"),
     PageDef("attendance", "/dashboard/attendance", NAV_PERMISSIONS["attendance"], "GET", "/api/v1/attendance"),

@@ -39,6 +39,16 @@ async def create_course(
     return ApiResponse(success=True, data=course.model_dump())
 
 
+@router.get("/{course_id}", response_model=ApiResponse)
+async def get_course(
+    course_id: UUID,
+    user: User = Depends(requires_permission("courses.read")),
+    db: AsyncSession = Depends(get_db),
+):
+    course = await course_service.get_course(db, user, course_id)
+    return ApiResponse(success=True, data=course_service.course_to_response(course).model_dump())
+
+
 @router.patch("/{course_id}", response_model=ApiResponse)
 async def update_course(
     course_id: UUID,

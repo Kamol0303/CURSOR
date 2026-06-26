@@ -248,6 +248,21 @@
     "selectedCount": "Выбрано: {count}",
     "enrollSelected": "Добавить выбранных",
     "unenroll": "Исключить",
+    "assignTeacher": "Назначить учителя",
+    "changeTeacher": "Сменить учителя",
+    "assignTeacherTitle": "Назначить учителя в группу",
+    "searchTeacher": "Поиск учителя по имени",
+    "searching": "Поиск...",
+    "clearSelection": "Очистить",
+    "assigning": "Назначение...",
+    "currentTeacher": "Текущий: {name}",
+    "assignTeacherErrors": {
+      "CENTER_MISMATCH": "Учитель должен принадлежать тому же центру, что и группа",
+      "TEACHER_NOT_FOUND": "Учитель не найден",
+      "TEACHER_INACTIVE": "Учитель неактивен",
+      "FORBIDDEN": "Доступ запрещён",
+      "UNKNOWN": "Произошла ошибка"
+    },
     "unenrollConfirm": "Исключить ученика из группы?",
     "unenrollError": "Ошибка исключения"
   },

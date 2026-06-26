@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { EnrollStudentModal } from "@/components/EnrollStudentModal";
+import { AssignTeacherModal } from "@/components/AssignTeacherModal";
 import { PermissionGate } from "@/components/PermissionGate";
 import { apiFetch, getMe, listCenters } from "@/lib/api";
 
@@ -10,6 +11,7 @@ type Group = {
   id: string;
   name: string;
   subject_name_uz: string | null;
+  teacher_id: string | null;
   teacher_name: string | null;
   room: string | null;
   enrollment_count: number;
@@ -27,6 +29,7 @@ export default function GroupsPage() {
   const [subjectId, setSubjectId] = useState("");
   const [room, setRoom] = useState("");
   const [enrollGroup, setEnrollGroup] = useState<Group | null>(null);
+  const [assignGroup, setAssignGroup] = useState<Group | null>(null);
 
   const load = useCallback(() => {
     setLoading(true);
@@ -105,15 +108,26 @@ export default function GroupsPage() {
                 <h3 className="font-semibold text-naqsh-primary">{g.name}</h3>
                 <p className="text-sm text-gray-600">{g.subject_name_uz} · {g.teacher_name || t("noTeacher")}</p>
                 <p className="text-sm text-gray-500">{t("room")}: {g.room || "—"} · {t("students")}: {g.enrollment_count}</p>
-                <PermissionGate permission="groups.enroll">
-                  <button
-                    type="button"
-                    onClick={() => setEnrollGroup(g)}
-                    className="mt-3 text-sm text-naqsh-accent hover:underline"
-                  >
-                    {t("manageStudents")}
-                  </button>
-                </PermissionGate>
+                <div className="mt-3 flex flex-wrap gap-3">
+                  <PermissionGate permission="groups.update">
+                    <button
+                      type="button"
+                      onClick={() => setAssignGroup(g)}
+                      className="text-sm text-naqsh-primary hover:underline"
+                    >
+                      {g.teacher_name ? t("changeTeacher") : t("assignTeacher")}
+                    </button>
+                  </PermissionGate>
+                  <PermissionGate permission="groups.enroll">
+                    <button
+                      type="button"
+                      onClick={() => setEnrollGroup(g)}
+                      className="text-sm text-naqsh-accent hover:underline"
+                    >
+                      {t("manageStudents")}
+                    </button>
+                  </PermissionGate>
+                </div>
               </div>
             ))}
             {groups.length === 0 && <p className="text-gray-400">{t("empty")}</p>}
@@ -126,6 +140,15 @@ export default function GroupsPage() {
           groupName={enrollGroup.name}
           onClose={() => setEnrollGroup(null)}
           onChanged={load}
+        />
+      )}
+      {assignGroup && (
+        <AssignTeacherModal
+          groupId={assignGroup.id}
+          groupName={assignGroup.name}
+          currentTeacherName={assignGroup.teacher_name}
+          onClose={() => setAssignGroup(null)}
+          onAssigned={load}
         />
       )}
     </>

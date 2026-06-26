@@ -248,6 +248,21 @@
     "selectedCount": "Selected: {count}",
     "enrollSelected": "Add selected",
     "unenroll": "Remove",
+    "assignTeacher": "Assign teacher",
+    "changeTeacher": "Change teacher",
+    "assignTeacherTitle": "Assign teacher to group",
+    "searchTeacher": "Search teacher by name",
+    "searching": "Searching...",
+    "clearSelection": "Clear",
+    "assigning": "Assigning...",
+    "currentTeacher": "Current: {name}",
+    "assignTeacherErrors": {
+      "CENTER_MISMATCH": "Teacher must belong to the same center as the group",
+      "TEACHER_NOT_FOUND": "Teacher not found",
+      "TEACHER_INACTIVE": "Teacher is inactive",
+      "FORBIDDEN": "Permission denied",
+      "UNKNOWN": "An error occurred"
+    },
     "unenrollConfirm": "Remove this student from the group?",
     "unenrollError": "Failed to remove student"
   },

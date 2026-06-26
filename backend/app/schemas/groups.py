@@ -60,6 +60,12 @@ class EnrollmentBatchCreate(BaseModel):
     student_ids: list[UUID] = Field(min_length=1, max_length=50)
 
 
+class GroupAssignTeacher(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    teacher_id: UUID
+
+
 class EnrollmentMemberResponse(BaseModel):
     enrollment_id: UUID
     student_id: UUID

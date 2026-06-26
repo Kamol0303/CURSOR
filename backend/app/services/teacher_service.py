@@ -34,17 +34,25 @@ async def list_teachers(
     page: int = 1,
     per_page: int = 20,
     center_id: UUID | None = None,
+    search: str | None = None,
 ) -> tuple[list[Teacher], int]:
     center_filter = get_user_center_filter(user)
     query = (
         select(Teacher)
         .options(selectinload(Teacher.teacher_subjects))
-        .where(Teacher.deleted_at.is_(None))
+        .where(Teacher.deleted_at.is_(None), Teacher.is_active.is_(True))
     )
     if center_filter:
         query = query.where(Teacher.center_id == center_filter)
     elif center_id:
         query = query.where(Teacher.center_id == center_id)
+    if search:
+        pattern = f"%{search.strip()}%"
+        query = query.where(
+            Teacher.full_name.ilike(pattern)
+            | Teacher.phone.ilike(pattern)
+            | Teacher.specialization.ilike(pattern)
+        )
 
     count_q = select(func.count()).select_from(query.subquery())
     total = (await db.execute(count_q)).scalar() or 0

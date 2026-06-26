@@ -260,6 +260,21 @@
     "selectedCount": "Tanlangan: {count}",
     "enrollSelected": "Tanlanganlarni qo'shish",
     "unenroll": "Chiqarish",
+    "assignTeacher": "O'qituvchi biriktirish",
+    "changeTeacher": "O'qituvchini almashtirish",
+    "assignTeacherTitle": "Guruhga o'qituvchi biriktirish",
+    "searchTeacher": "O'qituvchini ism bo'yicha qidiring",
+    "searching": "Qidirilmoqda...",
+    "clearSelection": "Tozalash",
+    "assigning": "Biriktirilmoqda...",
+    "currentTeacher": "Joriy: {name}",
+    "assignTeacherErrors": {
+      "CENTER_MISMATCH": "O'qituvchi guruh bilan bir markazda bo'lishi kerak",
+      "TEACHER_NOT_FOUND": "O'qituvchi topilmadi",
+      "TEACHER_INACTIVE": "O'qituvchi faol emas",
+      "FORBIDDEN": "Ruxsat yo'q",
+      "UNKNOWN": "Xatolik yuz berdi"
+    },
     "unenrollConfirm": "O'quvchini guruhdan chiqarishni tasdiqlaysizmi?",
     "unenrollError": "Chiqarishda xatolik"
   },

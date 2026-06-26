@@ -1,13 +1,15 @@
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, Query
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
 from app.core.deps import requires_permission
+from app.models.education import Enrollment
 from app.models.identity import User
 from app.schemas.common import ApiResponse
-from app.schemas.groups import EnrollmentBatchCreate, EnrollmentCreate, GroupCreate, GroupUpdate
+from app.schemas.groups import EnrollmentBatchCreate, EnrollmentCreate, GroupAssignTeacher, GroupCreate, GroupUpdate
 from app.schemas.payments import PaymentCreate, PaymentUpdate
 from app.services import group_service, payment_service
 
@@ -46,6 +48,28 @@ async def update_group(
 ):
     group = await group_service.update_group(db, user, group_id, body)
     return ApiResponse(success=True, data=group_service.group_to_response(group).model_dump())
+
+
+@groups_router.patch("/{group_id}/assign-teacher", response_model=ApiResponse)
+async def assign_group_teacher(
+    group_id: UUID,
+    body: GroupAssignTeacher,
+    user: User = Depends(requires_permission("groups.update")),
+    db: AsyncSession = Depends(get_db),
+):
+    group = await group_service.assign_teacher_to_group(db, user, group_id, body.teacher_id)
+    enroll_count = (
+        await db.execute(
+            select(func.count()).select_from(Enrollment).where(
+                Enrollment.group_id == group.id,
+                Enrollment.status == "active",
+            )
+        )
+    ).scalar() or 0
+    return ApiResponse(
+        success=True,
+        data=group_service.group_to_response(group, enrollment_count=enroll_count).model_dump(),
+    )
 
 
 @groups_router.delete("/{group_id}", response_model=ApiResponse)

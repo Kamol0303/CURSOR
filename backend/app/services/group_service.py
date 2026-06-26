@@ -114,11 +114,52 @@ async def update_group(db: AsyncSession, user: User, group_id: UUID, data: Group
     group = await get_group(db, user, group_id)
     if user.role.code not in {"super_admin", "center_director", "center_admin"}:
         raise HTTPException(status_code=403, detail={"code": "FORBIDDEN"})
-    for key, value in data.model_dump(exclude_unset=True).items():
+    payload = data.model_dump(exclude_unset=True)
+    if "teacher_id" in payload:
+        await _validate_teacher_for_group(db, user, group, payload["teacher_id"])
+    for key, value in payload.items():
         setattr(group, key, value)
     await db.flush()
     await db.refresh(group, ["subject", "teacher"])
     return group
+
+
+async def assign_teacher_to_group(
+    db: AsyncSession,
+    user: User,
+    group_id: UUID,
+    teacher_id: UUID,
+) -> Group:
+    group = await get_group(db, user, group_id)
+    if user.role.code not in {"super_admin", "center_director", "center_admin"}:
+        raise HTTPException(status_code=403, detail={"code": "FORBIDDEN"})
+    await _validate_teacher_for_group(db, user, group, teacher_id)
+    group.teacher_id = teacher_id
+    await db.flush()
+    await db.refresh(group, ["subject", "teacher"])
+    return group
+
+
+async def _validate_teacher_for_group(
+    db: AsyncSession,
+    user: User,
+    group: Group,
+    teacher_id: UUID | None,
+) -> None:
+    if teacher_id is None:
+        return
+    teacher = (
+        await db.execute(
+            select(Teacher).where(Teacher.id == teacher_id, Teacher.deleted_at.is_(None))
+        )
+    ).scalar_one_or_none()
+    if not teacher:
+        raise HTTPException(status_code=404, detail={"code": "TEACHER_NOT_FOUND"})
+    assert_center_access(user, teacher.center_id)
+    if teacher.center_id != group.center_id:
+        raise HTTPException(status_code=422, detail={"code": "CENTER_MISMATCH"})
+    if not teacher.is_active:
+        raise HTTPException(status_code=422, detail={"code": "TEACHER_INACTIVE"})
 
 
 async def delete_group(db: AsyncSession, user: User, group_id: UUID) -> None:

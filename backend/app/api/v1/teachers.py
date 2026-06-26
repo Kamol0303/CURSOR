@@ -18,11 +18,12 @@ async def list_teachers(
     page: int = Query(1, ge=1),
     per_page: int = Query(20, ge=1, le=100),
     center_id: UUID | None = None,
+    search: str | None = None,
     user: User = Depends(requires_permission("teachers.read")),
     db: AsyncSession = Depends(get_db),
 ):
     teachers, total = await teacher_service.list_teachers(
-        db, user, page=page, per_page=per_page, center_id=center_id
+        db, user, page=page, per_page=per_page, center_id=center_id, search=search
     )
     return ApiResponse(
         success=True,

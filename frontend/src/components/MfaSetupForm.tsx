@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 
 import { getApiBaseUrl } from "@/lib/api";
+import { setAuthCookie } from "@/lib/auth-cookie";
 
 type SetupData = {
   provisioning_uri: string;
@@ -75,6 +76,12 @@ export function MfaSetupForm({ setupToken, accessToken, onComplete, onError }: P
         return;
       }
       onComplete(data.data?.access_token);
+      if (data.data?.access_token) {
+        setAuthCookie(data.data.access_token);
+      }
+      if (data.data?.backup_codes?.length) {
+        window.alert(`Backup kodlar (bir marta ko'rsatiladi):\n${data.data.backup_codes.join("\n")}`);
+      }
     } catch {
       onError("MFA_INVALID");
     } finally {

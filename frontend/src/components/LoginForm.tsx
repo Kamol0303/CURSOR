@@ -6,6 +6,7 @@ import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { MfaSetupForm } from "@/components/MfaSetupForm";
 
 import { getApiBaseUrl } from "@/lib/api";
+import { getRoleFromToken, homePathForRole, setAuthCookie } from "@/lib/auth-cookie";
 
 type Step = "login" | "mfa" | "mfa_setup";
 
@@ -75,7 +76,8 @@ export function LoginForm() {
       }
       if (data.data?.access_token) {
         localStorage.setItem("tmb_access_token", data.data.access_token);
-        window.location.href = "/dashboard";
+        setAuthCookie(data.data.access_token);
+        window.location.href = homePathForRole(getRoleFromToken(data.data.access_token));
         return;
       }
       handleError("INVALID_CREDENTIALS");
@@ -103,7 +105,8 @@ export function LoginForm() {
         return;
       }
       localStorage.setItem("tmb_access_token", data.data.access_token);
-      window.location.href = "/dashboard";
+      setAuthCookie(data.data.access_token);
+      window.location.href = homePathForRole(getRoleFromToken(data.data.access_token));
     } catch {
       setError(t("errors.MFA_INVALID"));
     } finally {
@@ -191,7 +194,8 @@ export function LoginForm() {
               onComplete={(accessToken) => {
                 if (accessToken) {
                   localStorage.setItem("tmb_access_token", accessToken);
-                  window.location.href = "/dashboard";
+                  setAuthCookie(accessToken);
+                  window.location.href = homePathForRole(getRoleFromToken(accessToken));
                 }
               }}
               onError={(code) => handleError(code)}

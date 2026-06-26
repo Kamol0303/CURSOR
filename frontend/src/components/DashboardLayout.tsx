@@ -7,6 +7,7 @@ import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { NotificationBell } from "@/components/NotificationBell";
 import { useAuth } from "@/contexts/AuthContext";
 import { getApiBaseUrl } from "@/lib/api";
+import { clearAuthCookie } from "@/lib/auth-cookie";
 
 const NAV: ReadonlyArray<{
   href: string;
@@ -19,6 +20,7 @@ const NAV: ReadonlyArray<{
   { href: "/dashboard/students", key: "students", permission: "students.read" },
   { href: "/dashboard/teachers", key: "teachers", permission: "teachers.read" },
   { href: "/dashboard/groups", key: "groups", permission: "groups.read" },
+  { href: "/dashboard/courses", key: "courses", permission: "courses.read" },
   { href: "/dashboard/attendance", key: "attendance", permission: "attendance.read" },
   { href: "/dashboard/payments", key: "payments", permission: "payments.read" },
   { href: "/dashboard/exams", key: "exams", permission: "exams.read" },
@@ -46,6 +48,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
     });
     localStorage.removeItem("tmb_access_token");
     sessionStorage.removeItem("tmb_me_cache");
+    clearAuthCookie();
     window.location.href = "/";
   };
 

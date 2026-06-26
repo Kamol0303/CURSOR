@@ -415,7 +415,25 @@
   },
   "certificates": {
     "title": "Sertifikatlar",
-    "loading": "Yuklanmoqda..."
+    "loading": "Yuklanmoqda...",
+    "add": "Sertifikat qo'shish",
+    "addTitle": "Yangi sertifikat",
+    "student": "O'quvchi",
+    "studentSearch": "Ism bo'yicha qidirish...",
+    "loadingStudents": "O'quvchilar yuklanmoqda...",
+    "certTitle": "Sertifikat nomi",
+    "issueDate": "Berilgan sana",
+    "file": "Fayl",
+    "fileHint": "PDF, JPG yoki PNG (maks. 10 MB)",
+    "fileTypeError": "Faqat PDF, JPG yoki PNG fayllar qabul qilinadi",
+    "fileSizeError": "Fayl hajmi 10 MB dan oshmasligi kerak",
+    "fileUploadError": "Fayl yuklanmadi",
+    "formIncomplete": "Barcha maydonlarni to'ldiring",
+    "saveError": "Saqlashda xatolik",
+    "cancel": "Bekor qilish",
+    "save": "Saqlash",
+    "saving": "Saqlanmoqda...",
+    "download": "Yuklab olish"
   },
   "verify": {
     "title": "Sertifikatni tekshirish",
@@ -507,6 +525,7 @@
     "certificates": "Sertifikatlar",
     "noChildren": "Farzandlar topilmadi",
     "noCertificates": "Sertifikatlar yo'q",
+    "download": "Yuklab olish",
     "errors": {
       "PHONE_NOT_REGISTERED": "Telefon raqam ro'yxatda yo'q",
       "OTP_INVALID": "Noto'g'ri kod",

@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
-import { apiFetch, getApiBaseUrl } from "@/lib/api";
+import { apiFetch, downloadFile, getApiBaseUrl } from "@/lib/api";
 
 type Child = {
   id: string;
@@ -20,6 +20,7 @@ type Certificate = {
   course_name: string;
   issue_date: string;
   status: string;
+  file_id: string | null;
 };
 
 export default function ParentDashboardPage() {
@@ -106,12 +107,25 @@ export default function ParentDashboardPage() {
                       <p className="font-medium">{cert.course_name}</p>
                       <p className="text-gray-500">{cert.certificate_number}</p>
                       <p className="text-xs text-gray-400">{cert.issue_date}</p>
-                      <Link
-                        href={`/verify/${cert.certificate_number}`}
-                        className="text-naqsh-accent text-xs hover:underline mt-1 inline-block"
-                      >
-                        {t("verify")}
-                      </Link>
+                      <div className="flex gap-3 mt-1">
+                        <Link
+                          href={`/verify/${cert.certificate_number}`}
+                          className="text-naqsh-accent text-xs hover:underline"
+                        >
+                          {t("verify")}
+                        </Link>
+                        {cert.file_id && (
+                          <button
+                            type="button"
+                            onClick={() =>
+                              downloadFile(cert.file_id!, `certificate-${cert.certificate_number}`)
+                            }
+                            className="text-naqsh-accent text-xs hover:underline"
+                          >
+                            {t("download")}
+                          </button>
+                        )}
+                      </div>
                     </li>
                   ))}
                 </ul>

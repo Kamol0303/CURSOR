@@ -415,7 +415,25 @@
   },
   "certificates": {
     "title": "Certificates",
-    "loading": "Loading..."
+    "loading": "Loading...",
+    "add": "Add certificate",
+    "addTitle": "New certificate",
+    "student": "Student",
+    "studentSearch": "Search by name...",
+    "loadingStudents": "Loading students...",
+    "certTitle": "Certificate title",
+    "issueDate": "Issue date",
+    "file": "File",
+    "fileHint": "PDF, JPG or PNG (max 10 MB)",
+    "fileTypeError": "Only PDF, JPG or PNG files are accepted",
+    "fileSizeError": "File must not exceed 10 MB",
+    "fileUploadError": "File upload failed",
+    "formIncomplete": "Please fill in all fields",
+    "saveError": "Failed to save",
+    "cancel": "Cancel",
+    "save": "Save",
+    "saving": "Saving...",
+    "download": "Download"
   },
   "verify": {
     "title": "Certificate verification",
@@ -507,6 +525,7 @@
     "certificates": "Certificates",
     "noChildren": "No children found",
     "noCertificates": "No certificates",
+    "download": "Download",
     "errors": {
       "PHONE_NOT_REGISTERED": "Phone not registered",
       "OTP_INVALID": "Invalid code",

@@ -69,6 +69,7 @@ class Certificate(Base, TimestampMixin):
     idempotency_key: Mapped[str | None] = mapped_column(String(64), unique=True, nullable=True)
     locale: Mapped[str] = mapped_column(String(5), default="uz")
     is_demo_data: Mapped[bool] = mapped_column(Boolean, default=False)
+    file_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), ForeignKey("files.id"), nullable=True)
 
     student: Mapped["Student"] = relationship("Student", back_populates="certificates")
     center: Mapped["TrainingCenter"] = relationship("TrainingCenter", back_populates="certificates")

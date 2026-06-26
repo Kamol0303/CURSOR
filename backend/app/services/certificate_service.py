@@ -15,7 +15,10 @@ from app.core.redis_client import check_rate_limit
 from app.core.tenant import assert_center_access
 from app.models.education import Student, Subject
 from app.models.identity import User
+from app.models.files_messages import StoredFile
 from app.models.ratings_certs import Certificate, CertificateVerification
+from app.schemas.certificates import CertificateCreate
+from app.services import file_service
 from app.services.audit_service import write_audit_log
 
 
@@ -136,6 +139,90 @@ async def issue_certificate(
         resource_id=cert.id,
         ip_address=ip_address,
         details={"certificate_number": cert_number},
+    )
+    return cert
+
+
+async def create_certificate_with_file(
+    db: AsyncSession,
+    user: User,
+    data: CertificateCreate,
+    *,
+    ip_address: str | None,
+) -> Certificate:
+    if user.role.code not in {"super_admin", "center_director", "center_admin"}:
+        raise HTTPException(status_code=403, detail={"code": "FORBIDDEN"})
+
+    result = await db.execute(
+        select(Student)
+        .options(selectinload(Student.center))
+        .where(Student.id == data.student_id, Student.deleted_at.is_(None))
+    )
+    student = result.scalar_one_or_none()
+    if not student:
+        raise HTTPException(status_code=404, detail={"code": "NOT_FOUND"})
+    assert_center_access(user, student.center_id)
+
+    stored_result = await db.execute(
+        select(StoredFile).where(
+            StoredFile.id == data.file_id,
+            StoredFile.deleted_at.is_(None),
+        )
+    )
+    stored = stored_result.scalar_one_or_none()
+    if not stored:
+        raise HTTPException(status_code=404, detail={"code": "NOT_FOUND"})
+    assert_center_access(user, stored.center_id)
+    if stored.owner_type != file_service.CERTIFICATE_OWNER:
+        raise HTTPException(status_code=422, detail={"code": "INVALID_FILE"})
+    if stored.center_id != student.center_id:
+        raise HTTPException(status_code=422, detail={"code": "CENTER_MISMATCH"})
+    if stored.mime_type not in file_service.CERTIFICATE_MIMES:
+        raise HTTPException(status_code=415, detail={"code": "UNSUPPORTED_MEDIA_TYPE"})
+
+    course_uz = course_ru = course_en = data.title
+    if data.subject_id:
+        subject = await db.get(Subject, data.subject_id)
+        if subject:
+            course_uz, course_ru, course_en = subject.name_uz, subject.name_ru, subject.name_en
+
+    cert_number = generate_certificate_number()
+    center_name = student.center.name if student.center else ""
+    integrity_hash = compute_integrity_hash(
+        certificate_number=cert_number,
+        student_name=student.full_name,
+        center_name=center_name,
+        course_name=course_uz,
+        issue_date=data.issue_date,
+    )
+
+    cert = Certificate(
+        certificate_number=cert_number,
+        student_id=student.id,
+        center_id=student.center_id,
+        subject_id=data.subject_id,
+        course_name_uz=course_uz,
+        course_name_ru=course_ru,
+        course_name_en=course_en,
+        issue_date=data.issue_date,
+        integrity_hash=integrity_hash,
+        locale=user.locale_preference,
+        file_id=data.file_id,
+    )
+    db.add(cert)
+    await db.flush()
+    stored.owner_id = cert.id
+    student.graduation_date = student.graduation_date or data.issue_date
+    await db.flush()
+
+    await write_audit_log(
+        db,
+        user_id=user.id,
+        action="certificate.create",
+        resource_type="certificate",
+        resource_id=cert.id,
+        ip_address=ip_address,
+        details={"certificate_number": cert_number, "file_id": str(data.file_id)},
     )
     return cert
 

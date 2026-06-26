@@ -415,7 +415,25 @@
   },
   "certificates": {
     "title": "Сертификаты",
-    "loading": "Загрузка..."
+    "loading": "Загрузка...",
+    "add": "Добавить сертификат",
+    "addTitle": "Новый сертификат",
+    "student": "Учащийся",
+    "studentSearch": "Поиск по имени...",
+    "loadingStudents": "Загрузка учащихся...",
+    "certTitle": "Название сертификата",
+    "issueDate": "Дата выдачи",
+    "file": "Файл",
+    "fileHint": "PDF, JPG или PNG (макс. 10 МБ)",
+    "fileTypeError": "Допускаются только PDF, JPG или PNG",
+    "fileSizeError": "Размер файла не должен превышать 10 МБ",
+    "fileUploadError": "Не удалось загрузить файл",
+    "formIncomplete": "Заполните все поля",
+    "saveError": "Ошибка сохранения",
+    "cancel": "Отмена",
+    "save": "Сохранить",
+    "saving": "Сохранение...",
+    "download": "Скачать"
   },
   "verify": {
     "title": "Проверка сертификата",
@@ -507,6 +525,7 @@
     "certificates": "Сертификаты",
     "noChildren": "Дети не найдены",
     "noCertificates": "Нет сертификатов",
+    "download": "Скачать",
     "errors": {
       "PHONE_NOT_REGISTERED": "Телефон не зарегистрирован",
       "OTP_INVALID": "Неверный код",

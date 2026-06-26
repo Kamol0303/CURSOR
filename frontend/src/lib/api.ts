@@ -113,6 +113,24 @@ export async function getNotifications(limit = 10) {
   return apiFetch<Record<string, unknown>[]>("/notifications?limit=" + limit);
 }
 
+export async function downloadFile(fileId: string, fileName = "download") {
+  const token = getToken();
+  const res = await fetch(`${getApiBaseUrl()}/api/v1/files/${fileId}`, {
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
+    credentials: "include",
+  });
+  if (!res.ok) return false;
+  const blob = await res.blob();
+  const disposition = res.headers.get("content-disposition");
+  const match = disposition?.match(/filename="?([^";]+)"?/i);
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = match?.[1] || fileName;
+  a.click();
+  URL.revokeObjectURL(a.href);
+  return true;
+}
+
 export async function uploadFile(
   file: File,
   params: { center_id: string; owner_type: string; owner_id: string },

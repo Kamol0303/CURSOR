@@ -53,6 +53,7 @@ async def list_child_certificates(
             "course_name": getattr(c, f"course_name_{locale}", c.course_name_uz),
             "issue_date": c.issue_date.isoformat(),
             "status": c.status,
+            "file_id": str(c.file_id) if c.file_id else None,
         }
         for c in certs
     ]

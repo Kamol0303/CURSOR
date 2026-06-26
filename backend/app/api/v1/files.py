@@ -5,7 +5,7 @@ from fastapi.responses import FileResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
-from app.core.deps import requires_permission
+from app.core.deps import get_current_user, requires_permission
 from app.models.identity import User
 from app.schemas.common import ApiResponse
 from app.services import file_service
@@ -45,7 +45,7 @@ async def upload_file(
 @router.get("/{file_id}", response_model=None)
 async def download_file(
     file_id: UUID,
-    user: User = Depends(requires_permission("files.read")),
+    user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
     stored = await file_service.get_file(db, user, file_id)

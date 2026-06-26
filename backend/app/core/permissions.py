@@ -48,6 +48,7 @@ ROLE_PERMISSIONS: dict[str, list[str]] = {
         "files.read",
         *_MESSAGE_PERMS,
         "messages.monitor",
+        "certificates.create",
     ],
     "hokimiyat_operator": [
         "centers.create",
@@ -97,6 +98,7 @@ ROLE_PERMISSIONS: dict[str, list[str]] = {
         "files.upload",
         "files.read",
         *_MESSAGE_PERMS,
+        "certificates.create",
     ],
     "center_admin": [
         "centers.read",
@@ -121,6 +123,7 @@ ROLE_PERMISSIONS: dict[str, list[str]] = {
         "courses.read",
         "files.upload",
         "files.read",
+        "certificates.create",
     ],
     "teacher": [
         "teacher.portal",

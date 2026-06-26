@@ -68,3 +68,8 @@ async def health():
 
 
 app.include_router(api_router, prefix=settings.API_V1_PREFIX)
+
+if settings.METRICS_ENABLED:
+    from prometheus_fastapi_instrumentator import Instrumentator
+
+    Instrumentator().instrument(app).expose(app, endpoint="/metrics", include_in_schema=False)

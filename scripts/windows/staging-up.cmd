@@ -51,10 +51,5 @@ if errorlevel 1 (
 echo === Demo foydalanuvchilar ===
 docker compose -f docker-compose.staging.yml --env-file .env.staging exec -T backend python scripts/seed_demo_users.py --i-understand-this-creates-demo-credentials
 
-echo.
-echo ========================================
-echo Staging tayyor!
-echo   https://tamor.staging.local
-echo   hosts: 127.0.0.1 tamor.staging.local
-echo   Login: admin.aspect / CenterAdmin#26!
-echo ========================================
+call "%~dp0show-credentials.cmd"
+echo Staging tayyor! hosts: 127.0.0.1 tamor.staging.local

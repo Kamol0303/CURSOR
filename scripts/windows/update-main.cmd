@@ -13,7 +13,18 @@ if errorlevel 1 (
   echo checkout xato — celerybeat-schedule yoki boshqa faylni o'chiring va qayta urining
   exit /b 1
 )
-git pull origin main
+
+git pull --ff-only origin main
+if errorlevel 1 (
+  echo.
+  echo Ogohlantirish: local main origin/main bilan mos kelmaydi.
+  echo Local o'zgarishlar o'chiriladi — origin/main ga reset qilinmoqda...
+  git reset --hard origin/main
+  if errorlevel 1 (
+    echo git reset xato — qo'lda: git fetch origin ^&^& git reset --hard origin/main
+    exit /b 1
+  )
+)
 
 echo === 3. Eski staging/dev konteynerlarni to'xtatish ===
 docker compose down 2>nul
@@ -34,23 +45,26 @@ docker compose exec -T backend alembic upgrade head
 if errorlevel 1 (
   echo.
   echo Migratsiya xato! Loglarni ko'ring:
-  echo   docker compose logs backend --tail 120
+  echo   scripts\windows\backend-logs.cmd
   echo.
   echo Agar dev bazani tozalash mumkin bo'lsa:
   echo   docker compose down -v
   echo   docker compose up -d --build
   echo   docker compose exec -T backend alembic upgrade head
-  echo   docker compose exec -T backend python scripts/seed_demo_users.py
+  echo   docker compose exec -T backend python scripts/seed_demo_users.py --i-understand-this-creates-demo-credentials
   exit /b 1
 )
 
-echo === 7. Seed (ixtiyoriy — demo loginlar) ===
-docker compose exec -T backend python scripts/seed_demo_users.py
+echo === 7. Seed — demo loginlar va parollar ===
+docker compose exec -T backend python scripts/seed_demo_users.py --i-understand-this-creates-demo-credentials
+if errorlevel 1 (
+  echo.
+  echo Seed xato — log: docker compose logs backend --tail 80
+  echo Quyidagi statik loginlar baribir ishlashi mumkin:
+  call "%~dp0show-credentials.cmd"
+  exit /b 1
+)
 
 echo.
-echo ========================================
+call "%~dp0show-credentials.cmd"
 echo Tayyor!
-echo   Frontend: http://localhost:3000
-echo   Backend:  http://localhost:8000
-echo   Login:    admin.aspect / CenterAdmin#26!
-echo ========================================

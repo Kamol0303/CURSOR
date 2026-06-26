@@ -163,10 +163,21 @@
     "name": "Full name",
     "specialization": "Specialization",
     "experience": "Experience (years)",
+    "phone": "Phone",
     "status": "Status",
     "active": "Active",
     "inactive": "Inactive",
-    "empty": "No teachers found"
+    "empty": "No teachers found",
+    "add": "Add",
+    "edit": "Edit",
+    "delete": "Delete",
+    "addTitle": "New teacher",
+    "editTitle": "Edit teacher",
+    "save": "Save",
+    "saving": "Saving...",
+    "cancel": "Cancel",
+    "saveError": "Failed to save",
+    "deleteConfirm": "Delete teacher \"{name}\"?"
   },
   "groups": {
     "title": "Groups",
@@ -179,7 +190,12 @@
     "cancel": "Cancel",
     "empty": "No groups found",
     "selectSubject": "Select subject",
-    "noTeacher": "No teacher assigned"
+    "noTeacher": "No teacher assigned",
+    "enroll": "Enroll student",
+    "enrollTitle": "Enroll student in group",
+    "selectStudent": "Select student",
+    "enrolling": "Enrolling...",
+    "enrollError": "Failed to enroll student"
   },
   "attendance": {
     "title": "Attendance",

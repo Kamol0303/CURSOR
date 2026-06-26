@@ -175,10 +175,21 @@
     "name": "F.I.Sh",
     "specialization": "Mutaxassislik",
     "experience": "Tajriba (yil)",
+    "phone": "Telefon",
     "status": "Holati",
     "active": "Faol",
     "inactive": "Nofaol",
-    "empty": "O'qituvchilar topilmadi"
+    "empty": "O'qituvchilar topilmadi",
+    "add": "Qo'shish",
+    "edit": "Tahrirlash",
+    "delete": "O'chirish",
+    "addTitle": "Yangi o'qituvchi",
+    "editTitle": "O'qituvchini tahrirlash",
+    "save": "Saqlash",
+    "saving": "Saqlanmoqda...",
+    "cancel": "Bekor qilish",
+    "saveError": "Saqlashda xatolik",
+    "deleteConfirm": "\"{name}\" o'qituvchini o'chirishni tasdiqlaysizmi?"
   },
   "groups": {
     "title": "Guruhlar",
@@ -191,7 +202,12 @@
     "cancel": "Bekor qilish",
     "empty": "Guruhlar yo'q",
     "selectSubject": "Fanni tanlang",
-    "noTeacher": "O'qituvchi biriktirilmagan"
+    "noTeacher": "O'qituvchi biriktirilmagan",
+    "enroll": "O'quvchi qo'shish",
+    "enrollTitle": "Guruhga o'quvchi qo'shish",
+    "selectStudent": "O'quvchini tanlang",
+    "enrolling": "Qo'shilmoqda...",
+    "enrollError": "O'quvchini qo'shishda xatolik"
   },
   "attendance": {
     "title": "Davomat",

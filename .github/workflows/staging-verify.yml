@@ -1,0 +1,77 @@
+name: staging-verify
+
+on:
+  workflow_dispatch:
+    inputs:
+      staging_url:
+        description: "Staging base URL (e.g. https://tamor.staging.local)"
+        required: true
+        default: "https://tamor.staging.local"
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_USER: tamor
+          POSTGRES_PASSWORD: tamor_staging
+          POSTGRES_DB: tamor
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      redis:
+        image: redis:7-alpine
+        ports: ["6379:6379"]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Generate JWT keys
+        run: |
+          mkdir -p /tmp/secrets
+          openssl genrsa -out /tmp/secrets/jwt_private.pem 2048
+          openssl rsa -in /tmp/secrets/jwt_private.pem -pubout -out /tmp/secrets/jwt_public.pem
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install backend dependencies
+        working-directory: backend
+        run: pip install -r requirements.txt
+
+      - name: Run migrations
+        working-directory: backend
+        env:
+          DATABASE_URL: postgresql+asyncpg://tamor:tamor_staging@localhost:5432/tamor
+        run: alembic upgrade head
+
+      - name: Security integration tests
+        working-directory: backend
+        env:
+          DATABASE_URL: postgresql+asyncpg://tamor:tamor_staging@localhost:5432/tamor
+          REDIS_URL: redis://localhost:6379/0
+          JWT_PRIVATE_KEY_PATH: /tmp/secrets/jwt_private.pem
+          JWT_PUBLIC_KEY_PATH: /tmp/secrets/jwt_public.pem
+          TOTP_ENCRYPTION_KEY: staging-test-key-32-characters-ok!
+          PINFL_ENCRYPTION_KEY: staging-pinfl-key-32-characters!
+          ENVIRONMENT: test
+        run: pytest tests/security/ -v --tb=short
+
+      - name: Red-team offline checks
+        run: python3 scripts/red_team_verify.py --offline
+
+      - name: Red-team live checks (optional)
+        continue-on-error: true
+        run: python3 scripts/red_team_verify.py --url "${{ inputs.staging_url }}" --production
+
+      - name: Load test baseline
+        continue-on-error: true
+        run: |
+          pip install httpx
+          python3 scripts/load_test.py --url "${{ inputs.staging_url }}" -c 5 -n 10 || true

@@ -1,0 +1,87 @@
+name: production-gate
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  pre-deploy-check:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_USER: tamor
+          POSTGRES_PASSWORD: tamor_prod_check
+          POSTGRES_DB: tamor
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Generate JWT keys
+        run: |
+          mkdir -p /tmp/secrets
+          openssl genrsa -out /tmp/secrets/jwt_private.pem 2048
+          openssl rsa -in /tmp/secrets/jwt_private.pem -pubout -out /tmp/secrets/jwt_public.pem
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        working-directory: backend
+        run: pip install -r requirements.txt
+
+      - name: Run migrations
+        working-directory: backend
+        env:
+          DATABASE_URL: postgresql+asyncpg://tamor:tamor_prod_check@localhost:5432/tamor
+        run: alembic upgrade head
+
+      - name: Validate production config rejects dev secrets
+        working-directory: backend
+        env:
+          ENVIRONMENT: production
+          DEBUG: "false"
+          DATABASE_URL: postgresql+asyncpg://tamor:tamor_prod_check@localhost:5432/tamor
+          JWT_PRIVATE_KEY_PATH: /tmp/secrets/jwt_private.pem
+          JWT_PUBLIC_KEY_PATH: /tmp/secrets/jwt_public.pem
+          SECRETS_BACKEND: vault
+          TOTP_ENCRYPTION_KEY: production-grade-key-32-chars-ok!
+          PINFL_ENCRYPTION_KEY: production-grade-key-32-chars-ok!
+          SMS_WEBHOOK_SECRET: production-grade-key-32-chars-ok!!
+          TELEGRAM_WEBHOOK_SECRET: production-grade-key-32-chars-ok!
+          CORS_ORIGINS: '["https://tamor.toyloq.uz"]'
+        run: |
+          python -c "
+          from app.core.production import validate_production_settings
+          errors = validate_production_settings()
+          assert len(errors) == 0, errors
+          print('Production config validation OK')
+          "
+
+      - name: Pre-deploy check fails with demo data
+        working-directory: backend
+        env:
+          ENVIRONMENT: production
+          DEBUG: "false"
+          DATABASE_URL: postgresql+asyncpg://tamor:tamor_prod_check@localhost:5432/tamor
+          REDIS_URL: redis://localhost:6379/0
+          JWT_PRIVATE_KEY_PATH: /tmp/secrets/jwt_private.pem
+          JWT_PUBLIC_KEY_PATH: /tmp/secrets/jwt_public.pem
+          SECRETS_BACKEND: vault
+          TOTP_ENCRYPTION_KEY: production-grade-key-32-chars-ok!
+          PINFL_ENCRYPTION_KEY: production-grade-key-32-chars-ok!
+          SMS_WEBHOOK_SECRET: production-grade-key-32-chars-ok!!
+          TELEGRAM_WEBHOOK_SECRET: production-grade-key-32-chars-ok!
+          CORS_ORIGINS: '["https://tamor.toyloq.uz"]'
+        run: |
+          python scripts/pre_deploy_check.py && echo "Unexpected pass" && exit 1 || echo "Correctly blocked (no demo seeded)"

@@ -1,0 +1,165 @@
+# Production Docker Compose — on-prem / Uzbekistan infrastructure
+# Usage:
+#   cp .env.production.example .env.production  # fill secrets
+#   Install CA-signed certs to infra/nginx/tls/
+#   ./scripts/go-live.sh
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-tamor}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD required}
+      POSTGRES_DB: ${POSTGRES_DB:-tamor}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./infra/postgres/init-analytics-role.sql:/docker-entrypoint-initdb.d/02-analytics-role.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-tamor} -d ${POSTGRES_DB:-tamor}"]
+      interval: 10s
+      timeout: 5s
+      retries: 15
+      start_period: 30s
+    networks:
+      - internal
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    networks:
+      - internal
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    env_file: .env.production
+    environment:
+      ENVIRONMENT: production
+      DEBUG: "false"
+    volumes:
+      - jwt_secrets:/secrets
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    command: >
+      sh -c "
+        for i in $$(seq 1 30); do
+          if alembic upgrade head; then
+            exec uvicorn app.main:app --host 0.0.0.0 --port 8000 --workers 4 --proxy-headers --forwarded-allow-ips='*';
+          fi;
+          echo \"Migration attempt $$i failed, retrying in 2s...\";
+          sleep 2;
+        done;
+        echo 'ERROR: migrations failed after 30 attempts';
+        exit 1
+      "
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=3)",
+        ]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 60s
+    networks:
+      - internal
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    environment:
+      NEXT_PUBLIC_API_URL: https://${PUBLIC_HOST:-tamor.toyloq.uz}
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      - internal
+
+  ai-analytics:
+    build: ./ai-analytics-service
+    restart: unless-stopped
+    env_file: .env.production
+    environment:
+      ENVIRONMENT: production
+    volumes:
+      - jwt_secrets:/secrets:ro
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - internal
+
+  celery-worker:
+    build: ./backend
+    restart: unless-stopped
+    env_file: .env.production
+    environment:
+      ENVIRONMENT: production
+    volumes:
+      - jwt_secrets:/secrets:ro
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    command: celery -A app.tasks.celery_app worker --loglevel=warning --concurrency=2
+    networks:
+      - internal
+
+  celery-beat:
+    build: ./backend
+    restart: unless-stopped
+    env_file: .env.production
+    depends_on:
+      - redis
+      - celery-worker
+    command: celery -A app.tasks.celery_app beat --loglevel=warning
+    networks:
+      - internal
+
+  nginx:
+    image: nginx:1.25-alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./infra/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./infra/nginx/proxy_params.conf:/etc/nginx/proxy_params.conf:ro
+      - ./infra/nginx/tls:/etc/nginx/tls:ro
+    depends_on:
+      - backend
+      - frontend
+      - ai-analytics
+    networks:
+      - internal
+      - edge
+
+networks:
+  edge:
+  internal:
+    internal: true
+
+volumes:
+  postgres_data:
+  redis_data:
+  jwt_secrets:

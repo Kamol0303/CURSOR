@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 from __future__ import annotations
 
 from datetime import datetime, timedelta, timezone
@@ -11,10 +12,20 @@ from app.core.security import decrypt_value, hash_secret, verify_hmac_signature
 from app.models import APIKey, APIKeyScope
 from app.schemas.common import error_response, success_response
 
+=======
+from fastapi import APIRouter, Depends, Query, Request
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.core.database import get_db
+from app.core.rls import apply_rls_context, set_rls_role
+from app.schemas.common import ApiResponse
+from app.services import certificate_service
+>>>>>>> main
 
 router = APIRouter(prefix="/public", tags=["public"])
 
 
+<<<<<<< HEAD
 async def require_hmac_api_key(
     request: Request,
     db: AsyncSession = Depends(get_db),
@@ -92,3 +103,22 @@ async def aggregate_stats(
             "generated_at": datetime.now(timezone.utc).isoformat(),
         }
     )
+=======
+@router.get("/verify/{certificate_number}", response_model=ApiResponse)
+async def verify_certificate(
+    certificate_number: str,
+    request: Request,
+    locale: str = Query("uz", pattern=r"^(uz|ru|en)$"),
+    db: AsyncSession = Depends(get_db),
+):
+    set_rls_role("verifier")
+    await apply_rls_context(db)
+    result = await certificate_service.verify_certificate_public(
+        db,
+        certificate_number,
+        ip_address=request.client.host if request.client else None,
+        user_agent=request.headers.get("user-agent"),
+        locale=locale,
+    )
+    return ApiResponse(success=True, data=result)
+>>>>>>> main

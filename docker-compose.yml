@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 version: "3.9"
 
 services:
@@ -7,15 +8,34 @@ services:
       POSTGRES_DB: tamor
       POSTGRES_USER: tamor
       POSTGRES_PASSWORD: tamor
+=======
+services:
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: tamor
+      POSTGRES_PASSWORD: tamor_dev
+      POSTGRES_DB: tamor
+>>>>>>> main
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+<<<<<<< HEAD
+=======
+      - ./infra/postgres/init-analytics-role.sql:/docker-entrypoint-initdb.d/02-analytics-role.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U tamor"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+>>>>>>> main
 
   redis:
     image: redis:7-alpine
     ports:
       - "6379:6379"
+<<<<<<< HEAD
 
   minio:
     image: minio/minio:latest
@@ -59,3 +79,117 @@ services:
 volumes:
   postgres_data:
   minio_data:
+=======
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  backend:
+    build: ./backend
+    ports:
+      - "8000:8000"
+    environment:
+      ENVIRONMENT: development
+      DEBUG: "true"
+      DATABASE_URL: postgresql+asyncpg://tamor:tamor_dev@postgres:5432/tamor
+      REDIS_URL: redis://redis:6379/0
+      JWT_PRIVATE_KEY_PATH: /secrets/jwt_private.pem
+      JWT_PUBLIC_KEY_PATH: /secrets/jwt_public.pem
+      TOTP_ENCRYPTION_KEY: dev-only-change-in-production-32bytes!!
+      PINFL_ENCRYPTION_KEY: dev-pinfl-key-change-in-prod!!
+      CORS_ORIGINS: '["http://localhost:3000","http://127.0.0.1:3000"]'
+      AI_ANALYTICS_URL: http://ai-analytics:8001
+      SMS_WEBHOOK_SECRET: dev-sms-webhook-secret
+    volumes:
+      - jwt_secrets:/secrets
+      - ./backend:/app
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=3)",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 8
+      start_period: 60s
+    command: ["sh", "./scripts/dev_bootstrap.sh"]
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "3000:3000"
+    environment:
+      NEXT_PUBLIC_API_URL: http://localhost:8000
+      INTERNAL_API_URL: http://backend:8000
+      HOSTNAME: "0.0.0.0"
+      NEXT_PUBLIC_SHOW_DEMO_HINT: "true"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    depends_on:
+      backend:
+        condition: service_healthy
+
+  ai-analytics:
+    build: ./ai-analytics-service
+    ports:
+      - "8001:8001"
+    environment:
+      ENVIRONMENT: development
+      DATABASE_URL: postgresql+asyncpg://tamor_analytics:tamor_dev@postgres:5432/tamor
+      JWT_PUBLIC_KEY_PATH: /secrets/jwt_public.pem
+    volumes:
+      - jwt_secrets:/secrets
+    depends_on:
+      postgres:
+        condition: service_healthy
+      backend:
+        condition: service_started
+
+  celery-worker:
+    build: ./backend
+    environment:
+      ENVIRONMENT: development
+      DATABASE_URL: postgresql+asyncpg://tamor:tamor_dev@postgres:5432/tamor
+      REDIS_URL: redis://redis:6379/0
+      JWT_PRIVATE_KEY_PATH: /secrets/jwt_private.pem
+      JWT_PUBLIC_KEY_PATH: /secrets/jwt_public.pem
+      TOTP_ENCRYPTION_KEY: dev-only-change-in-production-32bytes!!
+      PINFL_ENCRYPTION_KEY: dev-pinfl-key-change-in-prod!!
+    volumes:
+      - jwt_secrets:/secrets
+      - ./backend:/app
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    command: celery -A app.tasks.celery_app worker --loglevel=info
+
+  celery-beat:
+    build: ./backend
+    environment:
+      ENVIRONMENT: development
+      DATABASE_URL: postgresql+asyncpg://tamor:tamor_dev@postgres:5432/tamor
+      REDIS_URL: redis://redis:6379/0
+    volumes:
+      - ./backend:/app
+    depends_on:
+      - redis
+      - celery-worker
+    command: celery -A app.tasks.celery_app beat --loglevel=info
+
+volumes:
+  postgres_data:
+  jwt_secrets:
+>>>>>>> main

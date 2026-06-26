@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 .DS_Store
 .env
 .env.*
@@ -24,3 +25,19 @@ coverage/
 backend/.venv/
 frontend/.turbo/
 frontend/out/
+=======
+.git/
+__pycache__/
+*.pyc
+.env
+.env.staging
+.env.production
+.env.local
+.venv/
+node_modules/
+.next/
+dist/
+build/
+*.pem
+secrets/
+>>>>>>> main

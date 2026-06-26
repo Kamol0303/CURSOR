@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 name: ci
 
 on:
@@ -6,10 +7,20 @@ on:
       - main
       - "CURSOR/**"
   pull_request:
+=======
+name: tamor-ci
+
+on:
+  push:
+    branches: [main, "CURSOR/**"]
+  pull_request:
+    branches: [main]
+>>>>>>> main
 
 jobs:
   backend:
     runs-on: ubuntu-latest
+<<<<<<< HEAD
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -23,11 +34,94 @@ jobs:
         run: ruff check backend/app backend/tests
       - name: Pytest
         run: pytest backend/tests
+=======
+    services:
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_USER: tamor
+          POSTGRES_PASSWORD: tamor_dev
+          POSTGRES_DB: tamor
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Generate JWT keys
+        run: |
+          mkdir -p /tmp/secrets
+          openssl genrsa -out /tmp/secrets/jwt_private.pem 2048
+          openssl rsa -in /tmp/secrets/jwt_private.pem -pubout -out /tmp/secrets/jwt_public.pem
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install backend dependencies
+        working-directory: backend
+        run: pip install -r requirements.txt
+
+      - name: Python dependency audit
+        working-directory: backend
+        run: |
+          pip install pip-audit
+          python -m pip_audit -r requirements.txt
+
+      - name: Lint backend
+        working-directory: backend
+        run: ruff check app tests
+
+      - name: Run migrations
+        working-directory: backend
+        env:
+          DATABASE_URL: postgresql+asyncpg://tamor:tamor_dev@localhost:5432/tamor
+          REDIS_URL: redis://localhost:6379/0
+          JWT_PRIVATE_KEY_PATH: /tmp/secrets/jwt_private.pem
+          JWT_PUBLIC_KEY_PATH: /tmp/secrets/jwt_public.pem
+          TOTP_ENCRYPTION_KEY: ci-test-key-32-characters-long!!
+          AI_ANALYTICS_URL: http://localhost:8001
+        run: alembic upgrade head
+
+      - name: Run backend tests
+        working-directory: backend
+        env:
+          DATABASE_URL: postgresql+asyncpg://tamor:tamor_dev@localhost:5432/tamor
+          REDIS_URL: redis://localhost:6379/0
+          JWT_PRIVATE_KEY_PATH: /tmp/secrets/jwt_private.pem
+          JWT_PUBLIC_KEY_PATH: /tmp/secrets/jwt_public.pem
+          TOTP_ENCRYPTION_KEY: ci-test-key-32-characters-long!!
+          AI_ANALYTICS_URL: http://localhost:8001
+          PINFL_ENCRYPTION_KEY: ci-pinfl-key-32-characters-long!!
+          ENVIRONMENT: test
+        run: pytest tests/ -v --tb=short
+
+      - name: Red-team automated checks (offline)
+        run: python scripts/red_team_verify.py --offline
+
+      - name: AI analytics PINFL guard (RT-14)
+        run: pip install pytest && pytest ai-analytics-service/tests/ -v
+>>>>>>> main
 
   frontend:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+<<<<<<< HEAD
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
@@ -45,3 +139,32 @@ jobs:
         run: |
           cd frontend
           npm run typecheck
+=======
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install frontend dependencies
+        working-directory: frontend
+        run: npm ci
+
+      - name: npm dependency audit
+        working-directory: frontend
+        run: |
+          npm audit --omit=dev --audit-level=critical
+          node -e "
+            const v = require('next/package.json').version;
+            const ok = v.startsWith('14.2.') && parseInt(v.split('.')[2], 10) >= 35;
+            if (!ok) { console.error('Next.js must be >= 14.2.35, got', v); process.exit(1); }
+            console.log('Next.js', v, 'OK (patched per Dec 2025 advisory)');
+          "
+
+      - name: Lint and build frontend
+        working-directory: frontend
+        run: |
+          npm run lint
+          npm run build
+>>>>>>> main

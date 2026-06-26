@@ -13,3 +13,4 @@ build/
 *.pem
 uploads/
 backend/uploads/
+backend/celerybeat-schedule

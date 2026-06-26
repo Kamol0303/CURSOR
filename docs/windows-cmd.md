@@ -62,3 +62,32 @@ O'rnatgach CMD yoki Git Bash ni **qayta oching**.
 | Login | Parol |
 |-------|-------|
 | `admin.aspect` | `CenterAdmin#26!` |
+
+---
+
+## Docker orqali (Node/PostgreSQL o'rnatish shart emas)
+
+1. **Docker Desktop** o'rnating va ishga tushiring: https://docs.docker.com/desktop/setup/install/windows-install/
+2. Loyiha papkasida:
+
+```cmd
+git pull origin main
+scripts\start.cmd
+```
+
+Yoki PowerShell:
+
+```powershell
+cd "E:\kamol sayt\CURSOR"
+.\scripts\start.ps1 dev
+```
+
+Brauzer: **http://localhost:3000** (faqat shu manzil — cloud preview ishlamaydi)
+
+To'xtatish:
+
+```cmd
+docker compose down
+```
+
+Batafsil: [local-run-guide.md](./local-run-guide.md)

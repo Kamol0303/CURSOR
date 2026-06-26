@@ -153,7 +153,26 @@
     "saving": "Сохранение...",
     "cancel": "Отмена",
     "saveError": "Ошибка сохранения",
-    "deleteConfirm": "Удалить центр «{name}»?"
+    "deleteConfirm": "Удалить центр «{name}»?",
+    "onboardAdd": "Зарегистрировать центр",
+    "onboardTitle": "Новый центр и директор",
+    "onboardSubtitle": "Будет создан центр и выдан временный пароль директору.",
+    "onboardDirectorLogin": "Логин директора",
+    "onboardTempPassword": "Временный пароль",
+    "onboardSubmit": "Создать и пригласить",
+    "onboardError": "Ошибка создания центра",
+    "onboardSuccessTitle": "Центр создан",
+    "onboardSuccessHint": "Передайте эти данные директору. При первом входе нужно сменить пароль и заполнить профиль.",
+    "onboardDone": "Понятно"
+  },
+  "onboarding": {
+    "title": "Заполнение профиля центра",
+    "subtitle": "Смените пароль и введите данные центра для продолжения.",
+    "stepPassword": "Пароль",
+    "stepProfile": "Профиль центра",
+    "changePasswordTitle": "Новый пароль",
+    "profileTitle": "Данные центра",
+    "complete": "Завершить профиль"
   },
   "students": {
     "title": "Учащиеся",

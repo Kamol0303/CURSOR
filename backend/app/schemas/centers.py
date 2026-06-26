@@ -19,6 +19,31 @@ class CenterCreate(BaseModel):
     mahalla_id: UUID | None = None
 
 
+class CenterOnboardCreate(BaseModel):
+    """Create a new center and invite its director (Super Admin / Hokimiyat)."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    name: str = Field(min_length=1, max_length=255)
+    director_username: str = Field(min_length=3, max_length=100, pattern=r"^[a-zA-Z0-9._-]+$")
+    director_full_name: str = Field(min_length=1, max_length=255)
+    director_email: str | None = Field(default=None, max_length=255)
+    director_phone: str | None = Field(default=None, max_length=20)
+    temporary_password: str | None = Field(default=None, min_length=12, max_length=128)
+
+
+class CenterProfileComplete(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    stir: str = Field(pattern=r"^\d{9}$")
+    director_name: str = Field(min_length=1, max_length=255)
+    phone: str = Field(min_length=5, max_length=20)
+    email: str | None = Field(default=None, max_length=255)
+    address: str = Field(min_length=3)
+    license_number: str | None = Field(default=None, max_length=100)
+    center_type: str = Field(pattern=r"^(private|public)$")
+
+
 class CenterUpdate(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
@@ -50,3 +75,10 @@ class CenterResponse(BaseModel):
     center_type: str
     is_active: bool
     mahalla_id: UUID | None
+    profile_completed: bool = False
+
+
+class CenterOnboardResponse(BaseModel):
+    center: CenterResponse
+    director_username: str
+    temporary_password: str

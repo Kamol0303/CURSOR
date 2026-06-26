@@ -1,12 +1,19 @@
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, Query, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
 from app.core.deps import requires_permission
 from app.models.identity import User
-from app.schemas.centers import CenterCreate, CenterResponse, CenterUpdate
+from app.schemas.centers import (
+    CenterCreate,
+    CenterOnboardCreate,
+    CenterOnboardResponse,
+    CenterProfileComplete,
+    CenterResponse,
+    CenterUpdate,
+)
 from app.schemas.common import ApiResponse
 from app.services import center_service
 
@@ -35,6 +42,46 @@ async def get_center(
     db: AsyncSession = Depends(get_db),
 ):
     center = await center_service.get_center(db, user, center_id)
+    return ApiResponse(success=True, data=CenterResponse.model_validate(center).model_dump())
+
+
+@router.post("/onboard", response_model=ApiResponse, status_code=201)
+async def onboard_center(
+    body: CenterOnboardCreate,
+    request: Request,
+    user: User = Depends(requires_permission("centers.create")),
+    db: AsyncSession = Depends(get_db),
+):
+    center, _director, temp_password = await center_service.onboard_center(
+        db,
+        user,
+        body,
+        ip_address=request.client.host if request.client else None,
+    )
+    payload = CenterOnboardResponse(
+        center=CenterResponse.model_validate(center),
+        director_username=body.director_username,
+        temporary_password=temp_password,
+    )
+    return ApiResponse(success=True, data=payload.model_dump())
+
+
+@router.get("/onboarding/status", response_model=ApiResponse)
+async def onboarding_status(
+    user: User = Depends(requires_permission("centers.read")),
+    db: AsyncSession = Depends(get_db),
+):
+    status = await center_service.get_onboarding_status(db, user)
+    return ApiResponse(success=True, data=status)
+
+
+@router.post("/onboarding/complete", response_model=ApiResponse)
+async def complete_onboarding(
+    body: CenterProfileComplete,
+    user: User = Depends(requires_permission("centers.update")),
+    db: AsyncSession = Depends(get_db),
+):
+    center = await center_service.complete_center_profile(db, user, body)
     return ApiResponse(success=True, data=CenterResponse.model_validate(center).model_dump())
 
 

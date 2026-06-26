@@ -251,9 +251,6 @@ async def login_with_password(
             )
             raise AuthError("ACCOUNT_LOCKED", 403)
 
-        if user.must_change_password:
-            raise AuthError("PASSWORD_CHANGE_REQUIRED", 403)
-
         role_code = user.role.code
         requires_mfa = role_code in MANDATORY_MFA_ROLES or user.mfa_enabled
 

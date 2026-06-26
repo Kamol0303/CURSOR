@@ -4,7 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
 from app.core.deps import bearer_scheme, get_current_user, get_current_user_optional, requires_permission
-from app.models.identity import User
+from app.models.identity import TrainingCenter, User
 from app.schemas.common import ApiResponse
 from app.schemas.auth import (
     LoginRequest,
@@ -369,6 +369,11 @@ async def admin_reset_password_endpoint(
 @router.get("/me", response_model=ApiResponse)
 async def me(user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db)):
     permissions = await get_user_permissions(user)
+    center_profile_completed: bool | None = None
+    if user.role.code == "center_director" and user.center_id:
+        center = await db.get(TrainingCenter, user.center_id)
+        center_profile_completed = bool(center.profile_completed) if center else False
+
     return ApiResponse(
         success=True,
         data=UserMeResponse(
@@ -383,5 +388,7 @@ async def me(user: User = Depends(get_current_user), db: AsyncSession = Depends(
             mfa_enabled=user.mfa_enabled,
             mfa_required=user.role.code in MANDATORY_MFA_ROLES,
             mfa_configured=bool(user.mfa_secret_encrypted),
+            must_change_password=user.must_change_password,
+            center_profile_completed=center_profile_completed,
         ).model_dump(),
     )

@@ -9,6 +9,8 @@ export type AuthUser = {
   role: string;
   center_id: string | null;
   permissions: string[];
+  must_change_password?: boolean;
+  center_profile_completed?: boolean | null;
 };
 
 type AuthContextValue = {
@@ -16,6 +18,9 @@ type AuthContextValue = {
   loading: boolean;
   can: (permission: string) => boolean;
   refresh: () => Promise<void>;
+  mustChangePassword: boolean;
+  centerProfileCompleted: boolean;
+  needsOnboarding: boolean;
 };
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -57,6 +62,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         role: res.data.role,
         center_id: res.data.center_id ?? null,
         permissions: res.data.permissions ?? [],
+        must_change_password: res.data.must_change_password ?? false,
+        center_profile_completed: res.data.center_profile_completed ?? null,
       };
       setUser(next);
       writeCache(next);
@@ -75,7 +82,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const can = useCallback((permission: string) => user?.permissions.includes(permission) ?? false, [user]);
 
-  const value = useMemo(() => ({ user, loading, can, refresh }), [user, loading, can, refresh]);
+  const mustChangePassword = Boolean(user?.must_change_password);
+  const centerProfileCompleted = user?.center_profile_completed !== false;
+  const needsOnboarding =
+    user?.role === "center_director" && (mustChangePassword || user?.center_profile_completed === false);
+
+  const value = useMemo(
+    () => ({ user, loading, can, refresh, mustChangePassword, centerProfileCompleted, needsOnboarding }),
+    [user, loading, can, refresh, mustChangePassword, centerProfileCompleted, needsOnboarding],
+  );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

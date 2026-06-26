@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { CenterFormModal } from "@/components/CenterFormModal";
+import { CenterOnboardModal } from "@/components/CenterOnboardModal";
 import { PermissionGate } from "@/components/PermissionGate";
 import { apiFetch, listCenters } from "@/lib/api";
 import { usePermissions } from "@/hooks/usePermissions";
@@ -26,6 +27,7 @@ export default function CentersPage() {
   const [centers, setCenters] = useState<Center[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
+  const [showOnboard, setShowOnboard] = useState(false);
   const [editCenter, setEditCenter] = useState<Center | null>(null);
 
   const load = useCallback(() => {
@@ -59,11 +61,11 @@ export default function CentersPage() {
               type="button"
               onClick={() => {
                 setEditCenter(null);
-                setShowForm(true);
+                setShowOnboard(true);
               }}
               className="px-4 py-2 bg-naqsh-primary text-white rounded-lg text-sm font-medium"
             >
-              {t("add")}
+              {t("onboardAdd")}
             </button>
           </PermissionGate>
         </div>
@@ -137,6 +139,12 @@ export default function CentersPage() {
           </div>
         )}
       </div>
+      {showOnboard && (
+        <CenterOnboardModal
+          onClose={() => setShowOnboard(false)}
+          onSaved={load}
+        />
+      )}
       {showForm && (
         <CenterFormModal
           center={editCenter}

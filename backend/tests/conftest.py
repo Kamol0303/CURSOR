@@ -131,12 +131,18 @@ async def security_fixtures(db_session: AsyncSession) -> dict:
         role_id=roles["auditor"].id,
         is_active=True,
     )
+    hokimiyat = User(
+        username=f"hokim_{suffix}",
+        password_hash=hash_password("Test#Hokimiyat1!"),
+        role_id=roles["hokimiyat_operator"].id,
+        is_active=True,
+    )
     parent = User(
         phone=f"+998{int(suffix[:8], 16) % 1000000000:09d}",
         role_id=roles["parent"].id,
         is_active=True,
     )
-    db_session.add_all([director_a, teacher_a, admin_a, auditor, parent])
+    db_session.add_all([director_a, teacher_a, admin_a, auditor, hokimiyat, parent])
     await db_session.flush()
 
     teacher_record_a = Teacher(
@@ -199,6 +205,7 @@ async def security_fixtures(db_session: AsyncSession) -> dict:
     await db_session.refresh(teacher_a, attribute_names=["role"])
     await db_session.refresh(admin_a, attribute_names=["role"])
     await db_session.refresh(auditor, attribute_names=["role"])
+    await db_session.refresh(hokimiyat, attribute_names=["role"])
     await db_session.refresh(parent, attribute_names=["role"])
 
     def token_for(user: User) -> str:
@@ -222,6 +229,7 @@ async def security_fixtures(db_session: AsyncSession) -> dict:
         "group_a": group_a,
         "group_b": group_b,
         "auditor": auditor,
+        "hokimiyat": hokimiyat,
         "parent": parent,
         "student_a": student_a,
         "student_b": student_b,
@@ -229,6 +237,7 @@ async def security_fixtures(db_session: AsyncSession) -> dict:
         "token_teacher_a": token_for(teacher_a),
         "token_admin_a": token_for(admin_a),
         "token_auditor": token_for(auditor),
+        "token_hokimiyat": token_for(hokimiyat),
         "token_parent": token_for(parent),
     }
 

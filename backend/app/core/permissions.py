@@ -48,6 +48,7 @@ ROLE_PERMISSIONS: dict[str, list[str]] = {
         *_MESSAGE_PERMS,
     ],
     "hokimiyat_operator": [
+        "centers.create",
         "centers.read",
         "students.read",
         "teachers.read",

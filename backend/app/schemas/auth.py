@@ -89,3 +89,5 @@ class UserMeResponse(BaseModel):
     mfa_enabled: bool
     mfa_required: bool = False
     mfa_configured: bool = False
+    must_change_password: bool = False
+    center_profile_completed: bool | None = None

@@ -153,7 +153,26 @@
     "saving": "Saving...",
     "cancel": "Cancel",
     "saveError": "Failed to save",
-    "deleteConfirm": "Delete center \"{name}\"?"
+    "deleteConfirm": "Delete center \"{name}\"?",
+    "onboardAdd": "Register center",
+    "onboardTitle": "New center and director",
+    "onboardSubtitle": "A center will be created and a temporary password issued for the director.",
+    "onboardDirectorLogin": "Director login",
+    "onboardTempPassword": "Temporary password",
+    "onboardSubmit": "Create and invite",
+    "onboardError": "Failed to create center",
+    "onboardSuccessTitle": "Center created",
+    "onboardSuccessHint": "Share these credentials with the director. They must change password and complete the profile on first login.",
+    "onboardDone": "Done"
+  },
+  "onboarding": {
+    "title": "Complete center profile",
+    "subtitle": "Update your password and enter your center details to continue.",
+    "stepPassword": "Password",
+    "stepProfile": "Center profile",
+    "changePasswordTitle": "Set new password",
+    "profileTitle": "Center information",
+    "complete": "Complete profile"
   },
   "students": {
     "title": "Students",

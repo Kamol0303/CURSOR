@@ -65,6 +65,8 @@ export async function getMe() {
     mfa_enabled: boolean;
     mfa_required?: boolean;
     mfa_configured?: boolean;
+    must_change_password?: boolean;
+    center_profile_completed?: boolean | null;
   }>("/auth/me");
 }
 

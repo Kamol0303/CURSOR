@@ -153,7 +153,26 @@
     "saving": "Saqlanmoqda...",
     "cancel": "Bekor qilish",
     "saveError": "Saqlashda xatolik",
-    "deleteConfirm": "\"{name}\" markazini o'chirishni tasdiqlaysizmi?"
+    "deleteConfirm": "\"{name}\" markazini o'chirishni tasdiqlaysizmi?",
+    "onboardAdd": "Markaz ro'yxatdan o'tkazish",
+    "onboardTitle": "Yangi markaz va direktor",
+    "onboardSubtitle": "Markaz yaratiladi va direktor uchun vaqtinchalik parol beriladi.",
+    "onboardDirectorLogin": "Direktor login",
+    "onboardTempPassword": "Vaqtinchalik parol",
+    "onboardSubmit": "Yaratish va taklif yuborish",
+    "onboardError": "Markaz yaratishda xatolik",
+    "onboardSuccessTitle": "Markaz yaratildi",
+    "onboardSuccessHint": "Quyidagi ma'lumotlarni direktorga yetkazing. Birinchi kirishda parol va profil to'ldirilishi talab qilinadi.",
+    "onboardDone": "Tushundim"
+  },
+  "onboarding": {
+    "title": "Markaz profilini to'ldirish",
+    "subtitle": "Tizimdan foydalanish uchun parolni yangilang va markaz ma'lumotlarini kiriting.",
+    "stepPassword": "Parol",
+    "stepProfile": "Markaz profili",
+    "changePasswordTitle": "Yangi parol o'rnatish",
+    "profileTitle": "Markaz ma'lumotlari",
+    "complete": "Profilni yakunlash"
   },
   "students": {
     "title": "O'quvchilar",

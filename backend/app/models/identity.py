@@ -80,6 +80,7 @@ class TrainingCenter(Base, TimestampMixin):
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
     mahalla_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), ForeignKey("mahallas.id"), nullable=True)
     is_demo_data: Mapped[bool] = mapped_column(Boolean, default=False)
+    profile_completed: Mapped[bool] = mapped_column(Boolean, default=False)
 
     users: Mapped[list["User"]] = relationship(back_populates="center")
     mahalla: Mapped[Mahalla | None] = relationship(back_populates="centers")

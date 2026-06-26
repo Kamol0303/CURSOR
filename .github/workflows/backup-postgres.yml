@@ -1,0 +1,53 @@
+name: postgres-backup
+
+on:
+  schedule:
+    # Daily at 02:00 UTC (07:00 Tashkent)
+    - cron: "0 2 * * *"
+  workflow_dispatch:
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_USER: tamor
+          POSTGRES_PASSWORD: tamor_dev
+          POSTGRES_DB: tamor
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install PostgreSQL client
+        run: sudo apt-get update && sudo apt-get install -y postgresql-client
+
+      - name: Run backup script
+        env:
+          POSTGRES_USER: tamor
+          POSTGRES_PASSWORD: tamor_dev
+          POSTGRES_DB: tamor
+          PGHOST: localhost
+          PGPORT: 5432
+        run: ./scripts/backup_postgres.sh ./backups
+
+      - name: Verify backup artifact
+        run: |
+          test -n "$(ls -1 ./backups/*.sql.gz 2>/dev/null)" || (echo "No backup file produced" && exit 1)
+          gzip -t ./backups/*.sql.gz
+
+      - name: Upload backup artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: postgres-backup-${{ github.run_id }}
+          path: backups/*.sql.gz
+          retention-days: 14
+          if-no-files-found: error

@@ -89,6 +89,7 @@
     "logout": "Sign out",
     "groups": "Groups",
     "courses": "Courses",
+    "messages": "Messages",
     "attendance": "Attendance",
     "payments": "Payments",
     "exams": "Exams",
@@ -216,6 +217,18 @@
     "lessonTitle": "Lesson title",
     "addLesson": "Add lesson",
     "noLessons": "No lessons yet"
+  },
+  "messages": {
+    "title": "Internal messages",
+    "loading": "Loading...",
+    "inbox": "Inbox",
+    "sent": "Sent",
+    "compose": "Compose",
+    "recipientId": "Recipient ID (UUID)",
+    "subject": "Subject",
+    "body": "Message body",
+    "send": "Send",
+    "empty": "No messages"
   },
   "studentCabinet": {
     "title": "Student portal",

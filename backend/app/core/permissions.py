@@ -6,6 +6,8 @@ _EXAM_PERMS = ["exams.create", "exams.read", "exams.update", "exams.delete", "ex
 _GRADE_PERMS = ["grades.create", "grades.read", "grades.update", "grades.delete"]
 _COURSE_PERMS = ["courses.create", "courses.read", "courses.update", "courses.delete"]
 
+_MESSAGE_PERMS = ["messages.read", "messages.send"]
+
 ROLE_PERMISSIONS: dict[str, list[str]] = {
     "super_admin": [
         "centers.create",
@@ -42,6 +44,7 @@ ROLE_PERMISSIONS: dict[str, list[str]] = {
         *_COURSE_PERMS,
         "files.upload",
         "files.read",
+        *_MESSAGE_PERMS,
     ],
     "hokimiyat_operator": [
         "centers.read",
@@ -89,6 +92,7 @@ ROLE_PERMISSIONS: dict[str, list[str]] = {
         *_COURSE_PERMS,
         "files.upload",
         "files.read",
+        *_MESSAGE_PERMS,
     ],
     "center_admin": [
         "centers.read",
@@ -128,6 +132,7 @@ ROLE_PERMISSIONS: dict[str, list[str]] = {
         "grades.read",
         "grades.create",
         "courses.read",
+        *_MESSAGE_PERMS,
     ],
     "accountant": [
         "students.read",
@@ -201,4 +206,5 @@ NAV_PERMISSIONS: dict[str, str] = {
     "certificates": "students.read",
     "analytics": "analytics.view",
     "security": "dashboard.view",
+    "messages": "messages.read",
 }

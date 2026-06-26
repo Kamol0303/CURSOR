@@ -1,16 +1,18 @@
-"""File storage and internal messaging."""
-
 from __future__ import annotations
 
 import uuid
 from datetime import datetime
+from typing import TYPE_CHECKING
 
 from sqlalchemy import BigInteger, Boolean, DateTime, ForeignKey, String, Text, func
 from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.core.database import Base
 from app.models.identity import TimestampMixin
+
+if TYPE_CHECKING:
+    from app.models.identity import User
 
 
 class StoredFile(Base, TimestampMixin):
@@ -39,3 +41,6 @@ class Message(Base, TimestampMixin):
     body: Mapped[str] = mapped_column(Text, nullable=False)
     is_read: Mapped[bool] = mapped_column(Boolean, default=False)
     sent_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+    sender: Mapped["User | None"] = relationship(foreign_keys=[sender_id])
+    recipient: Mapped["User | None"] = relationship(foreign_keys=[recipient_id])

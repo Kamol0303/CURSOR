@@ -89,6 +89,7 @@
     "logout": "Chiqish",
     "groups": "Guruhlar",
     "courses": "Kurslar",
+    "messages": "Xabarlar",
     "attendance": "Davomat",
     "payments": "To'lovlar",
     "exams": "Imtihonlar",
@@ -228,6 +229,18 @@
     "lessonTitle": "Dars nomi",
     "addLesson": "Dars qo'shish",
     "noLessons": "Darslar yo'q"
+  },
+  "messages": {
+    "title": "Ichki xabarlar",
+    "loading": "Yuklanmoqda...",
+    "inbox": "Kiruvchi",
+    "sent": "Yuborilgan",
+    "compose": "Yangi xabar",
+    "recipientId": "Qabul qiluvchi ID (UUID)",
+    "subject": "Mavzu",
+    "body": "Xabar matni",
+    "send": "Yuborish",
+    "empty": "Xabarlar yo'q"
   },
   "studentCabinet": {
     "title": "Shaxsiy kabinet",

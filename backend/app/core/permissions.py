@@ -204,6 +204,6 @@ NAV_PERMISSIONS: dict[str, str] = {
     "ratings": "ratings.view",
     "certificates": "students.read",
     "analytics": "analytics.view",
-    "security": "dashboard.view",
+    "security": "users.password_reset",
     "messages": "messages.read",
 }

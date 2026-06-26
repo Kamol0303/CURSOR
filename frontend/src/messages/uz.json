@@ -327,6 +327,11 @@
   "common": {
     "language": "Til"
   },
+  "forbidden": {
+    "title": "Kirish taqiqlangan",
+    "message": "Sizda ushbu sahifani ko'rish uchun ruxsat yo'q.",
+    "goHome": "Bosh sahifaga qaytish"
+  },
   "ratings": {
     "title": "Markazlar reytingi",
     "loading": "Yuklanmoqda...",

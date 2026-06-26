@@ -9,29 +9,9 @@ import { NotificationBell } from "@/components/NotificationBell";
 import { useAuth } from "@/contexts/AuthContext";
 import { getApiBaseUrl } from "@/lib/api";
 import { clearAuthCookie } from "@/lib/auth-cookie";
+import { DASHBOARD_NAV_ROUTES } from "@/lib/route-guards";
 
-const NAV: ReadonlyArray<{
-  href: string;
-  key: string;
-  permission: string;
-  exact?: boolean;
-}> = [
-  { href: "/dashboard", key: "dashboard", permission: "dashboard.view", exact: true },
-  { href: "/dashboard/centers", key: "centers", permission: "centers.read" },
-  { href: "/dashboard/students", key: "students", permission: "students.read" },
-  { href: "/dashboard/teachers", key: "teachers", permission: "teachers.read" },
-  { href: "/dashboard/groups", key: "groups", permission: "groups.read" },
-  { href: "/dashboard/courses", key: "courses", permission: "courses.read" },
-  { href: "/dashboard/messages", key: "messages", permission: "messages.read" },
-  { href: "/dashboard/attendance", key: "attendance", permission: "attendance.read" },
-  { href: "/dashboard/payments", key: "payments", permission: "payments.read" },
-  { href: "/dashboard/exams", key: "exams", permission: "exams.read" },
-  { href: "/dashboard/grades", key: "grades", permission: "grades.read" },
-  { href: "/dashboard/ratings", key: "ratings", permission: "ratings.view" },
-  { href: "/dashboard/certificates", key: "certificates", permission: "students.read" },
-  { href: "/dashboard/analytics", key: "analytics", permission: "analytics.view" },
-  { href: "/dashboard/security", key: "security", permission: "dashboard.view" },
-];
+const NAV = DASHBOARD_NAV_ROUTES;
 
 function isNavActive(pathname: string, href: string, exact?: boolean) {
   if (exact) return pathname === href;

@@ -1,11 +1,19 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { getRoleFromToken } from "@/lib/auth-cookie";
+import { getPermissionsFromToken, getRoleFromToken } from "@/lib/auth-cookie";
+import { canAccessDashboardRoute, homePathForPortalRole } from "@/lib/route-guards";
 
 export function middleware(request: NextRequest) {
   const rawToken = request.cookies.get("tmb_access_token")?.value;
   const token = rawToken ? decodeURIComponent(rawToken) : null;
   const { pathname } = request.nextUrl;
+
+  if (pathname === "/forbidden") {
+    if (!token) {
+      return NextResponse.redirect(new URL("/", request.url));
+    }
+    return NextResponse.next();
+  }
 
   const isDashboard = pathname.startsWith("/dashboard");
   const isStudent = pathname.startsWith("/student");
@@ -22,29 +30,38 @@ export function middleware(request: NextRequest) {
   }
 
   const role = getRoleFromToken(token);
+  const permissions = getPermissionsFromToken(token);
+  const portalHome = homePathForPortalRole(role);
 
-  if (isDashboard && role === "student") {
-    return NextResponse.redirect(new URL("/student/dashboard", request.url));
+  if (isDashboard) {
+    if (role === "student" || role === "parent" || role === "teacher") {
+      return NextResponse.redirect(new URL(portalHome, request.url));
+    }
+    if (!canAccessDashboardRoute(pathname, permissions, role)) {
+      return NextResponse.redirect(new URL("/forbidden", request.url));
+    }
+    return NextResponse.next();
   }
-  if (isDashboard && role === "parent") {
-    return NextResponse.redirect(new URL("/parent/dashboard", request.url));
-  }
-  if (isDashboard && role === "teacher") {
-    return NextResponse.redirect(new URL("/teacher/dashboard", request.url));
-  }
+
   if (isStudent && role !== "student") {
-    return NextResponse.redirect(new URL("/dashboard", request.url));
+    return NextResponse.redirect(new URL(portalHome, request.url));
   }
   if (isParent && role !== "parent") {
-    return NextResponse.redirect(new URL("/dashboard", request.url));
+    return NextResponse.redirect(new URL(portalHome, request.url));
   }
   if (isTeacher && role !== "teacher") {
-    return NextResponse.redirect(new URL("/dashboard", request.url));
+    return NextResponse.redirect(new URL(portalHome, request.url));
   }
 
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*", "/student/:path*", "/parent/:path*", "/teacher/:path*"],
+  matcher: [
+    "/dashboard/:path*",
+    "/student/:path*",
+    "/parent/:path*",
+    "/teacher/:path*",
+    "/forbidden",
+  ],
 };

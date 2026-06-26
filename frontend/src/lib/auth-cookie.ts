@@ -23,6 +23,18 @@ export function getRoleFromToken(token: string): string | null {
   }
 }
 
+export function getPermissionsFromToken(token: string): string[] {
+  try {
+    const segment = token.split(".")[1];
+    if (!segment) return [];
+    const normalized = segment.replace(/-/g, "+").replace(/_/g, "/");
+    const payload = JSON.parse(atob(normalized)) as { permissions?: string[] };
+    return Array.isArray(payload.permissions) ? payload.permissions : [];
+  } catch {
+    return [];
+  }
+}
+
 export function homePathForRole(role: string | null, needsOnboarding = false): string {
   if (role === "student") return "/student/dashboard";
   if (role === "parent") return "/parent/dashboard";

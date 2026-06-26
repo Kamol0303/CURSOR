@@ -315,6 +315,11 @@
   "common": {
     "language": "Language"
   },
+  "forbidden": {
+    "title": "Access denied",
+    "message": "You do not have permission to view this page.",
+    "goHome": "Back to home"
+  },
   "ratings": {
     "title": "Center ratings",
     "loading": "Loading...",

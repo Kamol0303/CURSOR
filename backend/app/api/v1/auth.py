@@ -1,8 +1,9 @@
 from fastapi import APIRouter, Depends, HTTPException, Request, Response
+from fastapi.security import HTTPAuthorizationCredentials
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
-from app.core.deps import get_current_user, get_current_user_optional, requires_permission
+from app.core.deps import bearer_scheme, get_current_user, get_current_user_optional, requires_permission
 from app.models.identity import User
 from app.schemas.auth import (
     ApiResponse,
@@ -32,6 +33,7 @@ from app.services.auth_service import (
     verify_parent_otp,
 )
 from app.core.permissions import MANDATORY_MFA_ROLES
+from app.core.security import verify_access_token
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -232,11 +234,28 @@ async def refresh(
 async def logout_endpoint(
     request: Request,
     response: Response,
+    credentials: HTTPAuthorizationCredentials | None = Depends(bearer_scheme),
     db: AsyncSession = Depends(get_db),
 ):
+    access_jti = None
+    access_exp = None
+    if credentials:
+        try:
+            payload = verify_access_token(credentials.credentials)
+            access_jti = payload.get("jti")
+            access_exp = payload.get("exp")
+        except ValueError:
+            pass
+
     refresh_token = request.cookies.get(REFRESH_COOKIE)
     if refresh_token:
-        await logout(db, refresh_token=refresh_token)
+        await logout(
+            db,
+            refresh_token=refresh_token,
+            access_jti=access_jti,
+            access_exp=access_exp,
+        )
+        await db.commit()
     _clear_refresh_cookie(response)
     return ApiResponse(success=True, data={"logged_out": True})
 
@@ -290,15 +309,19 @@ async def parent_verify_otp(
 @router.post("/change-password", response_model=ApiResponse)
 async def change_password_endpoint(
     body: ChangePasswordRequest,
+    request: Request,
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
+    payload = getattr(request.state, "token_payload", {})
     try:
         await change_password(
             db,
             user,
             current_password=body.current_password,
             new_password=body.new_password,
+            access_jti=payload.get("jti"),
+            access_exp=payload.get("exp"),
         )
         await db.commit()
     except AuthError as exc:

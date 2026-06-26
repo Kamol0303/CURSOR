@@ -10,7 +10,7 @@ from sqlalchemy.orm import selectinload
 
 from app.core.config import settings
 from app.core.permissions import MANDATORY_MFA_ROLES, ROLE_PERMISSIONS
-from app.core.redis_client import check_rate_limit
+from app.core.redis_client import check_rate_limit, deny_jti
 from app.core.security import (
     constant_time_elapsed,
     create_access_token,
@@ -86,6 +86,38 @@ async def _record_security_event(
             details=details or {},
         )
     )
+
+
+def _access_token_remaining_ttl(exp: int | None) -> int:
+    if exp is not None:
+        remaining = int(exp) - int(datetime.now(UTC).timestamp())
+        return max(remaining, 1)
+    return settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60
+
+
+async def revoke_access_token_jti(jti: str | None, exp: int | None = None) -> None:
+    if jti:
+        await deny_jti(jti, _access_token_remaining_ttl(exp))
+
+
+async def revoke_all_user_refresh_tokens(db: AsyncSession, user_id: UUID) -> None:
+    await db.execute(
+        update(RefreshToken)
+        .where(RefreshToken.user_id == user_id, RefreshToken.revoked_at.is_(None))
+        .values(revoked_at=datetime.now(UTC))
+    )
+
+
+async def revoke_user_sessions(
+    db: AsyncSession,
+    user_id: UUID,
+    *,
+    access_jti: str | None = None,
+    access_exp: int | None = None,
+) -> None:
+    """Invalidate refresh tokens and deny current access token JTI."""
+    await revoke_all_user_refresh_tokens(db, user_id)
+    await revoke_access_token_jti(access_jti, access_exp)
 
 
 async def login_with_password(
@@ -431,12 +463,23 @@ async def refresh_access_token(
     }
 
 
-async def logout(db: AsyncSession, *, refresh_token: str) -> None:
+async def logout(
+    db: AsyncSession,
+    *,
+    refresh_token: str,
+    access_jti: str | None = None,
+    access_exp: int | None = None,
+) -> None:
     token_hash = hash_token(refresh_token)
     result = await db.execute(select(RefreshToken).where(RefreshToken.token_hash == token_hash))
     stored = result.scalar_one_or_none()
     if stored:
-        stored.revoked_at = datetime.now(UTC)
+        await db.execute(
+            update(RefreshToken)
+            .where(RefreshToken.family_id == stored.family_id)
+            .values(revoked_at=datetime.now(UTC))
+        )
+    await revoke_access_token_jti(access_jti, access_exp)
 
 
 async def get_user_permissions(user: User) -> list[str]:
@@ -706,6 +749,8 @@ async def change_password(
     *,
     current_password: str,
     new_password: str,
+    access_jti: str | None = None,
+    access_exp: int | None = None,
 ) -> None:
     if not user.password_hash or not verify_password(user.password_hash, current_password):
         raise AuthError("INVALID_CREDENTIALS")
@@ -717,6 +762,8 @@ async def change_password(
     user.must_change_password = False
     user.failed_login_attempts = 0
     user.is_locked = False
+    await revoke_all_user_refresh_tokens(db, user.id)
+    await revoke_access_token_jti(access_jti, access_exp)
     await db.flush()
 
 
@@ -752,4 +799,5 @@ async def admin_reset_password(
     target.must_change_password = False
     target.failed_login_attempts = 0
     target.is_locked = False
+    await revoke_all_user_refresh_tokens(db, target.id)
     await db.flush()

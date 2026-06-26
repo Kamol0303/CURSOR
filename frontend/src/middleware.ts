@@ -10,8 +10,9 @@ export function middleware(request: NextRequest) {
   const isDashboard = pathname.startsWith("/dashboard");
   const isStudent = pathname.startsWith("/student");
   const isParent = pathname.startsWith("/parent") && !pathname.startsWith("/parent/login");
+  const isTeacher = pathname.startsWith("/teacher");
 
-  if (!isDashboard && !isStudent && !isParent) {
+  if (!isDashboard && !isStudent && !isParent && !isTeacher) {
     return NextResponse.next();
   }
 
@@ -28,10 +29,16 @@ export function middleware(request: NextRequest) {
   if (isDashboard && role === "parent") {
     return NextResponse.redirect(new URL("/parent/dashboard", request.url));
   }
+  if (isDashboard && role === "teacher") {
+    return NextResponse.redirect(new URL("/teacher/dashboard", request.url));
+  }
   if (isStudent && role !== "student") {
     return NextResponse.redirect(new URL("/dashboard", request.url));
   }
   if (isParent && role !== "parent") {
+    return NextResponse.redirect(new URL("/dashboard", request.url));
+  }
+  if (isTeacher && role !== "teacher") {
     return NextResponse.redirect(new URL("/dashboard", request.url));
   }
 
@@ -39,5 +46,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*", "/student/:path*", "/parent/:path*"],
+  matcher: ["/dashboard/:path*", "/student/:path*", "/parent/:path*", "/teacher/:path*"],
 };

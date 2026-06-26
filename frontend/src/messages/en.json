@@ -275,6 +275,8 @@
     "student": "Student",
     "status": "Status",
     "actions": "Actions",
+    "present": "Present",
+    "absent": "Absent",
     "qrSession": "Create QR session",
     "qrCode": "QR code (scan)"
   },
@@ -363,6 +365,38 @@
     "title": "Notifications",
     "empty": "No notifications",
     "markAllRead": "Mark all as read"
+  },
+  "teacherPortal": {
+    "subtitle": "Teacher portal",
+    "logout": "Sign out",
+    "welcome": "Welcome",
+    "loading": "Loading...",
+    "myGroups": "My groups",
+    "totalStudents": "Total students",
+    "quickGroups": "Groups",
+    "noGroups": "No groups",
+    "noStudents": "No students",
+    "noSchedule": "No schedule",
+    "room": "Room",
+    "students": "Students",
+    "backToGroups": "Back to groups",
+    "groupStudents": "Group students",
+    "studentName": "Student",
+    "grade": "Grade",
+    "profileName": "Full name",
+    "profileLogin": "Login",
+    "profileCenter": "Center",
+    "profilePhone": "Phone",
+    "profileSpec": "Specialization",
+    "changePassword": "Change password",
+    "nav": {
+      "dashboard": "Home",
+      "groups": "Groups",
+      "attendance": "Attendance",
+      "grades": "Grades",
+      "schedule": "Schedule",
+      "profile": "Profile"
+    }
   },
   "parent": {
     "title": "Parent portal",

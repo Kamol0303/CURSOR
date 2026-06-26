@@ -21,6 +21,7 @@ from app.api.v1.ratings import router as ratings_router
 from app.api.v1.reports import router as reports_router
 from app.api.v1.students import router as students_router
 from app.api.v1.student import router as student_router
+from app.api.v1.teacher import router as teacher_router
 from app.api.v1.teachers import router as teachers_router
 
 api_router = APIRouter()
@@ -45,6 +46,7 @@ api_router.include_router(notifications_router)
 api_router.include_router(messages_router)
 api_router.include_router(parent_router)
 api_router.include_router(student_router)
+api_router.include_router(teacher_router)
 api_router.include_router(external_router)
 api_router.include_router(integrations_router)
 api_router.include_router(public_router)

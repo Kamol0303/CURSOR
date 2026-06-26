@@ -26,6 +26,7 @@ export function getRoleFromToken(token: string): string | null {
 export function homePathForRole(role: string | null, needsOnboarding = false): string {
   if (role === "student") return "/student/dashboard";
   if (role === "parent") return "/parent/dashboard";
+  if (role === "teacher") return "/teacher/dashboard";
   if (role === "center_director" && needsOnboarding) return "/dashboard/onboarding";
   return "/dashboard";
 }

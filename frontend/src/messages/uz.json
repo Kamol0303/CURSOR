@@ -287,6 +287,8 @@
     "student": "O'quvchi",
     "status": "Holat",
     "actions": "Amallar",
+    "present": "Keldi",
+    "absent": "Kelmadi",
     "qrSession": "QR sessiya yaratish",
     "qrCode": "QR kod (skanerlang)"
   },
@@ -375,6 +377,38 @@
     "title": "Bildirishnomalar",
     "empty": "Bildirishnomalar yo'q",
     "markAllRead": "Hammasini o'qilgan deb belgilash"
+  },
+  "teacherPortal": {
+    "subtitle": "O'qituvchi portali",
+    "logout": "Chiqish",
+    "welcome": "Xush kelibsiz",
+    "loading": "Yuklanmoqda...",
+    "myGroups": "Mening guruhlarim",
+    "totalStudents": "Jami o'quvchilar",
+    "quickGroups": "Guruhlar",
+    "noGroups": "Guruhlar yo'q",
+    "noStudents": "O'quvchilar yo'q",
+    "noSchedule": "Jadval yo'q",
+    "room": "Xona",
+    "students": "O'quvchilar",
+    "backToGroups": "Guruhlarga qaytish",
+    "groupStudents": "Guruh o'quvchilari",
+    "studentName": "O'quvchi",
+    "grade": "Sinf",
+    "profileName": "F.I.Sh.",
+    "profileLogin": "Login",
+    "profileCenter": "Markaz",
+    "profilePhone": "Telefon",
+    "profileSpec": "Mutaxassislik",
+    "changePassword": "Parolni o'zgartirish",
+    "nav": {
+      "dashboard": "Bosh sahifa",
+      "groups": "Guruhlar",
+      "attendance": "Davomat",
+      "grades": "Baholar",
+      "schedule": "Jadval",
+      "profile": "Profil"
+    }
   },
   "parent": {
     "title": "Ota-ona portali",

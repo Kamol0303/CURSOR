@@ -275,6 +275,8 @@
     "student": "Учащийся",
     "status": "Статус",
     "actions": "Действия",
+    "present": "Присутствует",
+    "absent": "Отсутствует",
     "qrSession": "Создать QR-сессию",
     "qrCode": "QR-код (сканировать)"
   },
@@ -363,6 +365,38 @@
     "title": "Уведомления",
     "empty": "Нет уведомлений",
     "markAllRead": "Отметить все прочитанными"
+  },
+  "teacherPortal": {
+    "subtitle": "Портал учителя",
+    "logout": "Выйти",
+    "welcome": "Добро пожаловать",
+    "loading": "Загрузка...",
+    "myGroups": "Мои группы",
+    "totalStudents": "Всего учеников",
+    "quickGroups": "Группы",
+    "noGroups": "Нет групп",
+    "noStudents": "Нет учеников",
+    "noSchedule": "Нет расписания",
+    "room": "Кабинет",
+    "students": "Ученики",
+    "backToGroups": "К группам",
+    "groupStudents": "Ученики группы",
+    "studentName": "Ученик",
+    "grade": "Класс",
+    "profileName": "ФИО",
+    "profileLogin": "Логин",
+    "profileCenter": "Центр",
+    "profilePhone": "Телефон",
+    "profileSpec": "Специализация",
+    "changePassword": "Сменить пароль",
+    "nav": {
+      "dashboard": "Главная",
+      "groups": "Группы",
+      "attendance": "Посещаемость",
+      "grades": "Оценки",
+      "schedule": "Расписание",
+      "profile": "Профиль"
+    }
   },
   "parent": {
     "title": "Портал для родителей",

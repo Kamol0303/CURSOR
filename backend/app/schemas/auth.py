@@ -27,6 +27,29 @@ class AdminResetPasswordRequest(BaseModel):
     new_password: str = Field(min_length=12, max_length=128)
 
 
+class IssueCredentialsRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    target_user_id: UUID
+
+
+class CredentialTargetResponse(BaseModel):
+    id: str
+    username: str | None
+    phone: str | None
+    role: str
+    display_name: str
+
+
+class IssueCredentialsResponse(BaseModel):
+    user_id: str
+    login: str
+    username: str | None
+    role: str
+    temporary_password: str
+    must_change_password: bool
+
+
 class MfaVerifyRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
 

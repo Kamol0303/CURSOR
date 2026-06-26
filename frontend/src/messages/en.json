@@ -58,6 +58,22 @@
     "targetUsername": "Username",
     "adminResetButton": "Reset password",
     "adminResetSuccess": "Password updated for {username}",
+    "issueCredentialsTitle": "Issue login credentials",
+    "issueCredentialsHint": "Generate a temporary password for a user. They must change it on first login.",
+    "issueCredentialsButton": "Generate credentials",
+    "searchUser": "Search by name, username, or phone",
+    "searching": "Searching...",
+    "clearSelection": "Clear",
+    "credentialsOnce": "Save these credentials now — the password will not be shown again",
+    "issuedLogin": "Login",
+    "issuedPassword": "Temporary password",
+    "roles": {
+      "teacher": "Teacher",
+      "center_admin": "Manager",
+      "student": "Student",
+      "center_director": "Director",
+      "super_admin": "Super admin"
+    },
     "passwordErrors": {
       "INVALID_CREDENTIALS": "Current password is incorrect",
       "PASSWORD_TOO_SHORT": "Password is too short (minimum 12 characters)",

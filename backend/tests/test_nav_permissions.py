@@ -30,6 +30,11 @@ def test_center_admin_cannot_reset_passwords():
     assert "users.password_reset" not in ROLE_PERMISSIONS["center_admin"]
 
 
+def test_group_g_restricted_roles_lack_payments():
+    for role in ("teacher", "parent", "auditor", "hokimiyat_operator"):
+        assert "payments.read" not in ROLE_PERMISSIONS[role]
+
+
 def test_teacher_has_portal_not_dashboard():
     teacher = ROLE_PERMISSIONS["teacher"]
     assert "teacher.portal" in teacher

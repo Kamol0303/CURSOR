@@ -836,13 +836,12 @@ async def admin_reset_password(
     *,
     username: str,
     new_password: str,
+    ip: str | None = None,
 ) -> None:
+    from app.services.credential_service import apply_password
+
     if admin.role.code not in {"super_admin", "center_director"}:
         raise AuthError("FORBIDDEN", 403)
-
-    policy_errors = validate_password_policy(new_password)
-    if policy_errors:
-        raise AuthError(policy_errors[0], 422)
 
     result = await db.execute(
         select(User).options(selectinload(User.role)).where(User.username == username, User.deleted_at.is_(None))
@@ -857,10 +856,19 @@ async def admin_reset_password(
         if target.center_id and admin.center_id and target.center_id != admin.center_id:
             raise AuthError("FORBIDDEN", 403)
 
-    target.password_hash = hash_password(new_password)
+    await apply_password(db, target, new_password, must_change_password=False)
     target.password_changed_at = datetime.now(UTC)
-    target.must_change_password = False
-    target.failed_login_attempts = 0
-    target.is_locked = False
     await revoke_all_user_refresh_tokens(db, target.id)
+    await _record_security_event(
+        db,
+        event_type="password_reset_by_admin",
+        severity="info",
+        user_id=admin.id,
+        ip=ip,
+        details={
+            "issuer_id": str(admin.id),
+            "target_user_id": str(target.id),
+            "target_username": target.username,
+        },
+    )
     await db.flush()

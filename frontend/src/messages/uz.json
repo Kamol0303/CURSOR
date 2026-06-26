@@ -58,6 +58,22 @@
     "targetUsername": "Foydalanuvchi nomi",
     "adminResetButton": "Parolni tiklash",
     "adminResetSuccess": "{username} uchun parol yangilandi",
+    "issueCredentialsTitle": "Login va parol berish",
+    "issueCredentialsHint": "Foydalanuvchi uchun vaqtinchalik parol yarating. Birinchi kirishda o'zgartirishi shart.",
+    "issueCredentialsButton": "Kirish ma'lumotlarini yaratish",
+    "searchUser": "Ism, login yoki telefon bo'yicha qidirish",
+    "searching": "Qidirilmoqda...",
+    "clearSelection": "Tozalash",
+    "credentialsOnce": "Ma'lumotlarni hozir saqlang — parol qayta ko'rsatilmaydi",
+    "issuedLogin": "Login",
+    "issuedPassword": "Vaqtinchalik parol",
+    "roles": {
+      "teacher": "O'qituvchi",
+      "center_admin": "Menejer",
+      "student": "O'quvchi",
+      "center_director": "Direktor",
+      "super_admin": "Super admin"
+    },
     "passwordErrors": {
       "INVALID_CREDENTIALS": "Joriy parol noto'g'ri",
       "PASSWORD_TOO_SHORT": "Parol juda qisqa (kamida 12 belgi)",

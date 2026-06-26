@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { apiFetch } from "@/lib/api";
+import { PermissionGate } from "@/components/PermissionGate";
+import { useAuth } from "@/contexts/AuthContext";
 
 type Group = { id: string; name: string };
 type Student = { id: string; full_name: string };
@@ -10,6 +12,8 @@ type Record = { student_id: string; student_name: string; status: string };
 
 export default function AttendancePage() {
   const t = useTranslations("attendance");
+  const { can } = useAuth();
+  const canMark = can("attendance.mark");
   const [groups, setGroups] = useState<Group[]>([]);
   const [groupId, setGroupId] = useState("");
   const [sessionDate, setSessionDate] = useState(new Date().toISOString().slice(0, 10));
@@ -66,9 +70,11 @@ export default function AttendancePage() {
             ))}
           </select>
           <input type="date" className="border rounded-lg px-3 py-2" value={sessionDate} onChange={(e) => setSessionDate(e.target.value)} />
-          <button type="button" onClick={createQr} className="px-4 py-2 bg-naqsh-accent text-white rounded-lg text-sm">
-            {t("qrSession")}
-          </button>
+          <PermissionGate permission="attendance.mark">
+            <button type="button" onClick={createQr} className="px-4 py-2 bg-naqsh-accent text-white rounded-lg text-sm">
+              {t("qrSession")}
+            </button>
+          </PermissionGate>
         </div>
         {qrPayload && (
           <div className="bg-white border rounded-xl p-4 text-sm break-all">
@@ -82,7 +88,7 @@ export default function AttendancePage() {
               <tr>
                 <th className="text-left p-3">{t("student")}</th>
                 <th className="text-left p-3">{t("status")}</th>
-                <th className="p-3">{t("actions")}</th>
+                {canMark && <th className="p-3">{t("actions")}</th>}
               </tr>
             </thead>
             <tbody>
@@ -90,10 +96,12 @@ export default function AttendancePage() {
                 <tr key={s.id} className="border-b">
                   <td className="p-3">{s.full_name}</td>
                   <td className="p-3">{statusFor(s.id) || "—"}</td>
-                  <td className="p-3 space-x-1">
-                    <button type="button" className="text-xs px-2 py-1 bg-green-100 rounded" onClick={() => mark(s.id, "present")}>+</button>
-                    <button type="button" className="text-xs px-2 py-1 bg-red-100 rounded" onClick={() => mark(s.id, "absent")}>−</button>
-                  </td>
+                  {canMark && (
+                    <td className="p-3 space-x-1">
+                      <button type="button" className="text-xs px-2 py-1 bg-green-100 rounded" onClick={() => mark(s.id, "present")}>+</button>
+                      <button type="button" className="text-xs px-2 py-1 bg-red-100 rounded" onClick={() => mark(s.id, "absent")}>−</button>
+                    </td>
+                  )}
                 </tr>
               ))}
             </tbody>

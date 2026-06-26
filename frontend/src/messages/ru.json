@@ -58,6 +58,22 @@
     "targetUsername": "Имя пользователя",
     "adminResetButton": "Сбросить пароль",
     "adminResetSuccess": "Пароль обновлён для {username}",
+    "issueCredentialsTitle": "Выдать учётные данные",
+    "issueCredentialsHint": "Создайте временный пароль. Пользователь должен сменить его при первом входе.",
+    "issueCredentialsButton": "Создать учётные данные",
+    "searchUser": "Поиск по имени, логину или телефону",
+    "searching": "Поиск...",
+    "clearSelection": "Очистить",
+    "credentialsOnce": "Сохраните данные сейчас — пароль повторно не показывается",
+    "issuedLogin": "Логин",
+    "issuedPassword": "Временный пароль",
+    "roles": {
+      "teacher": "Учитель",
+      "center_admin": "Менеджер",
+      "student": "Учащийся",
+      "center_director": "Директор",
+      "super_admin": "Супер админ"
+    },
     "passwordErrors": {
       "INVALID_CREDENTIALS": "Неверный текущий пароль",
       "PASSWORD_TOO_SHORT": "Пароль слишком короткий (минимум 12 символов)",

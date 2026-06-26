@@ -15,6 +15,7 @@ from app.schemas.auth import (
     ParentOtpVerifyRequest,
     ChangePasswordRequest,
     AdminResetPasswordRequest,
+    IssueCredentialsRequest,
     TokenResponse,
     UserMeResponse,
 )
@@ -33,6 +34,7 @@ from app.services.auth_service import (
     verify_mfa_and_issue_tokens,
     verify_parent_otp,
 )
+from app.services.credential_service import issue_credentials, list_credential_targets
 from app.core.permissions import MANDATORY_MFA_ROLES
 from app.core.security import verify_access_token
 
@@ -350,6 +352,7 @@ async def change_password_endpoint(
 @router.post("/admin/reset-password", response_model=ApiResponse)
 async def admin_reset_password_endpoint(
     body: AdminResetPasswordRequest,
+    request: Request,
     user: User = Depends(requires_permission("users.password_reset")),
     db: AsyncSession = Depends(get_db),
 ):
@@ -359,11 +362,45 @@ async def admin_reset_password_endpoint(
             user,
             username=body.username,
             new_password=body.new_password,
+            ip=request.client.host if request.client else None,
         )
         await db.commit()
     except AuthError as exc:
         raise HTTPException(status_code=exc.status, detail={"code": exc.code}) from exc
     return ApiResponse(success=True, data={"username": body.username, "password_reset": True})
+
+
+@router.get("/admin/credential-targets", response_model=ApiResponse)
+async def credential_targets_endpoint(
+    search: str | None = None,
+    user: User = Depends(requires_permission("security.credentials.issue")),
+    db: AsyncSession = Depends(get_db),
+):
+    try:
+        targets = await list_credential_targets(db, user, search=search)
+    except AuthError as exc:
+        raise HTTPException(status_code=exc.status, detail={"code": exc.code}) from exc
+    return ApiResponse(success=True, data=targets)
+
+
+@router.post("/admin/issue-credentials", response_model=ApiResponse)
+async def issue_credentials_endpoint(
+    body: IssueCredentialsRequest,
+    request: Request,
+    user: User = Depends(requires_permission("security.credentials.issue")),
+    db: AsyncSession = Depends(get_db),
+):
+    try:
+        result = await issue_credentials(
+            db,
+            user,
+            target_user_id=body.target_user_id,
+            ip=request.client.host if request.client else None,
+        )
+        await db.commit()
+    except AuthError as exc:
+        raise HTTPException(status_code=exc.status, detail={"code": exc.code}) from exc
+    return ApiResponse(success=True, data=result)
 
 
 @router.get("/me", response_model=ApiResponse)

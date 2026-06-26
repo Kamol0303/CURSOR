@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { MfaSetupForm } from "@/components/MfaSetupForm";
 import { ChangePasswordForm } from "@/components/ChangePasswordForm";
 import { AdminResetPasswordForm } from "@/components/AdminResetPasswordForm";
+import { IssueCredentialsForm } from "@/components/IssueCredentialsForm";
 import { PermissionGate } from "@/components/PermissionGate";
 import { getApiBaseUrl, getToken } from "@/lib/api";
 
@@ -68,6 +69,12 @@ export default function SecurityPage() {
       <PermissionGate permission="users.password_reset">
         <div className="bg-white rounded-xl border p-6">
           <AdminResetPasswordForm />
+        </div>
+      </PermissionGate>
+
+      <PermissionGate permission="security.credentials.issue">
+        <div className="bg-white rounded-xl border p-6">
+          <IssueCredentialsForm />
         </div>
       </PermissionGate>
 

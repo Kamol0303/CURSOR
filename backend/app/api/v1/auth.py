@@ -28,6 +28,7 @@ from app.services.auth_service import (
     change_password,
     admin_reset_password,
     refresh_access_token,
+    regenerate_mfa_backup_codes,
     request_parent_otp,
     verify_mfa_and_issue_tokens,
     verify_parent_otp,
@@ -188,15 +189,32 @@ async def mfa_setup_confirm(
 
     if result.get("access_token"):
         _set_refresh_cookie(response, result["refresh_token"])
-        return ApiResponse(
-            success=True,
-            data=TokenResponse(
-                access_token=result["access_token"],
-                expires_at=result["expires_at"],
-            ).model_dump(),
-        )
+        data = TokenResponse(
+            access_token=result["access_token"],
+            expires_at=result["expires_at"],
+        ).model_dump()
+        if result.get("backup_codes"):
+            data["backup_codes"] = result["backup_codes"]
+        return ApiResponse(success=True, data=data)
 
-    return ApiResponse(success=True, data={"mfa_enabled": True})
+    data: dict = {"mfa_enabled": True}
+    if result.get("backup_codes"):
+        data["backup_codes"] = result["backup_codes"]
+    return ApiResponse(success=True, data=data)
+
+
+@router.post("/mfa/backup-codes/regenerate", response_model=ApiResponse)
+async def regenerate_backup_codes(
+    user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    try:
+        codes = await regenerate_mfa_backup_codes(db, user)
+        await db.commit()
+    except AuthError as exc:
+        raise HTTPException(status_code=exc.status, detail={"code": exc.code}) from exc
+
+    return ApiResponse(success=True, data={"backup_codes": codes, "remaining": len(codes)})
 
 
 @router.post("/refresh", response_model=ApiResponse)

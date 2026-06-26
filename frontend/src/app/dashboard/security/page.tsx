@@ -6,13 +6,15 @@ import { MfaSetupForm } from "@/components/MfaSetupForm";
 import { ChangePasswordForm } from "@/components/ChangePasswordForm";
 import { AdminResetPasswordForm } from "@/components/AdminResetPasswordForm";
 import { PermissionGate } from "@/components/PermissionGate";
-import { getToken } from "@/lib/api";
+import { getApiBaseUrl, getToken } from "@/lib/api";
 
 export default function SecurityPage() {
   const t = useTranslations("security");
   const [mfaEnabled, setMfaEnabled] = useState(false);
   const [mfaRequired, setMfaRequired] = useState(false);
   const [showSetup, setShowSetup] = useState(false);
+  const [backupCodes, setBackupCodes] = useState<string[] | null>(null);
+  const [regenerating, setRegenerating] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -25,6 +27,32 @@ export default function SecurityPage() {
       });
     });
   }, []);
+
+  const regenerateBackupCodes = async () => {
+    setRegenerating(true);
+    setError(null);
+    setMessage(null);
+    setBackupCodes(null);
+    try {
+      const token = getToken();
+      const res = await fetch(`${getApiBaseUrl()}/api/v1/auth/mfa/backup-codes/regenerate`, {
+        method: "POST",
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+        credentials: "include",
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setError(t(`errors.${data.detail?.code || "MFA_NOT_CONFIGURED"}` as "errors.MFA_INVALID"));
+        return;
+      }
+      setBackupCodes(data.data?.backup_codes || []);
+      setMessage(t("backupCodesRegenerated"));
+    } catch {
+      setError(t("errors.MFA_INVALID"));
+    } finally {
+      setRegenerating(false);
+    }
+  };
 
   return (
     <div className="max-w-lg space-y-6">
@@ -85,6 +113,30 @@ export default function SecurityPage() {
             }}
             onError={(code) => setError(t(`errors.${code}` as "errors.MFA_INVALID"))}
           />
+        )}
+
+        {mfaEnabled && (
+          <div className="space-y-2 pt-2 border-t">
+            <p className="text-sm text-gray-600">{t("backupCodesHint")}</p>
+            <button
+              type="button"
+              onClick={regenerateBackupCodes}
+              disabled={regenerating}
+              className="px-4 py-2 border rounded-lg text-sm hover:bg-gray-50 disabled:opacity-50"
+            >
+              {regenerating ? t("backupCodesRegenerating") : t("regenerateBackupCodes")}
+            </button>
+            {backupCodes && (
+              <div className="rounded-lg bg-amber-50 border border-amber-200 p-3">
+                <p className="text-xs font-semibold text-amber-900 mb-2">{t("backupCodesOnce")}</p>
+                <ul className="font-mono text-sm space-y-1">
+                  {backupCodes.map((code) => (
+                    <li key={code}>{code}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </div>
         )}
 
         {message && <p className="text-sm text-green-700">{message}</p>}

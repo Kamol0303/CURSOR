@@ -7,11 +7,13 @@ from app.core.redis_client import get_redis
 from app.core.security import decrypt_totp_secret
 from app.services.auth_service import (
     AuthError,
+    _try_consume_backup_code,
     cache_mfa_setup_token,
     cache_pending_mfa_secret,
     confirm_mfa_setup,
     init_mfa_setup,
     login_with_password,
+    regenerate_mfa_backup_codes,
 )
 
 
@@ -98,3 +100,34 @@ async def test_init_mfa_setup_for_authenticated_user(db_session, security_fixtur
     result = await init_mfa_setup(db_session, user=teacher)
     assert result["provisioning_uri"].startswith("otpauth://")
     assert len(result["secret"]) >= 16
+
+
+@pytest.mark.integration
+async def test_mfa_setup_generates_backup_codes(db_session, security_fixtures):
+    fx = security_fixtures
+    teacher = fx["teacher_a"]
+    teacher.mfa_secret_encrypted = None
+    teacher.mfa_enabled = False
+    await db_session.commit()
+
+    secret = pyotp.random_base32()
+    await cache_pending_mfa_secret(teacher.id, secret)
+    result = await confirm_mfa_setup(db_session, user=teacher, code=pyotp.TOTP(secret).now())
+    await db_session.commit()
+
+    assert result["mfa_enabled"] is True
+    assert len(result["backup_codes"]) == 10
+
+
+@pytest.mark.integration
+async def test_backup_code_consumed_once(db_session, security_fixtures):
+    fx = security_fixtures
+    teacher = fx["teacher_a"]
+    teacher.mfa_enabled = True
+    await db_session.commit()
+
+    codes = await regenerate_mfa_backup_codes(db_session, teacher)
+    await db_session.commit()
+    assert await _try_consume_backup_code(db_session, teacher.id, codes[0]) is True
+    await db_session.commit()
+    assert await _try_consume_backup_code(db_session, teacher.id, codes[0]) is False

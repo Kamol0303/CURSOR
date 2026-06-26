@@ -36,7 +36,7 @@ class MfaVerifyRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     mfa_token: str = Field(min_length=1, max_length=128)
-    code: str = Field(min_length=6, max_length=8)
+    code: str = Field(min_length=6, max_length=12)
 
 
 class MfaSetupInitRequest(BaseModel):

@@ -1,4 +1,5 @@
 import secrets
+import string
 import time
 from datetime import UTC, datetime, timedelta
 from uuid import UUID, uuid4
@@ -19,6 +20,7 @@ from app.core.security import (
     DUMMY_PASSWORD_HASH,
     encrypt_totp_secret,
     generate_refresh_token,
+    hash_backup_code,
     hash_password,
     hash_token,
     validate_password_policy,
@@ -27,6 +29,7 @@ from app.core.security import (
 from app.models.identity import (
     DeviceFingerprint,
     LoginAuditLog,
+    MfaBackupCode,
     RefreshToken,
     SecurityEvent,
     User,
@@ -42,6 +45,64 @@ class AuthError(Exception):
 
 MFA_ISSUER = "TMB"
 MFA_SETUP_TTL_SECONDS = 600
+BACKUP_CODE_COUNT = 10
+BACKUP_CODE_LENGTH = 8
+
+
+def _normalize_backup_code(code: str) -> str:
+    return "".join(ch for ch in code.upper() if ch.isalnum())
+
+
+def _generate_backup_codes(count: int = BACKUP_CODE_COUNT) -> list[str]:
+    alphabet = string.ascii_uppercase + string.digits
+    return ["".join(secrets.choice(alphabet) for _ in range(BACKUP_CODE_LENGTH)) for _ in range(count)]
+
+
+async def _replace_backup_codes(db: AsyncSession, user_id: UUID) -> list[str]:
+    from sqlalchemy import delete
+
+    await db.execute(delete(MfaBackupCode).where(MfaBackupCode.user_id == user_id))
+    plain_codes = _generate_backup_codes()
+    for plain in plain_codes:
+        db.add(MfaBackupCode(user_id=user_id, code_hash=hash_backup_code(plain)))
+    await db.flush()
+    return plain_codes
+
+
+async def _try_consume_backup_code(db: AsyncSession, user_id: UUID, code: str) -> bool:
+    normalized = _normalize_backup_code(code)
+    if len(normalized) < BACKUP_CODE_LENGTH:
+        return False
+    code_hash = hash_backup_code(normalized)
+    result = await db.execute(
+        select(MfaBackupCode).where(
+            MfaBackupCode.user_id == user_id,
+            MfaBackupCode.code_hash == code_hash,
+            MfaBackupCode.used_at.is_(None),
+        )
+    )
+    row = result.scalar_one_or_none()
+    if not row:
+        return False
+    row.used_at = datetime.now(UTC)
+    return True
+
+
+async def regenerate_mfa_backup_codes(db: AsyncSession, user: User) -> list[str]:
+    if not user.mfa_enabled:
+        raise AuthError("MFA_NOT_CONFIGURED")
+    return await _replace_backup_codes(db, user.id)
+
+
+async def count_remaining_backup_codes(db: AsyncSession, user_id: UUID) -> int:
+    from sqlalchemy import func
+
+    result = await db.execute(
+        select(func.count())
+        .select_from(MfaBackupCode)
+        .where(MfaBackupCode.user_id == user_id, MfaBackupCode.used_at.is_(None))
+    )
+    return int(result.scalar() or 0)
 
 
 async def _log_login(
@@ -291,8 +352,9 @@ async def verify_mfa_and_issue_tokens(
 
     secret = decrypt_totp_secret(user.mfa_secret_encrypted)
     totp = pyotp.TOTP(secret)
-    code = "".join(ch for ch in code if ch.isdigit())
-    if not totp.verify(code, valid_window=2):
+    digits = "".join(ch for ch in code if ch.isdigit())
+    mfa_valid = bool(digits) and totp.verify(digits, valid_window=2)
+    if not mfa_valid and not await _try_consume_backup_code(db, user.id, code):
         await _log_login(
             db,
             username=user.username,
@@ -612,8 +674,10 @@ async def confirm_mfa_setup(
         details={"first_login_setup": was_first_login_setup},
     )
 
+    backup_codes = await _replace_backup_codes(db, target.id)
+
     if was_first_login_setup:
-        return await _issue_tokens(
+        tokens = await _issue_tokens(
             db,
             user=target,
             ip=ip,
@@ -621,8 +685,10 @@ async def confirm_mfa_setup(
             client_hint=client_hint,
             mfa_used=True,
         )
+        tokens["backup_codes"] = backup_codes
+        return tokens
 
-    return {"mfa_enabled": True}
+    return {"mfa_enabled": True, "backup_codes": backup_codes}
 
 
 async def request_parent_otp(db: AsyncSession, *, phone: str, ip: str | None) -> dict:

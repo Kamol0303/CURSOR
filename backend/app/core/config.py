@@ -66,5 +66,9 @@ class Settings(BaseSettings):
     MAX_UPLOAD_BYTES: int = 5 * 1024 * 1024
     METRICS_ENABLED: bool = True
 
+    VAPID_PUBLIC_KEY: str = ""
+    VAPID_PRIVATE_KEY: str = ""
+    VAPID_SUBJECT: str = "mailto:admin@tmb.local"
+
 
 settings = Settings()

@@ -17,8 +17,14 @@ class PreferencesUpdate(BaseModel):
     in_app_enabled: bool | None = None
     sms_enabled: bool | None = None
     email_enabled: bool | None = None
+    push_enabled: bool | None = None
     locale: str | None = Field(default=None, pattern="^(uz|ru|en)$")
     event_types: list[str] | None = None
+
+
+class PushSubscribeRequest(BaseModel):
+    endpoint: str = Field(min_length=1)
+    keys: dict = Field(min_length=1)
 
 
 @router.get("", response_model=ApiResponse)
@@ -93,6 +99,7 @@ async def get_preferences(
             "in_app_enabled": pref.in_app_enabled,
             "sms_enabled": pref.sms_enabled,
             "email_enabled": pref.email_enabled,
+            "push_enabled": pref.push_enabled,
             "locale": pref.locale,
             "event_types": pref.event_types,
         },
@@ -112,9 +119,37 @@ async def update_preferences(
         pref.sms_enabled = body.sms_enabled
     if body.email_enabled is not None:
         pref.email_enabled = body.email_enabled
+    if body.push_enabled is not None:
+        pref.push_enabled = body.push_enabled
     if body.locale is not None:
         pref.locale = body.locale
     if body.event_types is not None:
         pref.event_types = body.event_types
     await db.commit()
     return ApiResponse(success=True, data={"updated": True})
+
+
+@router.post("/push-subscribe", response_model=ApiResponse)
+async def push_subscribe(
+    body: PushSubscribeRequest,
+    user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    from app.integrations.push_adapter import upsert_subscription
+
+    keys = body.keys or {}
+    p256dh = keys.get("p256dh")
+    auth = keys.get("auth")
+    if not p256dh or not auth:
+        raise HTTPException(status_code=422, detail={"code": "INVALID_SUBSCRIPTION"})
+    await upsert_subscription(
+        db,
+        user_id=user.id,
+        endpoint=body.endpoint,
+        p256dh=p256dh,
+        auth=auth,
+    )
+    pref = await notification_service.get_or_create_preferences(db, user.id)
+    pref.push_enabled = True
+    await db.commit()
+    return ApiResponse(success=True, data={"subscribed": True})

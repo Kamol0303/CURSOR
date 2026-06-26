@@ -32,3 +32,18 @@ self.addEventListener("fetch", (event) => {
     }),
   );
 });
+
+self.addEventListener("push", (event) => {
+  let payload = { title: "TMB", body: "" };
+  try {
+    if (event.data) payload = event.data.json();
+  } catch {
+    payload.body = event.data ? event.data.text() : "";
+  }
+  event.waitUntil(
+    self.registration.showNotification(payload.title || "TMB", {
+      body: payload.body || "",
+      icon: "/icons/icon-192.svg",
+    }),
+  );
+});

@@ -131,6 +131,8 @@ async def create_notification(
             active_channels.append("sms")
         if pref.email_enabled:
             active_channels.append("email")
+        if pref.push_enabled:
+            active_channels.append("push")
     if not active_channels:
         active_channels = ["in_app"]
 
@@ -213,6 +215,21 @@ async def _deliver_channel(
             )
         )
         notification.status = "sent" if result.success else "failed"
+        return
+
+    if channel == "push" and user:
+        from app.integrations.push_adapter import send_push_to_user
+
+        sent_count = await send_push_to_user(db, user_id=user.id, title=title, body=body)
+        db.add(
+            NotificationLog(
+                notification_id=notification.id,
+                channel="push",
+                status="sent" if sent_count else "skipped",
+            )
+        )
+        notification.status = "sent" if sent_count else "pending"
+        return
 
 
 async def list_notifications(

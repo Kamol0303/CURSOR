@@ -50,6 +50,12 @@ jobs:
         working-directory: backend
         run: pip install -r requirements.txt
 
+      - name: Python dependency audit
+        working-directory: backend
+        run: |
+          pip install pip-audit
+          python -m pip_audit -r requirements.txt
+
       - name: Lint backend
         working-directory: backend
         run: ruff check app tests
@@ -98,6 +104,17 @@ jobs:
       - name: Install frontend dependencies
         working-directory: frontend
         run: npm ci
+
+      - name: npm dependency audit
+        working-directory: frontend
+        run: |
+          npm audit --omit=dev --audit-level=critical
+          node -e "
+            const v = require('next/package.json').version;
+            const ok = v.startsWith('14.2.') && parseInt(v.split('.')[2], 10) >= 35;
+            if (!ok) { console.error('Next.js must be >= 14.2.35, got', v); process.exit(1); }
+            console.log('Next.js', v, 'OK (patched per Dec 2025 advisory)');
+          "
 
       - name: Lint and build frontend
         working-directory: frontend

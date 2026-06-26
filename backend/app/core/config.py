@@ -54,5 +54,13 @@ class Settings(BaseSettings):
     ESKIZ_EMAIL: str = ""
     ESKIZ_PASSWORD: str = ""
 
+    # Payment gateways (Click / Payme)
+    CLICK_SERVICE_ID: str = ""
+    CLICK_SECRET_KEY: str = ""
+    PAYME_SECRET_KEY: str = ""
+    PAYME_MERCHANT_LOGIN: str = "Paycom"
+    PAYME_WEBHOOK_HMAC_SECRET: str = ""
+    PAYMENT_WEBHOOK_ALLOW_UNSIGNED_DEV: bool = False
+
 
 settings = Settings()

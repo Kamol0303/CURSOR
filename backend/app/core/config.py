@@ -62,5 +62,9 @@ class Settings(BaseSettings):
     PAYME_WEBHOOK_HMAC_SECRET: str = ""
     PAYMENT_WEBHOOK_ALLOW_UNSIGNED_DEV: bool = False
 
+    FILE_UPLOAD_DIR: str = "uploads"
+    MAX_UPLOAD_BYTES: int = 5 * 1024 * 1024
+    METRICS_ENABLED: bool = True
+
 
 settings = Settings()

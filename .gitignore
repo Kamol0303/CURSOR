@@ -11,4 +11,5 @@ node_modules/
 dist/
 build/
 *.pem
-secrets/
+uploads/
+backend/uploads/

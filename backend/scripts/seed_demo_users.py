@@ -34,6 +34,7 @@ DEMO_USERS = [
     ("center_director", "director.aspect", "Direktor#2026!", True),
     ("center_admin", "admin.aspect", "CenterAdmin#26!", False),
     ("teacher", "teacher.dilnoza", "Teach#Dil2026!", False),
+    ("student", "student.sardor", "Student#2026!", False),
     ("auditor", "auditor.tuman", "Audit#Check26!", False),
 ]
 
@@ -103,7 +104,8 @@ async def seed_education_data(session: AsyncSession, center: TrainingCenter, rol
             session.add(TeacherSubject(teacher_id=teacher.id, subject_id=subjects[0].id))
 
     student_result = await session.execute(select(Student).where(Student.full_name == "Aliyev Sardor"))
-    if not student_result.scalar_one_or_none():
+    student = student_result.scalar_one_or_none()
+    if not student:
         student = Student(
             center_id=center.id,
             full_name="Aliyev Sardor",
@@ -122,6 +124,12 @@ async def seed_education_data(session: AsyncSession, center: TrainingCenter, rol
                 phone=PARENT_PHONE,
             )
         )
+
+    student_user = (
+        await session.execute(select(User).where(User.username == "student.sardor"))
+    ).scalar_one_or_none()
+    if student_user and student and not student.user_id:
+        student.user_id = student_user.id
 
     # Second center for cross-tenant IDOR tests
     other_center_result = await session.execute(
@@ -294,7 +302,7 @@ async def seed() -> None:
                     username=username,
                     password_hash=hash_password(password),
                     role_id=roles[role_code].id,
-                    center_id=center.id if role_code in {"center_director", "center_admin", "teacher"} else None,
+                    center_id=center.id if role_code in {"center_director", "center_admin", "teacher", "student"} else None,
                     is_demo_account=True,
                     is_active=True,
                     password_changed_at=datetime.now(UTC),
@@ -303,7 +311,7 @@ async def seed() -> None:
             else:
                 user.password_hash = hash_password(password)
                 user.role_id = roles[role_code].id
-                user.center_id = center.id if role_code in {"center_director", "center_admin", "teacher"} else None
+                user.center_id = center.id if role_code in {"center_director", "center_admin", "teacher", "student"} else None
                 user.is_demo_account = True
                 user.is_active = True
                 user.is_locked = False

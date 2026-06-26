@@ -110,6 +110,13 @@ async def submit_exam(db: AsyncSession, user: User, exam_id: UUID, body: ExamSub
     if not exam.questions:
         raise HTTPException(status_code=422, detail={"code": "EXAM_EMPTY"})
 
+    student_id = body.student_id
+    if user.role.code == "student":
+        from app.services import student_service
+
+        student = await student_service.get_linked_student(db, user)
+        student_id = student.id
+
     answers_map = {str(a.question_id): a.answer for a in body.answers}
     score = 0.0
     max_score = sum(q.points for q in exam.questions)
@@ -120,7 +127,7 @@ async def submit_exam(db: AsyncSession, user: User, exam_id: UUID, body: ExamSub
     passed = max_score > 0 and (score / max_score * 100) >= exam.pass_score
     result = ExamResult(
         exam_id=exam.id,
-        student_id=body.student_id,
+        student_id=student_id,
         center_id=exam.center_id,
         score=score,
         max_score=max_score,
@@ -129,7 +136,7 @@ async def submit_exam(db: AsyncSession, user: User, exam_id: UUID, body: ExamSub
     )
     db.add(result)
     await db.flush()
-    logger.info("exam_submitted exam_id=%s student_id=%s score=%s", exam.id, body.student_id, score)
+    logger.info("exam_submitted exam_id=%s student_id=%s score=%s", exam.id, student_id, score)
     return ExamResultResponse(
         id=result.id,
         exam_id=result.exam_id,

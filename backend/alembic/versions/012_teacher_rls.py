@@ -50,6 +50,31 @@ _TEACHER_GROUP_ROW = """
     )
 """
 
+_TEACHER_STUDENT_ID = """
+    current_setting('app.role', true) = 'teacher'
+    AND current_setting('app.teacher_id', true) <> ''
+    AND student_id IN (
+        SELECT e.student_id FROM enrollments e
+        JOIN groups g ON g.id = e.group_id
+        WHERE g.teacher_id = NULLIF(current_setting('app.teacher_id', true), '')::uuid
+        AND e.deleted_at IS NULL AND e.status = 'active'
+    )
+"""
+
+_TEACHER_EXAM = """
+    current_setting('app.role', true) = 'teacher'
+    AND current_setting('app.teacher_id', true) <> ''
+    AND exam_id IN (
+        SELECT id FROM exams
+        WHERE group_id IN (
+            SELECT id FROM groups
+            WHERE teacher_id = NULLIF(current_setting('app.teacher_id', true), '')::uuid
+            AND deleted_at IS NULL
+        )
+        AND deleted_at IS NULL
+    )
+"""
+
 
 def _replace_policy(table: str, name: str, using_expr: str) -> None:
     op.execute(f"DROP POLICY IF EXISTS {name} ON {table}")
@@ -114,11 +139,7 @@ def upgrade() -> None:
         """,
     )
 
-    for table in ("grades", "exam_results", "attendance_records"):
-        _replace_policy(
-            table,
-            f"{table}_rls",
-            f"""
+    _row_base = f"""
             current_setting('app.role', true) IN ('super_admin', 'hokimiyat_operator', 'auditor', 'system')
             OR (
                 current_setting('app.center_id', true) <> ''
@@ -138,9 +159,33 @@ def upgrade() -> None:
                     AND deleted_at IS NULL
                 )
             )
+    """
+
+    _replace_policy(
+        "grades",
+        "grades_rls",
+        f"""{_row_base}
+            OR ({_TEACHER_GROUP_ROW})
+            OR ({_TEACHER_STUDENT_ID})
+            """,
+    )
+
+    _replace_policy(
+        "attendance_records",
+        "attendance_records_rls",
+        f"""{_row_base}
             OR ({_TEACHER_GROUP_ROW})
             """,
-        )
+    )
+
+    _replace_policy(
+        "exam_results",
+        "exam_results_rls",
+        f"""{_row_base}
+            OR ({_TEACHER_STUDENT_ID})
+            OR ({_TEACHER_EXAM})
+            """,
+    )
 
 
 def downgrade() -> None:

@@ -5,7 +5,7 @@ from datetime import UTC, datetime, timedelta
 from uuid import UUID, uuid4
 
 import pyotp
-from sqlalchemy import select, update
+from sqlalchemy import or_, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
@@ -203,7 +203,10 @@ async def login_with_password(
         result = await db.execute(
             select(User)
             .options(selectinload(User.role))
-            .where(User.username == username, User.deleted_at.is_(None))
+            .where(
+                User.deleted_at.is_(None),
+                or_(User.username == username, User.phone == username),
+            )
         )
         user = result.scalar_one_or_none()
 

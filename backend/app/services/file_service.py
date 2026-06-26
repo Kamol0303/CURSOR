@@ -28,6 +28,10 @@ def _ensure_upload_dir() -> Path:
     return root
 
 
+STUDENT_PHOTO_MIMES = frozenset({"image/jpeg", "image/png"})
+STUDENT_PHOTO_OWNER = "student_photo"
+
+
 async def save_upload(
     db: AsyncSession,
     user: User,
@@ -42,11 +46,15 @@ async def save_upload(
     content = await file.read()
     if not content:
         raise HTTPException(status_code=422, detail={"code": "EMPTY_FILE"})
-    if len(content) > settings.MAX_UPLOAD_BYTES:
+    max_bytes = settings.MAX_UPLOAD_BYTES
+    if owner_type == STUDENT_PHOTO_OWNER:
+        max_bytes = min(max_bytes, 5 * 1024 * 1024)
+    if len(content) > max_bytes:
         raise HTTPException(status_code=413, detail={"code": "FILE_TOO_LARGE"})
 
     mime_type = file.content_type or mimetypes.guess_type(file.filename or "")[0] or "application/octet-stream"
-    if mime_type not in ALLOWED_MIME_TYPES:
+    allowed = STUDENT_PHOTO_MIMES if owner_type == STUDENT_PHOTO_OWNER else ALLOWED_MIME_TYPES
+    if mime_type not in allowed:
         raise HTTPException(status_code=415, detail={"code": "UNSUPPORTED_MEDIA_TYPE"})
 
     file_id = uuid.uuid4()

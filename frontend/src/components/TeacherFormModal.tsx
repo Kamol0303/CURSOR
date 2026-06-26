@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { apiFetch } from "@/lib/api";
+import { CredentialsRevealModal } from "@/components/CredentialsRevealModal";
 
 type Teacher = {
   id: string;
@@ -21,6 +22,12 @@ type Props = {
   onSaved: () => void;
 };
 
+type Credentials = {
+  login: string;
+  temporary_password: string;
+  sms_sent: boolean;
+};
+
 export function TeacherFormModal({ centerId, teacher, onClose, onSaved }: Props) {
   const t = useTranslations("teachers");
   const isEdit = Boolean(teacher?.id);
@@ -31,6 +38,7 @@ export function TeacherFormModal({ centerId, teacher, onClose, onSaved }: Props)
   const [isActive, setIsActive] = useState(teacher?.is_active ?? true);
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+  const [credentials, setCredentials] = useState<Credentials | null>(null);
 
   useEffect(() => {
     document.body.style.overflow = "hidden";
@@ -61,9 +69,17 @@ export function TeacherFormModal({ centerId, teacher, onClose, onSaved }: Props)
             specialization: specialization || null,
             years_of_experience: yearsOfExperience,
           };
-      const res = await apiFetch(path, { method, body: JSON.stringify(body) });
+      const res = await apiFetch<{ teacher: Teacher; credentials?: Credentials }>(path, {
+        method,
+        body: JSON.stringify(body),
+      });
       if (!res.success) {
         setError(t("saveError"));
+        return;
+      }
+      if (!isEdit && res.data?.credentials) {
+        setCredentials(res.data.credentials);
+        onSaved();
         return;
       }
       onSaved();
@@ -75,6 +91,22 @@ export function TeacherFormModal({ centerId, teacher, onClose, onSaved }: Props)
     }
   };
 
+  if (credentials) {
+    return (
+      <CredentialsRevealModal
+        title={t("credentialsTitle")}
+        login={credentials.login}
+        temporaryPassword={credentials.temporary_password}
+        smsSent={credentials.sms_sent}
+        smsHint={credentials.sms_sent ? t("credentialsSmsSent") : undefined}
+        onClose={() => {
+          setCredentials(null);
+          onClose();
+        }}
+      />
+    );
+  }
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
       <div className="bg-white rounded-xl shadow-xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
@@ -82,6 +114,7 @@ export function TeacherFormModal({ centerId, teacher, onClose, onSaved }: Props)
           <h3 className="text-lg font-semibold text-naqsh-primary">
             {isEdit ? t("editTitle") : t("addTitle")}
           </h3>
+          {!isEdit && <p className="text-xs text-gray-500">{t("credentialsHint")}</p>}
           <div>
             <label className="block text-sm font-medium mb-1">{t("name")}</label>
             <input
@@ -94,7 +127,12 @@ export function TeacherFormModal({ centerId, teacher, onClose, onSaved }: Props)
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="block text-sm font-medium mb-1">{t("phone")}</label>
-              <input className="w-full border rounded-lg px-3 py-2" value={phone} onChange={(e) => setPhone(e.target.value)} />
+              <input
+                className="w-full border rounded-lg px-3 py-2"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                placeholder="+998901234567"
+              />
             </div>
             <div>
               <label className="block text-sm font-medium mb-1">{t("experience")}</label>

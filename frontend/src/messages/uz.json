@@ -210,7 +210,15 @@
     "save": "Saqlash",
     "saving": "Saqlanmoqda...",
     "cancel": "Bekor qilish",
-    "saveError": "Saqlashda xatolik"
+    "saveError": "Saqlashda xatolik",
+    "noPassport": "Pasport yo'q",
+    "photo": "O'quvchi fotosurati",
+    "photoHint": "JPG yoki PNG, maksimal 5 MB",
+    "photoRequired": "Fotosurat yuklang",
+    "photoUploadError": "Fayl yuklashda xatolik",
+    "guardianPhoneHint": "Kiritilsa, ota-onaga avtomatik SMS yuboriladi (yangi hisob bo'lsa)",
+    "parentSmsTitle": "Ota-ona xabardor qilindi",
+    "parentSmsSent": "Ota-onaga login va vaqtinchalik parol SMS orqali yuborildi."
   },
   "teachers": {
     "title": "O'qituvchilar",
@@ -232,7 +240,10 @@
     "saving": "Saqlanmoqda...",
     "cancel": "Bekor qilish",
     "saveError": "Saqlashda xatolik",
-    "deleteConfirm": "\"{name}\" o'qituvchini o'chirishni tasdiqlaysizmi?"
+    "deleteConfirm": "\"{name}\" o'qituvchini o'chirishni tasdiqlaysizmi?",
+    "credentialsHint": "Saqlangandan keyin login va vaqtinchalik parol bir marta ko'rsatiladi. Telefon kiritilsa SMS ham yuboriladi.",
+    "credentialsTitle": "O'qituvchi kirish ma'lumotlari",
+    "credentialsSmsSent": "Ma'lumotlar SMS orqali ham yuborildi"
   },
   "groups": {
     "title": "Guruhlar",
@@ -458,6 +469,8 @@
     "room": "Xona",
     "students": "O'quvchilar",
     "backToGroups": "Guruhlarga qaytish",
+    "changePasswordTitle": "Parolni o'zgartirish majburiy",
+    "changePasswordHint": "Birinchi kirishda yangi parol o'rnating.",
     "groupStudents": "Guruh o'quvchilari",
     "studentName": "O'quvchi",
     "grade": "Sinf",

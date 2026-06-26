@@ -44,11 +44,23 @@ async def get_student(
 @router.post("", response_model=ApiResponse, status_code=201)
 async def create_student(
     body: StudentCreate,
+    request: Request,
     user: User = Depends(requires_permission("students.create")),
     db: AsyncSession = Depends(get_db),
 ):
-    student = await student_service.create_student(db, user, body)
-    return ApiResponse(success=True, data=student_service.student_to_response(student).model_dump())
+    student, parent = await student_service.create_student(
+        db,
+        user,
+        body,
+        ip=request.client.host if request.client else None,
+    )
+    return ApiResponse(
+        success=True,
+        data={
+            "student": student_service.student_to_response(student).model_dump(),
+            "parent": parent.model_dump() if parent else None,
+        },
+    )
 
 
 @router.patch("/{student_id}", response_model=ApiResponse)

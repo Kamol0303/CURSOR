@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
-import { apiFetch } from "@/lib/api";
+import { apiFetch, uploadFile } from "@/lib/api";
 
 type Props = {
   centerId: string;
@@ -22,8 +22,11 @@ export function StudentFormModal({ centerId, student, onClose, onSaved }: Props)
   const [guardianName, setGuardianName] = useState("");
   const [guardianPhone, setGuardianPhone] = useState("");
   const [jshshir, setJshshir] = useState("");
+  const [noPassport, setNoPassport] = useState(false);
+  const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+  const [parentSmsSent, setParentSmsSent] = useState(false);
 
   useEffect(() => {
     document.body.style.overflow = "hidden";
@@ -37,6 +40,27 @@ export function StudentFormModal({ centerId, student, onClose, onSaved }: Props)
     setSaving(true);
     setError(null);
     try {
+      let photoFileId: string | null = null;
+      if (!isEdit && noPassport) {
+        if (!photoFile) {
+          setError(t("photoRequired"));
+          setSaving(false);
+          return;
+        }
+        const ownerId = crypto.randomUUID();
+        const uploadRes = await uploadFile(photoFile, {
+          center_id: centerId,
+          owner_type: "student_photo",
+          owner_id: ownerId,
+        });
+        if (!uploadRes.success) {
+          setError(t("photoUploadError"));
+          setSaving(false);
+          return;
+        }
+        photoFileId = (uploadRes.data as { id: string }).id;
+      }
+
       const path = isEdit ? `/students/${student!.id}` : "/students";
       const method = isEdit ? "PATCH" : "POST";
       const body = isEdit
@@ -48,13 +72,23 @@ export function StudentFormModal({ centerId, student, onClose, onSaved }: Props)
             grade: grade || null,
             school: school || null,
             address: address || null,
-            jshshir: jshshir || null,
+            jshshir: noPassport ? null : jshshir || null,
+            no_passport: noPassport,
+            photo_file_id: photoFileId,
             guardian_name: guardianName || null,
             guardian_phone: guardianPhone || null,
           };
-      const res = await apiFetch(path, { method, body: JSON.stringify(body) });
+      const res = await apiFetch<{ student: unknown; parent?: { sms_sent?: boolean; created?: boolean } }>(path, {
+        method,
+        body: JSON.stringify(body),
+      });
       if (!res.success) {
         setError(t("saveError"));
+        return;
+      }
+      if (res.data?.parent?.sms_sent) {
+        setParentSmsSent(true);
+        onSaved();
         return;
       }
       onSaved();
@@ -65,6 +99,20 @@ export function StudentFormModal({ centerId, student, onClose, onSaved }: Props)
       setSaving(false);
     }
   };
+
+  if (parentSmsSent) {
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+        <div className="bg-white rounded-xl shadow-xl w-full max-w-md p-6 space-y-4">
+          <h3 className="text-lg font-semibold text-naqsh-primary">{t("parentSmsTitle")}</h3>
+          <p className="text-sm text-gray-600">{t("parentSmsSent")}</p>
+          <button type="button" onClick={onClose} className="w-full px-4 py-2 bg-naqsh-primary text-white rounded-lg">
+            OK
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
@@ -83,16 +131,43 @@ export function StudentFormModal({ centerId, student, onClose, onSaved }: Props)
             />
           </div>
           {!isEdit && (
-            <div>
-              <label className="block text-sm font-medium mb-1">{t("pinfl")}</label>
-              <input
-                className="w-full border rounded-lg px-3 py-2 font-mono"
-                value={jshshir}
-                onChange={(e) => setJshshir(e.target.value)}
-                pattern="\d{14}"
-                placeholder="14 raqam"
-              />
-            </div>
+            <>
+              <label className="flex items-center gap-2 text-sm">
+                <input
+                  type="checkbox"
+                  checked={noPassport}
+                  onChange={(e) => {
+                    setNoPassport(e.target.checked);
+                    if (e.target.checked) setJshshir("");
+                  }}
+                />
+                {t("noPassport")}
+              </label>
+              {!noPassport ? (
+                <div>
+                  <label className="block text-sm font-medium mb-1">{t("pinfl")}</label>
+                  <input
+                    className="w-full border rounded-lg px-3 py-2 font-mono"
+                    value={jshshir}
+                    onChange={(e) => setJshshir(e.target.value)}
+                    pattern="\d{14}"
+                    placeholder="14 raqam"
+                  />
+                </div>
+              ) : (
+                <div>
+                  <label className="block text-sm font-medium mb-1">{t("photo")}</label>
+                  <input
+                    type="file"
+                    accept=".jpg,.jpeg,.png,image/jpeg,image/png"
+                    className="w-full border rounded-lg px-3 py-2 text-sm"
+                    onChange={(e) => setPhotoFile(e.target.files?.[0] || null)}
+                    required
+                  />
+                  <p className="text-xs text-gray-500 mt-1">{t("photoHint")}</p>
+                </div>
+              )}
+            </>
           )}
           <div className="grid grid-cols-2 gap-3">
             <div>
@@ -120,7 +195,13 @@ export function StudentFormModal({ centerId, student, onClose, onSaved }: Props)
               </div>
               <div>
                 <label className="block text-sm font-medium mb-1">{t("guardianPhone")}</label>
-                <input className="w-full border rounded-lg px-3 py-2" value={guardianPhone} onChange={(e) => setGuardianPhone(e.target.value)} placeholder="+998901234567" />
+                <input
+                  className="w-full border rounded-lg px-3 py-2"
+                  value={guardianPhone}
+                  onChange={(e) => setGuardianPhone(e.target.value)}
+                  placeholder="+998901234567"
+                />
+                <p className="text-xs text-gray-500 mt-1">{t("guardianPhoneHint")}</p>
               </div>
             </>
           )}

@@ -75,7 +75,13 @@ async def get_teacher(db: AsyncSession, user: User, teacher_id: UUID) -> Teacher
     return teacher
 
 
-async def create_teacher(db: AsyncSession, user: User, data: TeacherCreate) -> Teacher:
+async def create_teacher(
+    db: AsyncSession,
+    user: User,
+    data: TeacherCreate,
+    *,
+    ip: str | None = None,
+) -> tuple[Teacher, dict | None]:
     assert_center_access(user, data.center_id)
     if user.role.code not in {"super_admin", "center_director"}:
         raise HTTPException(status_code=403, detail={"code": "FORBIDDEN"})
@@ -93,8 +99,21 @@ async def create_teacher(db: AsyncSession, user: User, data: TeacherCreate) -> T
 
     for subject_id in data.subject_ids:
         db.add(TeacherSubject(teacher_id=teacher.id, subject_id=subject_id))
+
+    credentials_info = None
+    from app.services.credential_service import provision_teacher_account
+
+    credentials_info = await provision_teacher_account(
+        db,
+        user,
+        teacher=teacher,
+        full_name=data.full_name,
+        phone=data.phone,
+        ip=ip,
+    )
+
     await db.refresh(teacher, ["teacher_subjects"])
-    return teacher
+    return teacher, credentials_info
 
 
 async def update_teacher(

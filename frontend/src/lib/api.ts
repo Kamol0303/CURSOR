@@ -112,3 +112,28 @@ export async function getAnalyticsInsights() {
 export async function getNotifications(limit = 10) {
   return apiFetch<Record<string, unknown>[]>("/notifications?limit=" + limit);
 }
+
+export async function uploadFile(
+  file: File,
+  params: { center_id: string; owner_type: string; owner_id: string },
+) {
+  const token = getToken();
+  const form = new FormData();
+  form.append("file", file);
+  form.append("center_id", params.center_id);
+  form.append("owner_type", params.owner_type);
+  form.append("owner_id", params.owner_id);
+
+  const res = await fetch(`${getApiBaseUrl()}/api/v1/files`, {
+    method: "POST",
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
+    credentials: "include",
+    body: form,
+  });
+
+  try {
+    return await res.json();
+  } catch {
+    return { success: false, data: null, error: { code: "PARSE_ERROR" } };
+  }
+}

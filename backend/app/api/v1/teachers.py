@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, Query, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
@@ -45,11 +45,21 @@ async def get_teacher(
 @router.post("", response_model=ApiResponse, status_code=201)
 async def create_teacher(
     body: TeacherCreate,
+    request: Request,
     user: User = Depends(requires_permission("teachers.create")),
     db: AsyncSession = Depends(get_db),
 ):
-    teacher = await teacher_service.create_teacher(db, user, body)
-    return ApiResponse(success=True, data=teacher_service.teacher_to_response(teacher).model_dump())
+    teacher, credentials = await teacher_service.create_teacher(
+        db,
+        user,
+        body,
+        ip=request.client.host if request.client else None,
+    )
+    payload = {
+        "teacher": teacher_service.teacher_to_response(teacher).model_dump(),
+        "credentials": credentials,
+    }
+    return ApiResponse(success=True, data=payload)
 
 
 @router.patch("/{teacher_id}", response_model=ApiResponse)

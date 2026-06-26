@@ -4,6 +4,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { ChangePasswordForm } from "@/components/ChangePasswordForm";
+import { useAuth } from "@/contexts/AuthContext";
 import { getApiBaseUrl } from "@/lib/api";
 import { clearAuthCookie } from "@/lib/auth-cookie";
 
@@ -24,6 +26,7 @@ function isActive(pathname: string, href: string, exact?: boolean) {
 export function TeacherLayout({ children }: { children: React.ReactNode }) {
   const t = useTranslations("teacherPortal");
   const pathname = usePathname();
+  const { mustChangePassword, refresh } = useAuth();
 
   const logout = async () => {
     await fetch(`${getApiBaseUrl()}/api/v1/auth/logout`, {
@@ -72,7 +75,17 @@ export function TeacherLayout({ children }: { children: React.ReactNode }) {
         <header className="bg-white border-b px-6 py-3 flex justify-end">
           <LanguageSwitcher />
         </header>
-        <main className="flex-1 p-6 overflow-auto">{children}</main>
+        <main className="flex-1 p-6 overflow-auto">
+          {mustChangePassword ? (
+            <div className="max-w-lg mx-auto bg-white rounded-xl border p-6 space-y-4">
+              <h2 className="text-xl font-bold text-naqsh-primary">{t("changePasswordTitle")}</h2>
+              <p className="text-sm text-gray-500">{t("changePasswordHint")}</p>
+              <ChangePasswordForm onSuccess={() => void refresh()} />
+            </div>
+          ) : (
+            children
+          )}
+        </main>
       </div>
     </div>
   );

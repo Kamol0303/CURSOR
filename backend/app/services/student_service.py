@@ -18,8 +18,9 @@ from app.models.academics import Exam, ExamResult, Grade
 from app.models.education import Enrollment, Guardian, Student
 from app.models.identity import User
 from app.models.operations import AttendanceRecord
-from app.schemas.students import StudentCreate, StudentResponse, StudentUpdate
+from app.schemas.students import ParentProvisioningResponse, StudentCreate, StudentResponse, StudentUpdate
 from app.services.audit_service import write_audit_log
+from app.services import file_service
 
 
 def student_to_response(student: Student, *, include_masked_pinfl: bool = True) -> StudentResponse:
@@ -44,6 +45,8 @@ def student_to_response(student: Student, *, include_masked_pinfl: bool = True) 
         enrollment_date=student.enrollment_date,
         graduation_date=student.graduation_date,
         consent_given_at=student.consent_given_at,
+        photo_file_id=student.photo_file_id,
+        no_passport=student.photo_file_id is not None and student.jshshir_encrypted is None,
     )
 
 
@@ -90,16 +93,32 @@ async def get_student(db: AsyncSession, user: User, student_id: UUID) -> Student
     return student
 
 
-async def create_student(db: AsyncSession, user: User, data: StudentCreate) -> Student:
+async def create_student(
+    db: AsyncSession,
+    user: User,
+    data: StudentCreate,
+    *,
+    ip: str | None = None,
+) -> tuple[Student, ParentProvisioningResponse | None]:
     assert_center_access(user, data.center_id)
     if user.role.code not in {"super_admin", "center_director", "center_admin"}:
         raise HTTPException(status_code=403, detail={"code": "FORBIDDEN"})
 
     encrypted = None
+    photo_file_id = data.photo_file_id
     if data.jshshir:
         if not validate_pinfl(data.jshshir):
             raise HTTPException(status_code=422, detail={"code": "PINFL_INVALID", "field": "jshshir"})
         encrypted = encrypt_pinfl(data.jshshir)
+        photo_file_id = None
+    elif data.no_passport:
+        if not photo_file_id:
+            raise HTTPException(status_code=422, detail={"code": "PHOTO_REQUIRED"})
+        stored = await file_service.get_file(db, user, photo_file_id)
+        if stored.center_id != data.center_id or stored.owner_type != file_service.STUDENT_PHOTO_OWNER:
+            raise HTTPException(status_code=422, detail={"code": "INVALID_PHOTO"})
+        if stored.mime_type not in file_service.STUDENT_PHOTO_MIMES:
+            raise HTTPException(status_code=415, detail={"code": "UNSUPPORTED_MEDIA_TYPE"})
 
     student = Student(
         center_id=data.center_id,
@@ -113,10 +132,17 @@ async def create_student(db: AsyncSession, user: User, data: StudentCreate) -> S
         grade=data.grade,
         enrollment_date=data.enrollment_date,
         consent_given_at=datetime.now(UTC) if data.guardian_phone else None,
+        photo_file_id=photo_file_id,
     )
     db.add(student)
     await db.flush()
 
+    if photo_file_id:
+        stored = await file_service.get_file(db, user, photo_file_id)
+        stored.owner_id = student.id
+        await db.flush()
+
+    parent_info: ParentProvisioningResponse | None = None
     if data.guardian_name and data.guardian_phone:
         db.add(
             Guardian(
@@ -125,7 +151,23 @@ async def create_student(db: AsyncSession, user: User, data: StudentCreate) -> S
                 phone=data.guardian_phone,
             )
         )
-    return student
+        from app.services.credential_service import provision_parent_for_student
+
+        parent_result = await provision_parent_for_student(
+            db,
+            user,
+            phone=data.guardian_phone,
+            guardian_name=data.guardian_name,
+            ip=ip,
+        )
+        parent_info = ParentProvisioningResponse(
+            parent_user_id=parent_result.get("parent_user_id"),
+            created=parent_result.get("created", False),
+            sms_sent=parent_result.get("sms_sent", False),
+            login=parent_result.get("login"),
+        )
+
+    return student, parent_info
 
 
 async def update_student(

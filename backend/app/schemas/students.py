@@ -1,7 +1,7 @@
 from datetime import date, datetime
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 
 class StudentCreate(BaseModel):
@@ -10,6 +10,8 @@ class StudentCreate(BaseModel):
     center_id: UUID
     full_name: str = Field(min_length=1, max_length=255)
     jshshir: str | None = Field(default=None, pattern=r"^\d{14}$")
+    no_passport: bool = False
+    photo_file_id: UUID | None = None
     date_of_birth: date | None = None
     gender: str | None = Field(default=None, pattern=r"^(male|female)$")
     phone: str | None = None
@@ -19,6 +21,15 @@ class StudentCreate(BaseModel):
     enrollment_date: date | None = None
     guardian_name: str | None = None
     guardian_phone: str | None = Field(default=None, pattern=r"^\+998\d{9}$")
+
+    @model_validator(mode="after")
+    def validate_identity_document(self) -> "StudentCreate":
+        if self.no_passport:
+            if self.jshshir:
+                raise ValueError("jshshir must be empty when no_passport is true")
+            if not self.photo_file_id:
+                raise ValueError("photo_file_id is required when no_passport is true")
+        return self
 
 
 class StudentUpdate(BaseModel):
@@ -32,6 +43,13 @@ class StudentUpdate(BaseModel):
     school: str | None = None
     grade: str | None = None
     enrollment_date: date | None = None
+
+
+class ParentProvisioningResponse(BaseModel):
+    parent_user_id: str | None = None
+    created: bool = False
+    sms_sent: bool = False
+    login: str | None = None
 
 
 class StudentResponse(BaseModel):
@@ -50,3 +68,10 @@ class StudentResponse(BaseModel):
     enrollment_date: date | None
     graduation_date: date | None
     consent_given_at: datetime | None
+    photo_file_id: UUID | None = None
+    no_passport: bool = False
+
+
+class StudentCreateResponse(BaseModel):
+    student: StudentResponse
+    parent: ParentProvisioningResponse | None = None

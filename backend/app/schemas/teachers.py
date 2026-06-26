@@ -40,3 +40,15 @@ class TeacherResponse(BaseModel):
     start_date: date | None
     is_active: bool
     subject_ids: list[UUID] = []
+
+
+class TeacherCredentialsResponse(BaseModel):
+    login: str
+    temporary_password: str
+    must_change_password: bool = True
+    sms_sent: bool = False
+
+
+class TeacherCreateResponse(BaseModel):
+    teacher: TeacherResponse
+    credentials: TeacherCredentialsResponse | None = None

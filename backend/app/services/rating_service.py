@@ -8,7 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from app.models.education import Student, Teacher, TeacherSubject
-from app.models.identity import SystemSetting, TrainingCenter
+from app.models.identity import SystemSetting, TrainingCenter, User
 from app.models.ratings_certs import RatingFormulaVersion, RatingHistory
 
 DEFAULT_WEIGHTS = {
@@ -232,18 +232,32 @@ async def compute_ratings(db: AsyncSession, *, user_id: UUID | None = None) -> l
     return results
 
 
-async def get_latest_ratings(db: AsyncSession, limit: int = 10) -> list[RatingHistory]:
+async def get_latest_ratings(
+    db: AsyncSession, user: User, *, limit: int = 10
+) -> list[RatingHistory]:
+    from app.core.tenant import get_user_center_filter
+
     latest_period = (
         await db.execute(select(func.max(RatingHistory.period)))
     ).scalar()
     if not latest_period:
         return []
 
-    result = await db.execute(
+    query = (
         select(RatingHistory)
         .options(selectinload(RatingHistory.center))
         .where(RatingHistory.period == latest_period)
         .order_by(RatingHistory.rank)
         .limit(limit)
     )
+    center_filter = get_user_center_filter(user)
+    if center_filter:
+        query = (
+            select(RatingHistory)
+            .options(selectinload(RatingHistory.center))
+            .where(RatingHistory.period == latest_period, RatingHistory.center_id == center_filter)
+            .order_by(RatingHistory.rank)
+            .limit(limit)
+        )
+    result = await db.execute(query)
     return list(result.scalars().all())

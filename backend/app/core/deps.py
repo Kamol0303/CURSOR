@@ -10,6 +10,7 @@ from app.core.database import get_db
 from app.core.redis_client import is_jti_denied
 from app.core.rls import apply_rls_context, set_rls_user
 from app.core.security import verify_access_token
+from app.core.tenant import clear_tenant_context, resolve_tenant_context, set_tenant_context
 from app.models.identity import User
 from app.services.auth_service import get_user_permissions
 
@@ -44,6 +45,11 @@ async def get_current_user(
     set_rls_user(user)
     await apply_rls_context(db)
 
+    tenant_ctx = await resolve_tenant_context(db, user)
+    set_tenant_context(tenant_ctx)
+    request.state.tenant_context = tenant_ctx
+    request.state.center_id = tenant_ctx.center_id
+
     request.state.token_payload = payload
     return user
 
@@ -75,6 +81,11 @@ async def get_current_user_optional(
 
     set_rls_user(user)
     await apply_rls_context(db)
+
+    tenant_ctx = await resolve_tenant_context(db, user)
+    set_tenant_context(tenant_ctx)
+    request.state.tenant_context = tenant_ctx
+    request.state.center_id = tenant_ctx.center_id
 
     request.state.token_payload = payload
     return user

@@ -19,7 +19,7 @@ from app.core.pinfl import encrypt_pinfl
 from app.core.rls import apply_rls_context, set_rls_role
 from app.core.security import create_access_token, hash_password
 from app.main import app
-from app.models.education import Guardian, Student
+from app.models.education import Enrollment, Group, Guardian, Student, Subject, Teacher
 from app.models.identity import Permission, Role, RolePermission, TrainingCenter, User
 
 
@@ -118,6 +118,13 @@ async def security_fixtures(db_session: AsyncSession) -> dict:
         center_id=center_a.id,
         is_active=True,
     )
+    admin_a = User(
+        username=f"admin_a_{suffix}",
+        password_hash=hash_password("Test#AdminA1!!!!"),
+        role_id=roles["center_admin"].id,
+        center_id=center_a.id,
+        is_active=True,
+    )
     auditor = User(
         username=f"auditor_{suffix}",
         password_hash=hash_password("Test#Auditor1!!!"),
@@ -129,7 +136,42 @@ async def security_fixtures(db_session: AsyncSession) -> dict:
         role_id=roles["parent"].id,
         is_active=True,
     )
-    db_session.add_all([director_a, teacher_a, auditor, parent])
+    db_session.add_all([director_a, teacher_a, admin_a, auditor, parent])
+    await db_session.flush()
+
+    teacher_record_a = Teacher(
+        center_id=center_a.id,
+        user_id=teacher_a.id,
+        full_name="SecTest Teacher A",
+        is_active=True,
+    )
+    teacher_record_b = Teacher(
+        center_id=center_b.id,
+        full_name="SecTest Teacher B",
+        is_active=True,
+    )
+    db_session.add_all([teacher_record_a, teacher_record_b])
+    await db_session.flush()
+
+    subject = Subject(name_uz="Matematika", name_ru="Matematika", name_en="Math", is_active=True)
+    db_session.add(subject)
+    await db_session.flush()
+
+    group_a = Group(
+        center_id=center_a.id,
+        subject_id=subject.id,
+        name=f"Group A {suffix}",
+        teacher_id=teacher_record_a.id,
+        is_active=True,
+    )
+    group_b = Group(
+        center_id=center_b.id,
+        subject_id=subject.id,
+        name=f"Group B {suffix}",
+        teacher_id=teacher_record_b.id,
+        is_active=True,
+    )
+    db_session.add_all([group_a, group_b])
     await db_session.flush()
 
     student_a = Student(center_id=center_a.id, full_name="SecTest Student A", grade="9")
@@ -142,11 +184,20 @@ async def security_fixtures(db_session: AsyncSession) -> dict:
     db_session.add_all([student_a, student_b])
     await db_session.flush()
 
+    db_session.add(
+        Enrollment(
+            student_id=student_a.id,
+            group_id=group_a.id,
+            center_id=center_a.id,
+            status="active",
+        )
+    )
     db_session.add(Guardian(student_id=student_a.id, full_name="Parent A", phone=parent.phone))
     await db_session.commit()
 
     await db_session.refresh(director_a, attribute_names=["role"])
     await db_session.refresh(teacher_a, attribute_names=["role"])
+    await db_session.refresh(admin_a, attribute_names=["role"])
     await db_session.refresh(auditor, attribute_names=["role"])
     await db_session.refresh(parent, attribute_names=["role"])
 
@@ -166,12 +217,17 @@ async def security_fixtures(db_session: AsyncSession) -> dict:
         "center_b": center_b,
         "director_a": director_a,
         "teacher_a": teacher_a,
+        "admin_a": admin_a,
+        "teacher_record_a": teacher_record_a,
+        "group_a": group_a,
+        "group_b": group_b,
         "auditor": auditor,
         "parent": parent,
         "student_a": student_a,
         "student_b": student_b,
         "token_director_a": token_for(director_a),
         "token_teacher_a": token_for(teacher_a),
+        "token_admin_a": token_for(admin_a),
         "token_auditor": token_for(auditor),
         "token_parent": token_for(parent),
     }

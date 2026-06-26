@@ -7,7 +7,11 @@ from fastapi import HTTPException
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.tenant import assert_center_access, get_user_center_filter
+from app.core.tenant import (
+    assert_group_in_scope,
+    get_tenant_context_optional,
+    resolve_tenant_context,
+)
 from app.models.education import Group, Student
 from app.models.identity import User
 from app.models.operations import AttendanceRecord, AttendanceSession
@@ -26,15 +30,21 @@ def record_to_response(record: AttendanceRecord, student_name: str | None = None
     )
 
 
-async def mark_attendance(
-    db: AsyncSession, user: User, data: AttendanceMarkRequest, *, method: str = "manual"
-) -> AttendanceRecord:
+async def _load_group(db: AsyncSession, user: User, group_id: UUID) -> Group:
     group = (
-        await db.execute(select(Group).where(Group.id == data.group_id, Group.deleted_at.is_(None)))
+        await db.execute(select(Group).where(Group.id == group_id, Group.deleted_at.is_(None)))
     ).scalar_one_or_none()
     if not group:
         raise HTTPException(status_code=404, detail={"code": "NOT_FOUND"})
-    assert_center_access(user, group.center_id)
+    ctx = get_tenant_context_optional() or await resolve_tenant_context(db, user)
+    await assert_group_in_scope(db, ctx, group, user)
+    return group
+
+
+async def mark_attendance(
+    db: AsyncSession, user: User, data: AttendanceMarkRequest, *, method: str = "manual"
+) -> AttendanceRecord:
+    group = await _load_group(db, user, data.group_id)
 
     student = (
         await db.execute(select(Student).where(Student.id == data.student_id, Student.deleted_at.is_(None)))
@@ -82,12 +92,7 @@ async def list_attendance(
     group_id: UUID,
     session_date: date,
 ) -> list[AttendanceRecordResponse]:
-    group = (
-        await db.execute(select(Group).where(Group.id == group_id, Group.deleted_at.is_(None)))
-    ).scalar_one_or_none()
-    if not group:
-        raise HTTPException(status_code=404, detail={"code": "NOT_FOUND"})
-    assert_center_access(user, group.center_id)
+    await _load_group(db, user, group_id)
 
     result = await db.execute(
         select(AttendanceRecord, Student.full_name)
@@ -101,12 +106,7 @@ async def list_attendance(
 async def create_qr_session(
     db: AsyncSession, user: User, *, group_id: UUID, session_date: date
 ) -> tuple[AttendanceSession, str]:
-    group = (
-        await db.execute(select(Group).where(Group.id == group_id, Group.deleted_at.is_(None)))
-    ).scalar_one_or_none()
-    if not group:
-        raise HTTPException(status_code=404, detail={"code": "NOT_FOUND"})
-    assert_center_access(user, group.center_id)
+    group = await _load_group(db, user, group_id)
 
     token = secrets.token_urlsafe(24)
     token_hash = hashlib.sha256(token.encode()).hexdigest()
@@ -171,12 +171,7 @@ async def mark_via_qr(
 async def attendance_summary(
     db: AsyncSession, user: User, *, group_id: UUID, month: str
 ) -> dict:
-    group = (
-        await db.execute(select(Group).where(Group.id == group_id, Group.deleted_at.is_(None)))
-    ).scalar_one_or_none()
-    if not group:
-        raise HTTPException(status_code=404, detail={"code": "NOT_FOUND"})
-    assert_center_access(user, group.center_id)
+    await _load_group(db, user, group_id)
 
     year, mon = map(int, month.split("-"))
     start = date(year, mon, 1)

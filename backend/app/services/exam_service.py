@@ -6,7 +6,13 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from app.core.logging_config import get_logger
-from app.core.tenant import assert_center_access, get_user_center_filter
+from app.core.tenant import (
+    assert_center_access,
+    get_tenant_context_optional,
+    get_user_center_filter,
+    resolve_tenant_context,
+    teacher_group_ids_subquery,
+)
 from app.models.academics import Exam, ExamQuestion, ExamResult
 from app.models.identity import User
 from app.schemas.exams import ExamCreate, ExamResponse, ExamResultResponse, ExamSubmitRequest, ExamUpdate
@@ -38,9 +44,15 @@ async def list_exams(
     per_page: int = 20,
 ) -> tuple[list[ExamResponse], int]:
     center_filter = get_user_center_filter(user)
+    ctx = get_tenant_context_optional() or await resolve_tenant_context(db, user)
     query = select(Exam).where(Exam.deleted_at.is_(None))
     if center_filter:
         query = query.where(Exam.center_id == center_filter)
+    if ctx.role == "teacher":
+        if not ctx.teacher_id:
+            query = query.where(Exam.id.in_([]))
+        else:
+            query = query.where(Exam.group_id.in_(teacher_group_ids_subquery(ctx.teacher_id)))
 
     total = (await db.execute(select(func.count()).select_from(query.subquery()))).scalar() or 0
     result = await db.execute(

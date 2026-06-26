@@ -16,7 +16,7 @@ async def list_ratings(
     user: User = Depends(requires_permission("ratings.view")),
     db: AsyncSession = Depends(get_db),
 ):
-    ratings = await rating_service.get_latest_ratings(db, limit=limit)
+    ratings = await rating_service.get_latest_ratings(db, user, limit=limit)
     data = [
         {
             "center_id": str(r.center_id),

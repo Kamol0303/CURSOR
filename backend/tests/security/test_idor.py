@@ -1,4 +1,4 @@
-"""Security tests for horizontal/vertical privilege escalation (Section 2A.4, 16.5)."""
+"""Cross-tenant and role-scope security tests."""
 
 import pytest
 
@@ -27,14 +27,13 @@ async def test_teacher_cannot_reveal_pinfl(api_client, security_fixtures):
 
 
 @pytest.mark.integration
-async def test_auditor_can_reveal_pinfl(api_client, security_fixtures):
+async def test_auditor_cannot_reveal_pinfl(api_client, security_fixtures):
     fx = security_fixtures
     response = await api_client.post(
         f"/api/v1/students/{fx['student_b'].id}/reveal-pinfl",
         headers={"Authorization": f"Bearer {fx['token_auditor']}"},
     )
-    assert response.status_code == 200
-    assert response.json()["data"]["jshshir"] == "12345678901234"
+    assert response.status_code == 403
 
 
 @pytest.mark.integration
@@ -63,6 +62,52 @@ async def test_student_list_masks_pinfl(api_client, security_fixtures):
         masked = student.get("jshshir_masked")
         if masked:
             assert "12345678901234" not in masked
+
+
+@pytest.mark.integration
+async def test_teacher_cannot_read_other_center_student(api_client, security_fixtures):
+    fx = security_fixtures
+    response = await api_client.get(
+        f"/api/v1/students/{fx['student_b'].id}",
+        headers={"Authorization": f"Bearer {fx['token_teacher_a']}"},
+    )
+    assert response.status_code == 403
+
+
+@pytest.mark.integration
+async def test_teacher_sees_only_own_group_students(api_client, security_fixtures):
+    fx = security_fixtures
+    response = await api_client.get(
+        "/api/v1/students",
+        headers={"Authorization": f"Bearer {fx['token_teacher_a']}"},
+    )
+    assert response.status_code == 200
+    ids = {s["id"] for s in response.json()["data"]}
+    assert str(fx["student_a"].id) in ids
+    assert str(fx["student_b"].id) not in ids
+
+
+@pytest.mark.integration
+async def test_teacher_cannot_access_other_center_group(api_client, security_fixtures):
+    fx = security_fixtures
+    response = await api_client.get(
+        f"/api/v1/groups",
+        headers={"Authorization": f"Bearer {fx['token_teacher_a']}"},
+    )
+    assert response.status_code == 200
+    group_ids = {g["id"] for g in response.json()["data"]}
+    assert str(fx["group_a"].id) in group_ids
+    assert str(fx["group_b"].id) not in group_ids
+
+
+@pytest.mark.integration
+async def test_center_admin_cannot_delete_student(api_client, security_fixtures):
+    fx = security_fixtures
+    response = await api_client.delete(
+        f"/api/v1/students/{fx['student_a'].id}",
+        headers={"Authorization": f"Bearer {fx['token_admin_a']}"},
+    )
+    assert response.status_code == 403
 
 
 def test_mfa_mandatory_roles_defined():

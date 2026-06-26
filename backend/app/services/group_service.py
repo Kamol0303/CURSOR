@@ -5,7 +5,13 @@ from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from app.core.tenant import assert_center_access, get_user_center_filter
+from app.core.tenant import (
+    assert_center_access,
+    assert_group_in_scope,
+    apply_group_scope,
+    get_tenant_context_optional,
+    resolve_tenant_context,
+)
 from app.models.education import Enrollment, Group, Student, Subject, Teacher
 from app.models.identity import User
 from app.schemas.groups import GroupCreate, GroupResponse, GroupUpdate
@@ -39,15 +45,14 @@ async def list_groups(
     per_page: int = 20,
     center_id: UUID | None = None,
 ) -> tuple[list[GroupResponse], int]:
-    center_filter = get_user_center_filter(user)
+    ctx = get_tenant_context_optional() or await resolve_tenant_context(db, user)
     query = (
         select(Group)
         .options(selectinload(Group.subject), selectinload(Group.teacher))
         .where(Group.deleted_at.is_(None))
     )
-    if center_filter:
-        query = query.where(Group.center_id == center_filter)
-    elif center_id:
+    query = apply_group_scope(query, ctx, Group)
+    if ctx.is_district_wide and center_id:
         query = query.where(Group.center_id == center_id)
 
     count_q = select(func.count()).select_from(query.subquery())
@@ -79,7 +84,8 @@ async def get_group(db: AsyncSession, user: User, group_id: UUID) -> Group:
     group = result.scalar_one_or_none()
     if not group:
         raise HTTPException(status_code=404, detail={"code": "NOT_FOUND"})
-    assert_center_access(user, group.center_id)
+    ctx = get_tenant_context_optional() or await resolve_tenant_context(db, user)
+    await assert_group_in_scope(db, ctx, group, user)
     return group
 
 

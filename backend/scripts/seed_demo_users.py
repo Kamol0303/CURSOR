@@ -24,7 +24,7 @@ from app.core.permissions import ROLE_DEFINITIONS, ROLE_PERMISSIONS
 from app.core.security import decrypt_totp_secret, encrypt_totp_secret, hash_password
 from app.core.pinfl import encrypt_pinfl
 from app.models.education import Guardian, Mahalla, Region, Student, Subject, Teacher, TeacherSubject
-from app.models.identity import Permission, Role, RolePermission, TrainingCenter, User
+from app.models.identity import ApiKey, Permission, Role, RolePermission, TrainingCenter, User
 from scripts.totp_qr_terminal import print_totp_qr
 
 
@@ -374,11 +374,19 @@ async def seed() -> None:
             )
             session.add(parent)
 
-        api_key = f"tamor_demo_sk_live_{secrets.token_hex(16)}"
-        hmac_secret = secrets.token_hex(32)
+        from app.services import api_key_service
+
+        existing_key = await session.execute(select(ApiKey).limit(1))
+        if not existing_key.scalar_one_or_none():
+            api_key_raw, _ = await api_key_service.create_api_key(
+                session, scopes=["aggregate_stats.read"], label_prefix="tamor_demo"
+            )
+        else:
+            api_key_raw = "(already seeded — see api_keys table)"
         print("External API Consumer:")
-        print(f"  API Key: {api_key}")
-        print(f"  HMAC Secret: {hmac_secret}")
+        print(f"  API Key: {api_key_raw}")
+        print("  Header: X-Api-Key: <key above>")
+        print("  Endpoint: GET /api/v1/external/aggregate-stats")
         print()
         print("Parent/Guardian:")
         print(f"  Phone: {PARENT_PHONE}")
@@ -386,13 +394,12 @@ async def seed() -> None:
 
         await seed_education_data(session, center, roles)
 
-        from app.services import rating_service
+        from app.services import notification_service, rating_service
 
         await rating_service.compute_ratings(session)
         print("Demo ratings computed.")
 
         from app.models.analytics_notifications import AiAnalysisLog, AiPrediction
-        from app.services import notification_service
 
         admin_user = (
             await session.execute(select(User).where(User.username == "admin.tmb"))

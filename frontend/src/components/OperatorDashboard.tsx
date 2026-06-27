@@ -23,9 +23,7 @@ type OperatorData = {
   certificate_trend: { label: string; value: number; is_forecast?: boolean }[];
 };
 
-type TrendVariant = "students" | "certificates" | null;
-
-export function OperatorDashboard({ trendVariant }: { trendVariant: TrendVariant }) {
+export function OperatorDashboard() {
   const t = useTranslations("operatorDashboard");
   const [data, setData] = useState<OperatorData | null>(null);
   const [userName, setUserName] = useState("");
@@ -44,20 +42,6 @@ export function OperatorDashboard({ trendVariant }: { trendVariant: TrendVariant
       })
       .finally(() => setLoading(false));
   }, []);
-
-  const trendData =
-    trendVariant === "certificates"
-      ? data?.certificate_trend ?? []
-      : trendVariant === "students"
-        ? data?.student_trend ?? []
-        : [];
-
-  const trendTitle =
-    trendVariant === "certificates" ? t("charts.certificateTrend") : t("charts.studentTrend");
-  const trendSubtitle =
-    trendVariant === "certificates"
-      ? t("charts.certificateTrendHint")
-      : t("charts.studentTrendHint");
 
   return (
     <div className="space-y-8">
@@ -82,19 +66,19 @@ export function OperatorDashboard({ trendVariant }: { trendVariant: TrendVariant
               }
               viewAllLabel={t("charts.viewAll")}
             />
-            {trendVariant ? (
-              <TrendLineChart
-                title={trendTitle}
-                subtitle={trendSubtitle}
-                data={trendData}
-                forecastLabel={t("charts.forecast")}
-              />
-            ) : (
-              <div className="bg-white rounded-2xl border border-dashed border-gray-200 p-8 flex items-center justify-center text-center text-gray-500 text-sm">
-                {t("charts.trendPlaceholder")}
-              </div>
-            )}
+            <TrendLineChart
+              title={t("charts.studentTrend")}
+              subtitle={t("charts.studentTrendHint")}
+              data={data.student_trend}
+              forecastLabel={t("charts.forecast")}
+            />
           </div>
+          <TrendLineChart
+            title={t("charts.certificateTrend")}
+            subtitle={t("charts.certificateTrendHint")}
+            data={data.certificate_trend}
+            forecastLabel={t("charts.forecast")}
+          />
         </>
       ) : (
         <p className="text-red-500">{t("error")}</p>

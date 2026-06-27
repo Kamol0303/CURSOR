@@ -71,7 +71,7 @@ export default function DashboardPage() {
   if (loading) return null;
 
   if (role === "hokimiyat_operator") {
-    return <OperatorDashboard trendVariant="students" />;
+    return <OperatorDashboard />;
   }
 
   return <StaffDashboard />;

@@ -9,10 +9,10 @@ from app.services import file_service
 
 
 class TestGroupCPermissions:
-    def test_hokimiyat_can_manage_subjects(self):
+    def test_hokimiyat_cannot_manage_subjects(self):
         perms = ROLE_PERMISSIONS["hokimiyat_operator"]
-        assert "subjects.create" in perms
-        assert "subjects.delete" in perms
+        assert "subjects.create" not in perms
+        assert "subjects.delete" not in perms
 
     def test_director_can_read_subjects_not_create(self):
         perms = ROLE_PERMISSIONS["center_director"]
@@ -42,7 +42,7 @@ class TestGroupCSubjectsApi:
         fx = security_fixtures
         create_res = await api_client.post(
             "/api/v1/subjects",
-            headers={"Authorization": f"Bearer {fx['token_hokimiyat']}"},
+            headers={"Authorization": f"Bearer {fx['token_super_admin']}"},
             json={
                 "name_uz": "Group C Fan",
                 "name_ru": "Group C Fan RU",
@@ -62,7 +62,7 @@ class TestGroupCSubjectsApi:
 
         update_res = await api_client.patch(
             f"/api/v1/subjects/{subject_id}",
-            headers={"Authorization": f"Bearer {fx['token_hokimiyat']}"},
+            headers={"Authorization": f"Bearer {fx['token_super_admin']}"},
             json={"name_uz": "Group C Fan Updated"},
         )
         assert update_res.status_code == 200
@@ -70,7 +70,7 @@ class TestGroupCSubjectsApi:
 
         delete_res = await api_client.delete(
             f"/api/v1/subjects/{subject_id}",
-            headers={"Authorization": f"Bearer {fx['token_hokimiyat']}"},
+            headers={"Authorization": f"Bearer {fx['token_super_admin']}"},
         )
         assert delete_res.status_code == 200
 

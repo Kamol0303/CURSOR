@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { KpiCards } from "@/components/KpiCards";
+import { OperatorDashboard } from "@/components/OperatorDashboard";
 import { StatsChart } from "@/components/StatsChart";
 import { getDashboardKpis, getMe } from "@/lib/api";
 
@@ -13,7 +14,7 @@ type DashData = {
   monthly_stats: { label: string; value: number }[];
 };
 
-export default function DashboardPage() {
+function StaffDashboard() {
   const t = useTranslations("dashboard");
   const [dash, setDash] = useState<DashData | null>(null);
   const [userName, setUserName] = useState("");
@@ -53,4 +54,26 @@ export default function DashboardPage() {
       )}
     </div>
   );
+}
+
+export default function DashboardPage() {
+  const [role, setRole] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    getMe()
+      .then((me) => {
+        if (me.success) setRole(me.data.role);
+      })
+      .finally(() => setLoading(false));
+  }, []);
+
+  if (loading) return null;
+
+  if (role === "hokimiyat_operator") {
+    // Bosqich 2.3: trendVariant — "students" | "certificates" (hozircha placeholder)
+    return <OperatorDashboard trendVariant={null} />;
+  }
+
+  return <StaffDashboard />;
 }

@@ -16,7 +16,7 @@ from app.services.audit_service import write_audit_log
 
 PROFILE_REQUIRED_FIELDS = ("stir", "phone", "address", "director_name", "center_type")
 
-CENTER_CREATE_ROLES = frozenset({"super_admin", "hokimiyat_operator"})
+CENTER_CREATE_ROLES = frozenset({"super_admin"})
 
 
 def center_to_response(center: TrainingCenter) -> dict:

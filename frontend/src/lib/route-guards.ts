@@ -7,6 +7,16 @@ export type DashboardNavItem = {
   exact?: boolean;
 };
 
+/** Hokimiyat — monitoring-only sidebar (district-wide read + analytics). */
+export const OPERATOR_NAV_ROUTES: readonly DashboardNavItem[] = [
+  { href: "/dashboard", key: "dashboard", permission: "dashboard.view", exact: true },
+  { href: "/dashboard/centers", key: "centers", permission: "centers.read" },
+  { href: "/dashboard/teachers", key: "teachers", permission: "teachers.read" },
+  { href: "/dashboard/students", key: "students", permission: "students.read" },
+  { href: "/dashboard/certificates", key: "certificates", permission: "certificates.read" },
+  { href: "/dashboard/analytics", key: "analytics", permission: "analytics.view" },
+] as const;
+
 export const DASHBOARD_NAV_ROUTES: readonly DashboardNavItem[] = [
   { href: "/dashboard", key: "dashboard", permission: "dashboard.view", exact: true },
   { href: "/dashboard/centers", key: "centers", permission: "centers.read" },
@@ -22,7 +32,7 @@ export const DASHBOARD_NAV_ROUTES: readonly DashboardNavItem[] = [
   { href: "/dashboard/exams", key: "exams", permission: "exams.read" },
   { href: "/dashboard/grades", key: "grades", permission: "grades.read" },
   { href: "/dashboard/ratings", key: "ratings", permission: "ratings.view" },
-  { href: "/dashboard/certificates", key: "certificates", permission: "ratings.view" },
+  { href: "/dashboard/certificates", key: "certificates", permission: "certificates.read" },
   { href: "/dashboard/analytics", key: "analytics", permission: "analytics.view" },
   { href: "/dashboard/security", key: "security", permission: "users.password_reset" },
 ] as const;
@@ -30,13 +40,21 @@ export const DASHBOARD_NAV_ROUTES: readonly DashboardNavItem[] = [
 const ONBOARDING_PATH = "/dashboard/onboarding";
 
 const SORTED_ROUTES = [...DASHBOARD_NAV_ROUTES].sort((a, b) => b.href.length - a.href.length);
+const SORTED_OPERATOR_ROUTES = [...OPERATOR_NAV_ROUTES].sort((a, b) => b.href.length - a.href.length);
 
-export function requiredPermissionForPath(pathname: string): string | null {
+export function navRoutesForRole(role: string | null): readonly DashboardNavItem[] {
+  if (role === "hokimiyat_operator") return OPERATOR_NAV_ROUTES;
+  return DASHBOARD_NAV_ROUTES;
+}
+
+export function requiredPermissionForPath(pathname: string, role?: string | null): string | null {
   if (pathname === ONBOARDING_PATH || pathname.startsWith(`${ONBOARDING_PATH}/`)) {
     return "__onboarding__";
   }
 
-  for (const route of SORTED_ROUTES) {
+  const routes = role === "hokimiyat_operator" ? SORTED_OPERATOR_ROUTES : SORTED_ROUTES;
+
+  for (const route of routes) {
     if (route.exact) {
       if (pathname === route.href) return route.permission;
       continue;
@@ -47,7 +65,7 @@ export function requiredPermissionForPath(pathname: string): string | null {
   }
 
   if (pathname.startsWith("/dashboard")) {
-    return "dashboard.view";
+    return role === "hokimiyat_operator" ? null : "dashboard.view";
   }
 
   return null;
@@ -58,11 +76,16 @@ export function canAccessDashboardRoute(
   permissions: string[],
   role: string | null,
 ): boolean {
-  const required = requiredPermissionForPath(pathname);
+  const required = requiredPermissionForPath(pathname, role);
   if (required === "__onboarding__") {
     return role === "center_director";
   }
-  if (!required) return true;
+  if (!required) {
+    if (role === "hokimiyat_operator" && pathname.startsWith("/dashboard")) {
+      return false;
+    }
+    return true;
+  }
   return permissions.includes(required);
 }
 

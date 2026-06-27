@@ -23,7 +23,7 @@ def test_accountant_cannot_access_teachers():
 
 
 def test_accountant_cannot_access_certificates_nav():
-    assert "ratings.view" not in ROLE_PERMISSIONS["accountant"]
+    assert "certificates.read" not in ROLE_PERMISSIONS["accountant"]
 
 
 def test_center_admin_cannot_reset_passwords():

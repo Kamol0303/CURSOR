@@ -124,7 +124,7 @@
     }
   },
   "dashboard": {
-    "welcome": "Hokimiyat Dashboard",
+    "welcome": "Admin dashboard",
     "loading": "Loading...",
     "kpi": {
       "total_centers": "Branches",
@@ -143,6 +143,30 @@
       "daily": "Daily stats",
       "weekly": "Weekly stats",
       "monthly": "Monthly stats"
+    }
+  },
+  "operatorDashboard": {
+    "welcome": "District monitoring dashboard",
+    "subtitle": "District-wide statistics — no operational controls, no financial metrics.",
+    "loading": "Loading...",
+    "error": "Failed to load data",
+    "kpi": {
+      "active_centers": "Training centers",
+      "total_teachers": "Teachers",
+      "total_students": "Students",
+      "certificates_ytd": "Certificates issued (YTD)",
+      "total_courses": "Active courses"
+    },
+    "charts": {
+      "certificatesByCenter": "Certificates by center",
+      "certificatesByCenterHint": "Certificates issued per center in the current year",
+      "viewAll": "View all →",
+      "studentTrend": "Student count trend",
+      "studentTrendHint": "Active students over 12 months with next-month forecast",
+      "certificateTrend": "Certificate issuance trend",
+      "certificateTrendHint": "Monthly certificates with next-month forecast",
+      "forecast": "Forecast",
+      "trendPlaceholder": "Select a forecast chart variant (students or certificates)."
     }
   },
   "centers": {

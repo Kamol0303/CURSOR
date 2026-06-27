@@ -31,7 +31,7 @@ def _cert_to_dict(c) -> dict:
 async def list_certificates(
     page: int = Query(1, ge=1),
     per_page: int = Query(20, ge=1, le=100),
-    user: User = Depends(requires_permission("ratings.view")),
+    user: User = Depends(requires_permission("certificates.read")),
     db: AsyncSession = Depends(get_db),
 ):
     certs, total = await certificate_service.list_certificates(db, user, page=page, per_page=per_page)

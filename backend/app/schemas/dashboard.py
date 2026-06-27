@@ -1,6 +1,30 @@
 from pydantic import BaseModel
 
 
+class CenterCertificateStat(BaseModel):
+    center_id: str
+    center_name: str
+    certificate_count: int
+
+
+class TrendPoint(BaseModel):
+    label: str
+    value: int
+    is_forecast: bool = False
+
+
+class OperatorDashboardResponse(BaseModel):
+    active_centers: int
+    total_teachers: int
+    total_students: int
+    certificates_ytd: int
+    total_courses: int
+    certificates_by_center: list[CenterCertificateStat]
+    certificates_by_center_total: int
+    student_trend: list[TrendPoint]
+    certificate_trend: list[TrendPoint]
+
+
 class DashboardKpi(BaseModel):
     key: str
     value: int | float

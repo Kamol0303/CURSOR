@@ -31,8 +31,8 @@ class TestGroupGAttendanceAccess:
     def test_hokimiyat_cannot_mark_attendance(self):
         assert "attendance.mark" not in ROLE_PERMISSIONS["hokimiyat_operator"]
 
-    def test_hokimiyat_can_read_attendance(self):
-        assert "attendance.read" in ROLE_PERMISSIONS["hokimiyat_operator"]
+    def test_hokimiyat_cannot_read_attendance(self):
+        assert "attendance.read" not in ROLE_PERMISSIONS["hokimiyat_operator"]
 
     def test_teacher_can_mark_attendance(self):
         assert "attendance.mark" in ROLE_PERMISSIONS["teacher"]
@@ -84,13 +84,13 @@ class TestGroupGApiEnforcement:
         )
         assert response.status_code == 403
 
-    async def test_hokimiyat_can_read_attendance(self, api_client, security_fixtures):
+    async def test_hokimiyat_cannot_read_attendance(self, api_client, security_fixtures):
         fx = security_fixtures
         response = await api_client.get(
             f"/api/v1/attendance?group_id={fx['group_a'].id}&session_date=2026-01-15",
             headers={"Authorization": f"Bearer {fx['token_hokimiyat']}"},
         )
-        assert response.status_code == 200
+        assert response.status_code == 403
 
     async def test_hokimiyat_cannot_create_qr_session(self, api_client, security_fixtures):
         fx = security_fixtures

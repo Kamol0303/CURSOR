@@ -45,7 +45,7 @@ async def get_subject(db: AsyncSession, subject_id: UUID) -> Subject:
 
 
 async def create_subject(db: AsyncSession, user: User, body: SubjectCreate) -> SubjectResponse:
-    if user.role.code not in {"super_admin", "hokimiyat_operator"}:
+    if user.role.code != "super_admin":
         raise HTTPException(status_code=403, detail={"code": "FORBIDDEN"})
 
     subject = Subject(
@@ -65,7 +65,7 @@ async def update_subject(
     subject_id: UUID,
     body: SubjectUpdate,
 ) -> SubjectResponse:
-    if user.role.code not in {"super_admin", "hokimiyat_operator"}:
+    if user.role.code != "super_admin":
         raise HTTPException(status_code=403, detail={"code": "FORBIDDEN"})
 
     subject = await get_subject(db, subject_id)
@@ -95,7 +95,7 @@ async def _assert_subject_deletable(db: AsyncSession, subject_id: UUID) -> None:
 
 
 async def delete_subject(db: AsyncSession, user: User, subject_id: UUID) -> None:
-    if user.role.code not in {"super_admin", "hokimiyat_operator"}:
+    if user.role.code != "super_admin":
         raise HTTPException(status_code=403, detail={"code": "FORBIDDEN"})
 
     subject = await get_subject(db, subject_id)

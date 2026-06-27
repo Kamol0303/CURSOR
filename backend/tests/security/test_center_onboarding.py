@@ -6,12 +6,12 @@ from app.core.security import hash_password
 
 
 @pytest.mark.integration
-async def test_hokimiyat_can_onboard_center(api_client, security_fixtures):
+async def test_super_admin_can_onboard_center(api_client, security_fixtures):
     fx = security_fixtures
     suffix = fx["center_a"].name[-8:]
     response = await api_client.post(
         "/api/v1/centers/onboard",
-        headers={"Authorization": f"Bearer {fx['token_hokimiyat']}"},
+        headers={"Authorization": f"Bearer {fx['token_super_admin']}"},
         json={
             "name": f"Onboard Test {suffix}",
             "director_username": f"dir_new_{suffix}",
@@ -25,6 +25,24 @@ async def test_hokimiyat_can_onboard_center(api_client, security_fixtures):
     assert data["director_username"] == f"dir_new_{suffix}"
     assert len(data["temporary_password"]) >= 12
     assert data["center"]["profile_completed"] is False
+
+
+@pytest.mark.integration
+async def test_hokimiyat_cannot_onboard_center(api_client, security_fixtures):
+    fx = security_fixtures
+    suffix = fx["center_a"].name[-8:]
+    response = await api_client.post(
+        "/api/v1/centers/onboard",
+        headers={"Authorization": f"Bearer {fx['token_hokimiyat']}"},
+        json={
+            "name": f"Onboard Blocked {suffix}",
+            "director_username": f"dir_blk_{suffix}",
+            "director_full_name": "Blocked",
+            "director_email": f"blk_{suffix}@example.com",
+            "director_phone": "+998901234567",
+        },
+    )
+    assert response.status_code == 403
 
 
 @pytest.mark.integration

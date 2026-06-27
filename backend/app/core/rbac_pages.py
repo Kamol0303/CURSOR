@@ -21,6 +21,13 @@ class PageDef:
 
 ADMIN_DASHBOARD_PAGES: tuple[PageDef, ...] = (
     PageDef("dashboard", "/dashboard", NAV_PERMISSIONS["dashboard"], "GET", "/api/v1/dashboard/kpis"),
+    PageDef(
+        "operator_dashboard",
+        "/dashboard",
+        "dashboard.operator",
+        "GET",
+        "/api/v1/dashboard/operator-summary",
+    ),
     PageDef("centers", "/dashboard/centers", NAV_PERMISSIONS["centers"], "GET", "/api/v1/centers"),
     PageDef("students", "/dashboard/students", NAV_PERMISSIONS["students"], "GET", "/api/v1/students"),
     PageDef("teachers", "/dashboard/teachers", NAV_PERMISSIONS["teachers"], "GET", "/api/v1/teachers"),

@@ -5,7 +5,7 @@ from app.core.database import get_db
 from app.core.deps import requires_permission
 from app.models.identity import User
 from app.schemas.common import ApiResponse
-from app.services import dashboard_service
+from app.services import dashboard_service, operator_dashboard_service
 
 router = APIRouter(prefix="/dashboard", tags=["dashboard"])
 
@@ -16,4 +16,13 @@ async def get_kpis(
     db: AsyncSession = Depends(get_db),
 ):
     data = await dashboard_service.get_dashboard(db, user)
+    return ApiResponse(success=True, data=data.model_dump())
+
+
+@router.get("/operator-summary", response_model=ApiResponse)
+async def get_operator_summary(
+    user: User = Depends(requires_permission("dashboard.operator")),
+    db: AsyncSession = Depends(get_db),
+):
+    data = await operator_dashboard_service.get_operator_summary(db, user)
     return ApiResponse(success=True, data=data.model_dump())

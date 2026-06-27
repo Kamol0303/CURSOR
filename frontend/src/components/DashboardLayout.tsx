@@ -9,9 +9,7 @@ import { NotificationBell } from "@/components/NotificationBell";
 import { useAuth } from "@/contexts/AuthContext";
 import { getApiBaseUrl } from "@/lib/api";
 import { clearAuthCookie } from "@/lib/auth-cookie";
-import { DASHBOARD_NAV_ROUTES } from "@/lib/route-guards";
-
-const NAV = DASHBOARD_NAV_ROUTES;
+import { navRoutesForRole } from "@/lib/route-guards";
 
 function isNavActive(pathname: string, href: string, exact?: boolean) {
   if (exact) return pathname === href;
@@ -43,7 +41,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
   };
 
   const roleLabel = user?.role ? t(`roles.${user.role}` as "roles.super_admin") : "";
-  const visibleNav = NAV.filter((item) => can(item.permission));
+  const visibleNav = navRoutesForRole(user?.role ?? null).filter((item) => can(item.permission));
   const isOnboarding = pathname === "/dashboard/onboarding";
 
   return (

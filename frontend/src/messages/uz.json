@@ -124,7 +124,7 @@
     }
   },
   "dashboard": {
-    "welcome": "Hokimiyat dashboard",
+    "welcome": "Boshqaruv paneli",
     "loading": "Yuklanmoqda...",
     "kpi": {
       "total_centers": "Jami filiallar",
@@ -143,6 +143,30 @@
       "daily": "Kunlik statistika",
       "weekly": "Haftalik statistika",
       "monthly": "Oylik statistika"
+    }
+  },
+  "operatorDashboard": {
+    "welcome": "Hokimiyat monitoring paneli",
+    "subtitle": "Tuman bo'yicha umumiy statistika — operatsion boshqaruvsiz, moliyaviy ko'rsatkichlarsiz.",
+    "loading": "Yuklanmoqda...",
+    "error": "Ma'lumot yuklanmadi",
+    "kpi": {
+      "active_centers": "Ta'lim markazlari",
+      "total_teachers": "O'qituvchilar",
+      "total_students": "O'quvchilar",
+      "certificates_ytd": "Berilgan sertifikatlar (yil)",
+      "total_courses": "Faol kurslar"
+    },
+    "charts": {
+      "certificatesByCenter": "Markazlar kesimida sertifikatlar",
+      "certificatesByCenterHint": "Joriy yil bo'yicha har bir markazda berilgan sertifikatlar soni",
+      "viewAll": "Hammasini ko'rish →",
+      "studentTrend": "O'quvchilar soni dinamikasi",
+      "studentTrendHint": "So'nggi 12 oy davomida faol o'quvchilar va kelgusi oy prognozi",
+      "certificateTrend": "Sertifikat berish tendensiyasi",
+      "certificateTrendHint": "Oylar bo'yicha berilgan sertifikatlar va kelgusi oy prognozi",
+      "forecast": "Prognoz",
+      "trendPlaceholder": "Prognoz diagrammasi uchun variant tanlang (o'quvchilar yoki sertifikatlar)."
     }
   },
   "centers": {

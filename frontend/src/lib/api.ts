@@ -90,6 +90,24 @@ export async function getDashboardKpis() {
   }>("/dashboard/kpis");
 }
 
+export async function getOperatorSummary() {
+  return apiFetch<{
+    active_centers: number;
+    total_teachers: number;
+    total_students: number;
+    certificates_ytd: number;
+    total_courses: number;
+    certificates_by_center: {
+      center_id: string;
+      center_name: string;
+      certificate_count: number;
+    }[];
+    certificates_by_center_total: number;
+    student_trend: { label: string; value: number; is_forecast?: boolean }[];
+    certificate_trend: { label: string; value: number; is_forecast?: boolean }[];
+  }>("/dashboard/operator-summary");
+}
+
 export async function listCenters(page = 1) {
   return apiFetch<Record<string, unknown>[]>("/centers?page=" + page);
 }

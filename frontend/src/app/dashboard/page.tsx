@@ -71,8 +71,7 @@ export default function DashboardPage() {
   if (loading) return null;
 
   if (role === "hokimiyat_operator") {
-    // Bosqich 2.3: trendVariant — "students" | "certificates" (hozircha placeholder)
-    return <OperatorDashboard trendVariant={null} />;
+    return <OperatorDashboard trendVariant="students" />;
   }
 
   return <StaffDashboard />;

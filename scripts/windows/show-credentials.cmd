@@ -2,17 +2,17 @@
 REM Barcha demo login va parollarni terminalda ko'rsatish
 echo.
 echo ============================================================
-echo   TMB DEMO LOGINLAR (faqat dev/staging — production emas)
+echo   TMB DEMO LOGINLAR (faqat dev/staging - production emas)
 echo ============================================================
 echo.
 echo   super_admin        admin.tmb              Tmb#2026Admin!
-echo                      MFA: ha — seed chiqaradi TOTP QR
+echo                      MFA: ha - seed chiqaradi TOTP QR
 echo.
 echo   hokimiyat_operator operator.hokimiyat       Hokim#Op2026!
-echo                      MFA: ha — seed chiqaradi TOTP QR
+echo                      MFA: ha - seed chiqaradi TOTP QR
 echo.
 echo   center_director    director.aspect          Direktor#2026!
-echo                      MFA: ha — seed chiqarida TOTP QR
+echo                      MFA: ha - seed chiqarida TOTP QR
 echo.
 echo   center_admin       admin.aspect             CenterAdmin#26!
 echo                      MFA: yo'q

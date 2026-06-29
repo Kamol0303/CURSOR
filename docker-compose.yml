@@ -27,7 +27,13 @@ services:
       retries: 5
 
   backend:
-    build: ./backend
+    build:
+      context: ./backend
+      args:
+        HTTP_PROXY: ""
+        HTTPS_PROXY: ""
+        http_proxy: ""
+        https_proxy: ""
     ports:
       - "8000:8000"
     environment:
@@ -97,7 +103,13 @@ services:
         condition: service_started
 
   celery-worker:
-    build: ./backend
+    build:
+      context: ./backend
+      args:
+        HTTP_PROXY: ""
+        HTTPS_PROXY: ""
+        http_proxy: ""
+        https_proxy: ""
     environment:
       ENVIRONMENT: development
       DATABASE_URL: postgresql+asyncpg://tamor:tamor_dev@postgres:5432/tamor
@@ -117,7 +129,13 @@ services:
     command: celery -A app.tasks.celery_app worker --loglevel=info
 
   celery-beat:
-    build: ./backend
+    build:
+      context: ./backend
+      args:
+        HTTP_PROXY: ""
+        HTTPS_PROXY: ""
+        http_proxy: ""
+        https_proxy: ""
     environment:
       ENVIRONMENT: development
       DATABASE_URL: postgresql+asyncpg://tamor:tamor_dev@postgres:5432/tamor

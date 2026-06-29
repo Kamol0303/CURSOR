@@ -21,13 +21,15 @@ type Center = {
   license_expiry: string | null;
   center_type: string;
   is_active: boolean;
+  mahalla_id: string | null;
   mahalla_name_uz: string | null;
 };
 
 export default function CentersPage() {
   const t = useTranslations("centers");
   const { can } = usePermissions();
-  const { role } = useAuth();
+  const { user } = useAuth();
+  const role = user?.role;
   const [centers, setCenters] = useState<Center[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);

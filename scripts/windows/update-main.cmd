@@ -3,6 +3,24 @@ REM TMB — main branch yangilanishi va dev Docker qayta ishga tushirish
 REM Ishlatish: scripts\windows\update-main.cmd
 cd /d "%~dp0..\.."
 
+echo === 0. Docker tekshiruvi ===
+docker info >nul 2>&1
+if errorlevel 1 (
+  echo.
+  echo XATO: Docker Engine ishlamayapti!
+  echo.
+  echo 1. Start menyudan "Docker Desktop" ni oching
+  echo 2. Tray ^(past o'ng^) da balina yashil bo'lguncha kuting - 2-3 daqiqa
+  echo 3. Tekshiring: docker info
+  echo 4. Keyin qayta: scripts\windows\update-main.cmd
+  echo.
+  echo Docker Desktop ochilmoqda ^(agar o'rnatilgan bo'lsa^)...
+  start "" "%ProgramFiles%\Docker\Docker\Docker Desktop.exe" 2>nul
+  exit /b 1
+)
+
+echo Docker tayyor.
+
 echo === 1. Git: celerybeat-schedule tozalash (checkout blokini oldini olish) ===
 if exist backend\celerybeat-schedule del /f /q backend\celerybeat-schedule
 
@@ -33,7 +51,7 @@ docker compose -f docker-compose.staging.yml down 2>nul
 echo === 4. Dev muhitni qayta build qilish (localhost:3000 / :8000) ===
 docker compose up -d --build --remove-orphans
 if errorlevel 1 (
-  echo Docker xato — log: docker compose logs backend --tail 80
+  echo Docker xato - log: docker compose logs backend --tail 80
   exit /b 1
 )
 

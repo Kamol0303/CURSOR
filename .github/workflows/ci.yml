@@ -118,6 +118,48 @@ jobs:
 
       - name: Lint and build frontend
         working-directory: frontend
+        env:
+          NEXT_PUBLIC_API_URL: https://tamor.toyloq.uz
         run: |
           npm run lint
           npm run build
+          test -f .next/standalone/server.js
+          test -d .next/static
+
+  prod-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Build production frontend image
+        run: |
+          docker build \
+            -f frontend/Dockerfile.prod \
+            --build-arg NEXT_PUBLIC_API_URL=https://tamor.toyloq.uz \
+            -t tamor-frontend-prod:ci \
+            frontend
+
+      - name: Build production backend image
+        run: |
+          docker build \
+            --build-arg HTTP_PROXY= \
+            --build-arg HTTPS_PROXY= \
+            -t tamor-backend-prod:ci \
+            backend
+
+      - name: Smoke test frontend container
+        run: |
+          CID=$(docker run -d -p 127.0.0.1:3457:3000 -e HOSTNAME=0.0.0.0 tamor-frontend-prod:ci)
+          trap "docker rm -f $CID" EXIT
+          for i in $(seq 1 30); do
+            curl -fsS -o /dev/null http://127.0.0.1:3457/ && exit 0
+            sleep 1
+          done
+          docker logs "$CID" --tail 40
+          exit 1

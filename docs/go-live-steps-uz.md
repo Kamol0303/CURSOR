@@ -117,4 +117,6 @@ docker compose -f docker-compose.prod.yml down
 | `scripts/windows/update-main.cmd` | Dev muhit yangilash |
 | `scripts/windows/show-credentials.cmd` | Demo loginlar |
 | `scripts/windows/go-live-prep.cmd` | Prod tayyorgarlik (Windows) |
+| `scripts/verify-prod-build.sh` | Prod image build tekshiruvi (deploysiz) |
+| `scripts/windows/verify-prod-build.cmd` | Prod build tekshiruvi (Windows) |
 | `scripts/go-live.sh` | To'liq go-live (Linux) |

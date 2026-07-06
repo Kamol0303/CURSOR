@@ -75,97 +75,187 @@ cd backend && pytest tests/security/ -v
 
 ## Запуск проекта
 
-### Windows (development)
+Выберите **один** раздел для вашей платформы. Каждый блок полный — читать разделы других ОС не нужно.
 
-**1. Клонирование репозитория**
+| Платформа | Раздел |
+|----------|--------|
+| Windows (dev) | [§1 Windows — development](#1-windows--development-полный) |
+| Windows (staging) | [§2 Windows — staging](#2-windows--staging) |
+| Windows (prod test) | [§3 Windows — production prep](#3-windows--production-prep) |
+| macOS (dev) | [§4 macOS — development](#4-macos--development-полный) |
+| macOS (staging) | [§5 macOS — staging](#5-macos--staging) |
+| Linux Kali/Ubuntu (dev) | [§6 Linux — development](#6-linux-kaliubuntudebian--development-полный) |
+| Linux (staging) | [§7 Linux — staging](#7-linux--staging) |
+| Linux VPS (production) | [§8 Linux server — production](#8-linux-server--production-полный) |
+
+---
+
+### 1. Windows — development (полный)
+
+**Требования:** Windows 10/11, [Docker Desktop](https://www.docker.com/products/docker-desktop/), Git for Windows, PowerShell или CMD.
+
+**Шаг 1 — Установка Docker Desktop**
+
+1. Установите Docker Desktop и перезагрузите компьютер, если потребуется.
+2. Откройте Docker Desktop из меню Пуск.
+3. Дождитесь зелёного значка кита в трее (2–3 минуты).
+4. Проверьте:
+
+```cmd
+docker info
+docker compose version
+```
+
+**Шаг 2 — Клонирование проекта**
 
 ```cmd
 git clone https://github.com/Kamol0303/CURSOR.git
 cd CURSOR
 ```
 
-**2. Файл окружения и LLM-ключи**
+**Шаг 3 — Файл окружения**
 
 ```cmd
 copy .env.example .env
 scripts\windows\setup-llm-env.cmd
 ```
 
-**3. Запуск полного dev-стека** (обновляет `main`, собирает Docker, миграции, seed)
+(Опционально) Отредактируйте `.env` в Notepad для `LLM_API_KEY`, `GEMINI_API_KEY`, `MISTRAL_API_KEY`.
+
+**Шаг 4 — Запуск dev-стека** (git pull, сборка Docker, миграции, seed)
 
 ```cmd
 scripts\windows\update-main.cmd
 ```
 
-**4. Проверка стека**
+**Шаг 5 — Проверка**
 
 ```cmd
 docker compose ps
 curl -s http://localhost:8000/health
 ```
 
-Учётные данные dev выводятся **локально** после seed (не хранятся в репозитории). Windows: `scripts\windows\show-credentials.cmd`
+Ожидаемый ответ health: `{"status":"ok","environment":"development"}`
 
-| URL | Адрес |
-|-----|-------|
+**Шаг 6 — Открытие в браузере**
+
+Откройте **на этом ПК**: http://localhost:3000
+
+Учётные данные dev показываются локально (не в README):
+
+```cmd
+scripts\windows\show-credentials.cmd
+```
+
+**URL (Windows dev)**
+
+| Сервис | URL |
+|---------|-----|
 | Frontend | http://localhost:3000 |
 | API | http://localhost:8000 |
 | API docs | http://localhost:8000/docs |
 | PostgreSQL (host) | `localhost:5433` |
 
-**Windows — staging (HTTPS, локально)**
+**Остановка / перезапуск (Windows dev)**
 
 ```cmd
+docker compose down
+docker compose down -v
+scripts\windows\update-main.cmd
+scripts\windows\backend-logs.cmd
+```
+
+> **Ошибка Docker?** Запустите Docker Desktop и дождитесь зелёного кита в трее, затем снова выполните `scripts\windows\update-main.cmd`.
+
+---
+
+### 2. Windows — staging
+
+Локальный HTTPS staging с Nginx + TLS.
+
+```cmd
+cd CURSOR
 scripts\windows\setup-staging-env.cmd
 bash infra/nginx/generate-dev-certs.sh
 scripts\windows\staging-up.cmd
 ```
 
-Добавьте в `C:\Windows\System32\drivers\etc\hosts`: `127.0.0.1 tamor.staging.local`  
-Откройте: https://tamor.staging.local
+Добавьте в `C:\Windows\System32\drivers\etc\hosts` (от имени администратора):
 
-**Windows — полезные команды**
-
-```cmd
-scripts\windows\backend-logs.cmd              REM логи backend (dev)
-scripts\windows\backend-logs.cmd staging      REM логи backend (staging)
-docker compose down                           REM остановить dev
-docker compose down -v                        REM остановить dev + очистить БД
-docker compose logs backend --tail 80           REM последние строки backend
+```
+127.0.0.1 tamor.staging.local
 ```
 
-**Windows — подготовка production** (локальный тест prod-сборки; реальный prod — на Linux)
+Откройте: https://tamor.staging.local
+
+Логи: `scripts\windows\backend-logs.cmd staging`
+
+Остановка:
 
 ```cmd
+docker compose -f docker-compose.staging.yml --env-file .env.staging down
+```
+
+---
+
+### 3. Windows — production prep
+
+Только локальный тест production-сборки. Реальный production работает на **Linux-сервере** (§8).
+
+```cmd
+cd CURSOR
 copy .env.production.example .env.production
-REM Отредактируйте .env.production — заполните все CHANGE_ME
+REM Edit .env.production — fill ALL CHANGE_ME values
 scripts\windows\go-live-prep.cmd
 scripts\windows\verify-prod-build.cmd
 ```
 
-> Если `docker info` выдаёт ошибку: откройте **Docker Desktop** из меню Пуск и дождитесь зелёного кита в трее (2–3 минуты).
+Остановка:
+
+```cmd
+docker compose -f docker-compose.prod.yml --env-file .env.production down
+```
 
 ---
 
-### macOS (development)
+### 4. macOS — development (полный)
 
-**1. Клонирование и настройка**
+**Требования:** macOS 12+, [Docker Desktop for Mac](https://www.docker.com/products/docker-desktop/), Git (Xcode CLI или Homebrew).
+
+**Шаг 1 — Установка Docker**
+
+```bash
+docker --version
+docker compose version
+docker info
+```
+
+Откройте Docker Desktop, если `docker info` выдаёт ошибку.
+
+**Шаг 2 — Клонирование**
 
 ```bash
 git clone https://github.com/Kamol0303/CURSOR.git
 cd CURSOR
-cp .env.example .env
-# Отредактируйте .env — LLM_API_KEY, GEMINI_API_KEY, MISTRAL_API_KEY (опционально)
 ```
 
-**2. Запуск одной командой** (рекомендуется)
+**Шаг 3 — Окружение**
+
+```bash
+cp .env.example .env
+nano .env
+```
+
+Установите опциональные AI-ключи: `LLM_API_KEY`, `GEMINI_API_KEY`, `MISTRAL_API_KEY`, `AI_ENABLED=true`.
+
+**Шаг 4 — Запуск (рекомендуется)**
 
 ```bash
 chmod +x scripts/start.sh scripts/restart-fresh.sh
 ./scripts/start.sh dev
 ```
 
-**3. Или запуск вручную**
+**Шаг 4 (альтернатива) — Ручной запуск**
 
 ```bash
 docker compose up -d --build
@@ -173,122 +263,275 @@ docker compose exec backend alembic upgrade head
 docker compose exec backend python scripts/seed_demo_users.py --i-understand-this-creates-demo-credentials
 ```
 
-| URL | Адрес |
-|-----|-------|
+**Шаг 5 — Проверка**
+
+```bash
+docker compose ps
+curl -s http://localhost:8000/health
+curl -s http://localhost:3000 | head -5
+```
+
+**Шаг 6 — Открытие в браузере**
+
+```bash
+open http://localhost:3000
+```
+
+Учётные данные dev выводятся в терминале после seed (не в README).
+
+**URL (macOS dev)**
+
+| Сервис | URL |
+|---------|-----|
 | Frontend | http://localhost:3000 |
 | API | http://localhost:8000 |
 | API docs | http://localhost:8000/docs |
 | PostgreSQL (host) | `localhost:5433` |
 
-**macOS — staging (HTTPS, локально)**
+**Остановка / перезапуск (macOS dev)**
 
 ```bash
+docker compose down
+docker compose down -v
+./scripts/restart-fresh.sh dev
+docker compose logs backend --tail 80
+./scripts/show-mfa-qr.sh
+```
+
+---
+
+### 5. macOS — staging
+
+```bash
+cd CURSOR
+chmod +x scripts/start.sh
 ./scripts/start.sh staging
-# Добавьте в /etc/hosts: 127.0.0.1 tamor.staging.local
 sudo sh -c 'echo "127.0.0.1 tamor.staging.local" >> /etc/hosts'
 open https://tamor.staging.local
+./scripts/verify-staging.sh
 ```
 
-**macOS — полезные команды**
+Остановка:
 
 ```bash
-docker compose down                    # остановить dev
-docker compose down -v                 # остановить + очистить БД
-./scripts/restart-fresh.sh dev         # полный сброс и перезапуск
-docker compose logs backend --tail 80  # последние строки backend
-./scripts/show-mfa-qr.sh               # MFA QR для admin.tmb
+docker compose -f docker-compose.staging.yml --env-file .env.staging down
 ```
 
 ---
 
-### Linux (development)
+### 6. Linux (Kali/Ubuntu/Debian) — development (полный)
 
-Те же команды, что и на macOS. Нужны Docker Engine и Compose plugin:
+**Требования:** Kali, Ubuntu 22.04+ или Debian 12+. Docker Engine + Compose plugin + Git.
 
-```bash
-sudo apt update && sudo apt install -y docker.io docker-compose-plugin git
-sudo usermod -aG docker $USER   # выйдите и войдите снова
-```
-
-**Linux (Kali/Ubuntu) — самый простой способ:**
+**Шаг 1 — Установка Docker** (один раз на машине)
 
 ```bash
-chmod +x scripts/linux-dev-setup.sh
-./scripts/linux-dev-setup.sh
+sudo apt update
+sudo apt install -y docker.io docker-compose-plugin git curl
+sudo usermod -aG docker $USER
 ```
 
-Скрипт останавливает production-стек, проверяет конфликт портов и запускает dev.
+Выйдите и войдите снова (или `newgrp docker`), затем проверьте:
 
----
+```bash
+docker info
+docker compose version
+```
 
-### Linux-сервер (production)
+> На Linux **не** используйте `copy` или `scripts\windows\...` — это только для Windows.
 
-Запуск на production VPS (например, `tamor.toyloq.uz`). Используются `docker-compose.prod.yml` и `.env.production`.
-
-**1. Клонирование и секреты**
+**Шаг 2 — Клонирование**
 
 ```bash
 git clone https://github.com/Kamol0303/CURSOR.git
 cd CURSOR
-cp .env.production.example .env.production
-nano .env.production   # заполните ВСЕ CHANGE_ME: пароль БД, JWT secret, LLM-ключи и т.д.
 ```
 
-**2. TLS-сертификаты от CA** (не dev self-signed)
+При необходимости используйте полный путь, например `/home/YOUR_USER/CURSOR` (не `/root/CURSOR`, если вы не всегда работаете от root).
+
+**Шаг 3 — Окружение**
 
 ```bash
-# Разместите CA-сертификаты:
-#   infra/nginx/tls/fullchain.pem
-#   infra/nginx/tls/privkey.pem
-ls -la infra/nginx/tls/
+cp .env.example .env
+nano .env
 ```
 
-**3. Go-live** (сборка, миграции, очистка demo, pre-deploy, проверка)
+Опционально: `LLM_API_KEY`, `GEMINI_API_KEY`, `MISTRAL_API_KEY`.
+
+**Шаг 4 — Запуск (рекомендуется)**
+
+```bash
+chmod +x scripts/linux-dev-setup.sh scripts/start.sh
+./scripts/linux-dev-setup.sh
+```
+
+Этот скрипт: останавливает конфликты prod/staging, освобождает порты 5432/5433/6379, создаёт `.env`, запускает dev.
+
+**Шаг 4 (альтернатива) — Ручной запуск**
+
+```bash
+docker compose down --remove-orphans 2>/dev/null || true
+docker compose up -d --build
+docker compose exec backend alembic upgrade head
+docker compose exec backend python scripts/seed_demo_users.py --i-understand-this-creates-demo-credentials
+```
+
+**Шаг 5 — Проверка**
+
+```bash
+docker compose ps
+curl -s http://localhost:8000/health
+curl -s http://localhost:3000 | head -5
+```
+
+**Шаг 6 — Открытие в браузере**
+
+Откройте **на этой машине**: http://localhost:3000
+
+**Не** запускайте Firefox/Chrome от `root`. Используйте обычного пользователя:
+
+```bash
+exit
+firefox http://localhost:3000 &
+```
+
+Или из root-оболочки:
+
+```bash
+su - YOUR_USER -c "firefox http://localhost:3000 &"
+```
+
+Учётные данные dev выводятся в терминале после seed (не в README).
+
+**URL (Linux dev)**
+
+| Сервис | URL |
+|---------|-----|
+| Frontend | http://localhost:3000 |
+| API | http://localhost:8000 |
+| API docs | http://localhost:8000/docs |
+| PostgreSQL (host) | `localhost:5433` |
+
+**Остановка / перезапуск (Linux dev)**
+
+```bash
+docker compose down
+docker compose down -v
+./scripts/linux-dev-setup.sh
+docker compose logs backend --tail 80
+```
+
+**Конфликт порта 5432?**
+
+Dev использует хост-порт **5433**. Если запуск всё ещё не удаётся:
+
+```bash
+docker ps --format '{{.Names}} {{.Ports}}' | grep 5432
+docker stop CONTAINER_NAME
+sudo systemctl stop postgresql
+./scripts/linux-dev-setup.sh
+```
+
+---
+
+### 7. Linux — staging
+
+```bash
+cd CURSOR
+cp .env.staging.example .env.staging
+nano .env.staging
+bash infra/nginx/generate-dev-certs.sh
+chmod +x scripts/start.sh scripts/verify-staging.sh
+./scripts/start.sh staging
+echo "127.0.0.1 tamor.staging.local" | sudo tee -a /etc/hosts
+./scripts/verify-staging.sh
+```
+
+Откройте: https://tamor.staging.local
+
+Остановка:
+
+```bash
+docker compose -f docker-compose.staging.yml --env-file .env.staging down
+```
+
+---
+
+### 8. Linux server — production (полный)
+
+**Требования:** Ubuntu/Debian VPS в Узбекистане, Docker Engine, домен (например, `tamor.toyloq.uz`), CA TLS-сертификаты, HashiCorp Vault.
+
+**Не для локальных ноутбуков** — для Kali/Ubuntu dev используйте §6.
+
+**Шаг 1 — Клонирование на сервере**
+
+```bash
+git clone https://github.com/Kamol0303/CURSOR.git
+cd CURSOR
+```
+
+**Шаг 2 — Production-секреты**
+
+```bash
+cp .env.production.example .env.production
+nano .env.production
+```
+
+Заполните **все** значения `CHANGE_ME`:
+
+- `POSTGRES_PASSWORD`, `DATABASE_URL`
+- `VAULT_ADDR`, `VAULT_TOKEN`
+- `TOTP_ENCRYPTION_KEY`, `PINFL_ENCRYPTION_KEY` (32+ символов)
+- `CLICK_*`, `PAYME_*` платёжные ключи
+- `LLM_API_KEY`, `GEMINI_API_KEY`, `MISTRAL_API_KEY`
+
+**Шаг 3 — TLS-сертификаты (подписанные CA)**
+
+```bash
+ls -la infra/nginx/tls/fullchain.pem infra/nginx/tls/privkey.pem
+```
+
+Разместите файлы, подписанные CA (не `generate-dev-certs.sh` для production):
+
+- `infra/nginx/tls/fullchain.pem`
+- `infra/nginx/tls/privkey.pem`
+
+**Шаг 4 — Go live**
 
 ```bash
 chmod +x scripts/go-live.sh scripts/verify-prod.sh
 ./scripts/go-live.sh
 ```
 
-Неинтерактивная очистка (CI / автоматизация):
+Неинтерактивная очистка demo:
 
 ```bash
 GO_LIVE_PURGE=yes ./scripts/go-live.sh
 ```
 
-**4. Проверка после деплоя**
+**Шаг 5 — Проверка**
 
 ```bash
 PUBLIC_HOST=tamor.toyloq.uz ./scripts/verify-prod.sh
 python3 scripts/red_team_verify.py --url https://tamor.toyloq.uz --production
+curl -fsS https://tamor.toyloq.uz/health
 ```
 
-**Linux-сервер — управление production**
+**Управление production**
 
 ```bash
-# Статус
 docker compose -f docker-compose.prod.yml --env-file .env.production ps
-
-# Логи
 docker compose -f docker-compose.prod.yml --env-file .env.production logs -f backend
-
-# Перезапуск
 docker compose -f docker-compose.prod.yml --env-file .env.production up -d --build
-
-# Миграции после обновления
-docker compose -f docker-compose.prod.yml --env-file .env.production \
-  exec backend alembic upgrade head
-
-# Остановка
+docker compose -f docker-compose.prod.yml --env-file .env.production exec backend alembic upgrade head
 docker compose -f docker-compose.prod.yml --env-file .env.production down
 ```
 
-**Linux-сервер — staging**
+**Production staging на сервере**
 
 ```bash
 cp .env.staging.example .env.staging
 nano .env.staging
-bash infra/nginx/generate-dev-certs.sh   # или реальные сертификаты для staging-хоста
 ./scripts/start.sh staging
 ./scripts/verify-staging.sh
 ```

@@ -75,97 +75,187 @@ cd backend && pytest tests/security/ -v
 
 ## Ishga tushirish
 
-### Windows (development)
+Platformangiz uchun **bitta** bo'limni tanlang. Har bir blok to'liq — boshqa OS bo'limlarini o'qishingiz shart emas.
 
-**1. Repozitoriyani klonlash**
+| Platforma | Bo'lim |
+|----------|--------|
+| Windows (dev) | [§1 Windows — development](#1-windows--development-toliq) |
+| Windows (staging) | [§2 Windows — staging](#2-windows--staging) |
+| Windows (prod test) | [§3 Windows — production prep](#3-windows--production-prep) |
+| macOS (dev) | [§4 macOS — development](#4-macos--development-toliq) |
+| macOS (staging) | [§5 macOS — staging](#5-macos--staging) |
+| Linux Kali/Ubuntu (dev) | [§6 Linux — development](#6-linux-kaliubuntudebian--development-toliq) |
+| Linux (staging) | [§7 Linux — staging](#7-linux--staging) |
+| Linux VPS (production) | [§8 Linux server — production](#8-linux-server--production-toliq) |
+
+---
+
+### 1. Windows — development (to'liq)
+
+**Talablar:** Windows 10/11, [Docker Desktop](https://www.docker.com/products/docker-desktop/), Git for Windows, PowerShell yoki CMD.
+
+**1-qadam — Docker Desktop o'rnatish**
+
+1. Docker Desktop ni o'rnating va so'ralsa qayta ishga tushiring.
+2. Start menyudan Docker Desktop ni oching.
+3. Traydagi balina belgisi yashil bo'lguncha kuting (2–3 daqiqa).
+4. Tekshiring:
+
+```cmd
+docker info
+docker compose version
+```
+
+**2-qadam — Loyihani klonlash**
 
 ```cmd
 git clone https://github.com/Kamol0303/CURSOR.git
 cd CURSOR
 ```
 
-**2. Muhit fayli va LLM kalitlari**
+**3-qadam — Muhit fayli**
 
 ```cmd
 copy .env.example .env
 scripts\windows\setup-llm-env.cmd
 ```
 
-**3. To'liq dev stackni ishga tushirish** (`main` yangilanadi, Docker build, migratsiya, seed)
+(Ixtiyoriy) `LLM_API_KEY`, `GEMINI_API_KEY`, `MISTRAL_API_KEY` uchun `.env` ni Notepad da tahrirlang.
+
+**4-qadam — Dev stackni ishga tushirish** (git pull, Docker build, migratsiya, seed)
 
 ```cmd
 scripts\windows\update-main.cmd
 ```
 
-**4. Stack holatini tekshirish**
+**5-qadam — Tekshirish**
 
 ```cmd
 docker compose ps
 curl -s http://localhost:8000/health
 ```
 
-Dev loginlar seeddan keyin **faqat mahalliy terminalda** ko'rsatiladi (repozitoriyada saqlanmaydi). Windows: `scripts\windows\show-credentials.cmd`
+Kutilgan health javobi: `{"status":"ok","environment":"development"}`
 
-| URL | Manzil |
-|-----|--------|
+**6-qadam — Brauzerda ochish**
+
+**Shu kompyuterda** oching: http://localhost:3000
+
+Dev loginlar mahalliy ko'rsatiladi (README da emas):
+
+```cmd
+scripts\windows\show-credentials.cmd
+```
+
+**URL lar (Windows dev)**
+
+| Xizmat | URL |
+|---------|-----|
 | Frontend | http://localhost:3000 |
 | API | http://localhost:8000 |
 | API hujjatlari | http://localhost:8000/docs |
 | PostgreSQL (host) | `localhost:5433` |
 
-**Windows — staging (HTTPS, mahalliy)**
+**To'xtatish / qayta ishga tushirish (Windows dev)**
 
 ```cmd
+docker compose down
+docker compose down -v
+scripts\windows\update-main.cmd
+scripts\windows\backend-logs.cmd
+```
+
+> **Docker xatosi?** Docker Desktop ni oching va traydagi balina yashil bo'lguncha kuting, keyin `scripts\windows\update-main.cmd` ni qayta ishga tushiring.
+
+---
+
+### 2. Windows — staging
+
+Nginx + TLS bilan mahalliy HTTPS staging.
+
+```cmd
+cd CURSOR
 scripts\windows\setup-staging-env.cmd
 bash infra/nginx/generate-dev-certs.sh
 scripts\windows\staging-up.cmd
 ```
 
-`C:\Windows\System32\drivers\etc\hosts` ga qo'shing: `127.0.0.1 tamor.staging.local`  
-Brauzerda: https://tamor.staging.local
+`C:\Windows\System32\drivers\etc\hosts` ga qo'shing (Administrator sifatida):
 
-**Windows — foydali buyruqlar**
-
-```cmd
-scripts\windows\backend-logs.cmd              REM backend loglari (dev)
-scripts\windows\backend-logs.cmd staging      REM backend loglari (staging)
-docker compose down                           REM dev ni to'xtatish
-docker compose down -v                        REM dev + bazani tozalash
-docker compose logs backend --tail 80           REM so'nggi backend chiqishi
+```
+127.0.0.1 tamor.staging.local
 ```
 
-**Windows — production tayyorgarlik** (mahalliy prod build testi; haqiqiy prod Linuxda)
+Oching: https://tamor.staging.local
+
+Loglar: `scripts\windows\backend-logs.cmd staging`
+
+To'xtatish:
 
 ```cmd
+docker compose -f docker-compose.staging.yml --env-file .env.staging down
+```
+
+---
+
+### 3. Windows — production prep
+
+Faqat mahalliy production build testi. Haqiqiy production **Linux serverda** ishlaydi (§8).
+
+```cmd
+cd CURSOR
 copy .env.production.example .env.production
-REM .env.production ni tahrirlang — barcha CHANGE_ME qiymatlarini to'ldiring
+REM Edit .env.production — fill ALL CHANGE_ME values
 scripts\windows\go-live-prep.cmd
 scripts\windows\verify-prod-build.cmd
 ```
 
-> Agar `docker info` xato bersa: **Docker Desktop** ni Start menyudan oching va traydagi balina yashil bo'lguncha kuting (2–3 daqiqa).
+To'xtatish:
+
+```cmd
+docker compose -f docker-compose.prod.yml --env-file .env.production down
+```
 
 ---
 
-### macOS (development)
+### 4. macOS — development (to'liq)
 
-**1. Klonlash va sozlash**
+**Talablar:** macOS 12+, [Docker Desktop for Mac](https://www.docker.com/products/docker-desktop/), Git (Xcode CLI yoki Homebrew).
+
+**1-qadam — Docker o'rnatish**
+
+```bash
+docker --version
+docker compose version
+docker info
+```
+
+Agar `docker info` xato bersa, Docker Desktop ni oching.
+
+**2-qadam — Klonlash**
 
 ```bash
 git clone https://github.com/Kamol0303/CURSOR.git
 cd CURSOR
-cp .env.example .env
-# .env ni tahrirlang — LLM_API_KEY, GEMINI_API_KEY, MISTRAL_API_KEY (ixtiyoriy)
 ```
 
-**2. Bitta buyruq bilan ishga tushirish** (tavsiya etiladi)
+**3-qadam — Muhit**
+
+```bash
+cp .env.example .env
+nano .env
+```
+
+Ixtiyoriy AI kalitlari: `LLM_API_KEY`, `GEMINI_API_KEY`, `MISTRAL_API_KEY`, `AI_ENABLED=true`.
+
+**4-qadam — Ishga tushirish (tavsiya etiladi)**
 
 ```bash
 chmod +x scripts/start.sh scripts/restart-fresh.sh
 ./scripts/start.sh dev
 ```
 
-**3. Yoki qo'lda ishga tushirish**
+**4-qadam (muqobil) — Qo'lda ishga tushirish**
 
 ```bash
 docker compose up -d --build
@@ -173,122 +263,275 @@ docker compose exec backend alembic upgrade head
 docker compose exec backend python scripts/seed_demo_users.py --i-understand-this-creates-demo-credentials
 ```
 
-| URL | Manzil |
-|-----|--------|
+**5-qadam — Tekshirish**
+
+```bash
+docker compose ps
+curl -s http://localhost:8000/health
+curl -s http://localhost:3000 | head -5
+```
+
+**6-qadam — Brauzerda ochish**
+
+```bash
+open http://localhost:3000
+```
+
+Dev hisob ma'lumotlari seeddan keyin terminalda chiqadi (README da emas).
+
+**URL lar (macOS dev)**
+
+| Xizmat | URL |
+|---------|-----|
 | Frontend | http://localhost:3000 |
 | API | http://localhost:8000 |
 | API hujjatlari | http://localhost:8000/docs |
 | PostgreSQL (host) | `localhost:5433` |
 
-**macOS — staging (HTTPS, mahalliy)**
+**To'xtatish / qayta ishga tushirish (macOS dev)**
 
 ```bash
+docker compose down
+docker compose down -v
+./scripts/restart-fresh.sh dev
+docker compose logs backend --tail 80
+./scripts/show-mfa-qr.sh
+```
+
+---
+
+### 5. macOS — staging
+
+```bash
+cd CURSOR
+chmod +x scripts/start.sh
 ./scripts/start.sh staging
-# /etc/hosts ga qo'shing: 127.0.0.1 tamor.staging.local
 sudo sh -c 'echo "127.0.0.1 tamor.staging.local" >> /etc/hosts'
 open https://tamor.staging.local
+./scripts/verify-staging.sh
 ```
 
-**macOS — foydali buyruqlar**
+To'xtatish:
 
 ```bash
-docker compose down                    # dev ni to'xtatish
-docker compose down -v                 # to'xtatish + bazani tozalash
-./scripts/restart-fresh.sh dev         # to'liq qayta ishga tushirish
-docker compose logs backend --tail 80  # so'nggi backend chiqishi
-./scripts/show-mfa-qr.sh               # admin.tmb uchun MFA QR
+docker compose -f docker-compose.staging.yml --env-file .env.staging down
 ```
 
 ---
 
-### Linux (development)
+### 6. Linux (Kali/Ubuntu/Debian) — development (to'liq)
 
-macOS bilan bir xil buyruqlar. Docker Engine va Compose plugin kerak:
+**Talablar:** Kali, Ubuntu 22.04+ yoki Debian 12+. Docker Engine + Compose plugin + Git.
 
-```bash
-sudo apt update && sudo apt install -y docker.io docker-compose-plugin git
-sudo usermod -aG docker $USER   # chiqib qayta kiring
-```
-
-**Linux (Kali/Ubuntu) — eng oson yo'l:**
+**1-qadam — Docker o'rnatish** (mashinada bir marta)
 
 ```bash
-chmod +x scripts/linux-dev-setup.sh
-./scripts/linux-dev-setup.sh
+sudo apt update
+sudo apt install -y docker.io docker-compose-plugin git curl
+sudo usermod -aG docker $USER
 ```
 
-Bu skript production stackni to'xtatadi, port ziddiyatini tekshiradi va dev ni ishga tushiradi.
+Chiqib qayta kiring (yoki `newgrp docker`), keyin tekshiring:
 
----
+```bash
+docker info
+docker compose version
+```
 
-### Linux server (production)
+> Linuxda `copy` yoki `scripts\windows\...` ishlatmang — ular faqat Windows uchun.
 
-Production VPS da ishga tushiriladi (masalan, `tamor.toyloq.uz`). `docker-compose.prod.yml` va `.env.production` ishlatiladi.
-
-**1. Klonlash va maxfiy kalitlar**
+**2-qadam — Klonlash**
 
 ```bash
 git clone https://github.com/Kamol0303/CURSOR.git
 cd CURSOR
-cp .env.production.example .env.production
-nano .env.production   # BARCHA CHANGE_ME: DB parol, JWT secret, LLM kalitlari va h.k.
 ```
 
-**2. CA imzolangan TLS sertifikatlari** (dev self-signed emas)
+Kerak bo'lsa to'liq yo'lni ishlating, masalan `/home/YOUR_USER/CURSOR` (`/root/CURSOR` emas, agar doim root sifatida ishlamasangiz).
+
+**3-qadam — Muhit**
 
 ```bash
-# CA sertifikatlarni joylashtiring:
-#   infra/nginx/tls/fullchain.pem
-#   infra/nginx/tls/privkey.pem
-ls -la infra/nginx/tls/
+cp .env.example .env
+nano .env
 ```
 
-**3. Go-live** (build, migratsiya, demo tozalash, pre-deploy, tekshiruv)
+Ixtiyoriy: `LLM_API_KEY`, `GEMINI_API_KEY`, `MISTRAL_API_KEY`.
+
+**4-qadam — Ishga tushirish (tavsiya etiladi)**
+
+```bash
+chmod +x scripts/linux-dev-setup.sh scripts/start.sh
+./scripts/linux-dev-setup.sh
+```
+
+Bu skript: prod/staging ziddiyatlarini to'xtatadi, 5432/5433/6379 portlarini bo'shatadi, `.env` yaratadi, dev ni ishga tushiradi.
+
+**4-qadam (muqobil) — Qo'lda ishga tushirish**
+
+```bash
+docker compose down --remove-orphans 2>/dev/null || true
+docker compose up -d --build
+docker compose exec backend alembic upgrade head
+docker compose exec backend python scripts/seed_demo_users.py --i-understand-this-creates-demo-credentials
+```
+
+**5-qadam — Tekshirish**
+
+```bash
+docker compose ps
+curl -s http://localhost:8000/health
+curl -s http://localhost:3000 | head -5
+```
+
+**6-qadam — Brauzerda ochish**
+
+**Shu mashinada** oching: http://localhost:3000
+
+Firefox/Chrome ni `root` sifatida ishga tushirmang. Oddiy foydalanuvchingizdan foydalaning:
+
+```bash
+exit
+firefox http://localhost:3000 &
+```
+
+Yoki root shell dan:
+
+```bash
+su - YOUR_USER -c "firefox http://localhost:3000 &"
+```
+
+Dev hisob ma'lumotlari seeddan keyin terminalda chiqadi (README da emas).
+
+**URL lar (Linux dev)**
+
+| Xizmat | URL |
+|---------|-----|
+| Frontend | http://localhost:3000 |
+| API | http://localhost:8000 |
+| API hujjatlari | http://localhost:8000/docs |
+| PostgreSQL (host) | `localhost:5433` |
+
+**To'xtatish / qayta ishga tushirish (Linux dev)**
+
+```bash
+docker compose down
+docker compose down -v
+./scripts/linux-dev-setup.sh
+docker compose logs backend --tail 80
+```
+
+**5432 port ziddiyati?**
+
+Dev host port **5433** dan foydalanadi. Agar ishga tushirish yana muvaffaqiyatsiz bo'lsa:
+
+```bash
+docker ps --format '{{.Names}} {{.Ports}}' | grep 5432
+docker stop CONTAINER_NAME
+sudo systemctl stop postgresql
+./scripts/linux-dev-setup.sh
+```
+
+---
+
+### 7. Linux — staging
+
+```bash
+cd CURSOR
+cp .env.staging.example .env.staging
+nano .env.staging
+bash infra/nginx/generate-dev-certs.sh
+chmod +x scripts/start.sh scripts/verify-staging.sh
+./scripts/start.sh staging
+echo "127.0.0.1 tamor.staging.local" | sudo tee -a /etc/hosts
+./scripts/verify-staging.sh
+```
+
+Oching: https://tamor.staging.local
+
+To'xtatish:
+
+```bash
+docker compose -f docker-compose.staging.yml --env-file .env.staging down
+```
+
+---
+
+### 8. Linux server — production (to'liq)
+
+**Talablar:** O'zbekistondagi Ubuntu/Debian VPS, Docker Engine, domen (masalan, `tamor.toyloq.uz`), CA TLS sertifikatlari, HashiCorp Vault.
+
+**Mahalliy noutbuklar uchun emas** — Kali/Ubuntu dev uchun §6 dan foydalaning.
+
+**1-qadam — Serverda klonlash**
+
+```bash
+git clone https://github.com/Kamol0303/CURSOR.git
+cd CURSOR
+```
+
+**2-qadam — Production maxfiy kalitlari**
+
+```bash
+cp .env.production.example .env.production
+nano .env.production
+```
+
+Barcha `CHANGE_ME` qiymatlarini to'ldiring:
+
+- `POSTGRES_PASSWORD`, `DATABASE_URL`
+- `VAULT_ADDR`, `VAULT_TOKEN`
+- `TOTP_ENCRYPTION_KEY`, `PINFL_ENCRYPTION_KEY` (32+ belgi)
+- `CLICK_*`, `PAYME_*` to'lov kalitlari
+- `LLM_API_KEY`, `GEMINI_API_KEY`, `MISTRAL_API_KEY`
+
+**3-qadam — TLS sertifikatlari (CA imzolangan)**
+
+```bash
+ls -la infra/nginx/tls/fullchain.pem infra/nginx/tls/privkey.pem
+```
+
+CA imzolangan fayllarni joylashtiring (production uchun `generate-dev-certs.sh` emas):
+
+- `infra/nginx/tls/fullchain.pem`
+- `infra/nginx/tls/privkey.pem`
+
+**4-qadam — Go live**
 
 ```bash
 chmod +x scripts/go-live.sh scripts/verify-prod.sh
 ./scripts/go-live.sh
 ```
 
-Interaktiv bo'lmagan tozalash (CI / avtomatlashtirish):
+Interaktiv bo'lmagan demo tozalash:
 
 ```bash
 GO_LIVE_PURGE=yes ./scripts/go-live.sh
 ```
 
-**4. Deploydan keyin tekshiruv**
+**5-qadam — Tekshirish**
 
 ```bash
 PUBLIC_HOST=tamor.toyloq.uz ./scripts/verify-prod.sh
 python3 scripts/red_team_verify.py --url https://tamor.toyloq.uz --production
+curl -fsS https://tamor.toyloq.uz/health
 ```
 
-**Linux server — production boshqaruvi**
+**Production boshqaruvi**
 
 ```bash
-# Holat
 docker compose -f docker-compose.prod.yml --env-file .env.production ps
-
-# Loglar
 docker compose -f docker-compose.prod.yml --env-file .env.production logs -f backend
-
-# Qayta ishga tushirish
 docker compose -f docker-compose.prod.yml --env-file .env.production up -d --build
-
-# Yangilashdan keyin migratsiya
-docker compose -f docker-compose.prod.yml --env-file .env.production \
-  exec backend alembic upgrade head
-
-# To'xtatish
+docker compose -f docker-compose.prod.yml --env-file .env.production exec backend alembic upgrade head
 docker compose -f docker-compose.prod.yml --env-file .env.production down
 ```
 
-**Linux server — staging**
+**Serverda production staging**
 
 ```bash
 cp .env.staging.example .env.staging
 nano .env.staging
-bash infra/nginx/generate-dev-certs.sh   # yoki staging host uchun haqiqiy sertifikat
 ./scripts/start.sh staging
 ./scripts/verify-staging.sh
 ```

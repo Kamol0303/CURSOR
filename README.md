@@ -75,97 +75,187 @@ cd backend && pytest tests/security/ -v
 
 ## How to run
 
-### Windows (development)
+Choose **one** section for your platform. Each block is complete — you do not need to read other OS sections.
 
-**1. Clone the repository**
+| Platform | Section |
+|----------|---------|
+| Windows (dev) | [§1 Windows — development](#1-windows--development-full) |
+| Windows (staging) | [§2 Windows — staging](#2-windows--staging) |
+| Windows (prod test) | [§3 Windows — production prep](#3-windows--production-prep) |
+| macOS (dev) | [§4 macOS — development](#4-macos--development-full) |
+| macOS (staging) | [§5 macOS — staging](#5-macos--staging) |
+| Linux Kali/Ubuntu (dev) | [§6 Linux — development](#6-linux-kaliubuntudebian--development-full) |
+| Linux (staging) | [§7 Linux — staging](#7-linux--staging) |
+| Linux VPS (production) | [§8 Linux server — production](#8-linux-server--production-full) |
+
+---
+
+### 1. Windows — development (full)
+
+**Requirements:** Windows 10/11, [Docker Desktop](https://www.docker.com/products/docker-desktop/), Git for Windows, PowerShell or CMD.
+
+**Step 1 — Install Docker Desktop**
+
+1. Install Docker Desktop and restart if prompted.
+2. Open Docker Desktop from the Start menu.
+3. Wait until the tray whale icon is green (2–3 minutes).
+4. Verify:
+
+```cmd
+docker info
+docker compose version
+```
+
+**Step 2 — Clone the project**
 
 ```cmd
 git clone https://github.com/Kamol0303/CURSOR.git
 cd CURSOR
 ```
 
-**2. Create environment file and LLM keys**
+**Step 3 — Environment file**
 
 ```cmd
 copy .env.example .env
 scripts\windows\setup-llm-env.cmd
 ```
 
-**3. Start the full dev stack** (pulls `main`, builds Docker, migrates DB, seeds demo users)
+(Optional) Edit `.env` in Notepad for `LLM_API_KEY`, `GEMINI_API_KEY`, `MISTRAL_API_KEY`.
+
+**Step 4 — Start dev stack** (git pull, Docker build, migrations, seed)
 
 ```cmd
 scripts\windows\update-main.cmd
 ```
 
-**4. Verify the stack**
+**Step 5 — Verify**
 
 ```cmd
 docker compose ps
 curl -s http://localhost:8000/health
 ```
 
-Dev credentials are printed **locally** after seed (not stored in this repository). On Windows: `scripts\windows\show-credentials.cmd`
+Expected health response: `{"status":"ok","environment":"development"}`
 
-| URL | Address |
-|-----|---------|
+**Step 6 — Open in browser**
+
+Open **on this PC**: http://localhost:3000
+
+Dev logins are shown locally (not in README):
+
+```cmd
+scripts\windows\show-credentials.cmd
+```
+
+**URLs (Windows dev)**
+
+| Service | URL |
+|---------|-----|
 | Frontend | http://localhost:3000 |
 | API | http://localhost:8000 |
 | API docs | http://localhost:8000/docs |
-| PostgreSQL (host) | `localhost:5433` (avoids port 5432 conflicts) |
+| PostgreSQL (host) | `localhost:5433` |
 
-**Windows — staging (HTTPS, local)**
+**Stop / restart (Windows dev)**
 
 ```cmd
+docker compose down
+docker compose down -v
+scripts\windows\update-main.cmd
+scripts\windows\backend-logs.cmd
+```
+
+> **Docker error?** Start Docker Desktop and wait for the green whale icon, then run `scripts\windows\update-main.cmd` again.
+
+---
+
+### 2. Windows — staging
+
+HTTPS local staging with Nginx + TLS.
+
+```cmd
+cd CURSOR
 scripts\windows\setup-staging-env.cmd
 bash infra/nginx/generate-dev-certs.sh
 scripts\windows\staging-up.cmd
 ```
 
-Add to `C:\Windows\System32\drivers\etc\hosts`: `127.0.0.1 tamor.staging.local`  
-Open: https://tamor.staging.local
+Add to `C:\Windows\System32\drivers\etc\hosts` (as Administrator):
 
-**Windows — useful commands**
-
-```cmd
-scripts\windows\backend-logs.cmd              REM backend logs (dev)
-scripts\windows\backend-logs.cmd staging      REM backend logs (staging)
-docker compose down                           REM stop dev
-docker compose down -v                        REM stop dev + wipe DB
-docker compose logs backend --tail 80           REM recent backend output
+```
+127.0.0.1 tamor.staging.local
 ```
 
-**Windows — production prep** (test prod build locally; real prod runs on Linux)
+Open: https://tamor.staging.local
+
+Logs: `scripts\windows\backend-logs.cmd staging`
+
+Stop:
 
 ```cmd
+docker compose -f docker-compose.staging.yml --env-file .env.staging down
+```
+
+---
+
+### 3. Windows — production prep
+
+Local production build test only. Real production runs on a **Linux server** (§8).
+
+```cmd
+cd CURSOR
 copy .env.production.example .env.production
-REM Edit .env.production — fill all CHANGE_ME values
+REM Edit .env.production — fill ALL CHANGE_ME values
 scripts\windows\go-live-prep.cmd
 scripts\windows\verify-prod-build.cmd
 ```
 
-> If `docker info` fails: open **Docker Desktop** from the Start menu and wait until the tray whale icon turns green (2–3 minutes).
+Stop:
+
+```cmd
+docker compose -f docker-compose.prod.yml --env-file .env.production down
+```
 
 ---
 
-### macOS (development)
+### 4. macOS — development (full)
 
-**1. Clone and configure**
+**Requirements:** macOS 12+, [Docker Desktop for Mac](https://www.docker.com/products/docker-desktop/), Git (Xcode CLI or Homebrew).
+
+**Step 1 — Install Docker**
+
+```bash
+docker --version
+docker compose version
+docker info
+```
+
+Open Docker Desktop if `docker info` fails.
+
+**Step 2 — Clone**
 
 ```bash
 git clone https://github.com/Kamol0303/CURSOR.git
 cd CURSOR
-cp .env.example .env
-# Edit .env — add LLM_API_KEY, GEMINI_API_KEY, MISTRAL_API_KEY (optional)
 ```
 
-**2. One-command start** (recommended)
+**Step 3 — Environment**
+
+```bash
+cp .env.example .env
+nano .env
+```
+
+Set optional AI keys: `LLM_API_KEY`, `GEMINI_API_KEY`, `MISTRAL_API_KEY`, `AI_ENABLED=true`.
+
+**Step 4 — Start (recommended)**
 
 ```bash
 chmod +x scripts/start.sh scripts/restart-fresh.sh
 ./scripts/start.sh dev
 ```
 
-**3. Or start manually**
+**Step 4 (alternative) — Manual start**
 
 ```bash
 docker compose up -d --build
@@ -173,122 +263,275 @@ docker compose exec backend alembic upgrade head
 docker compose exec backend python scripts/seed_demo_users.py --i-understand-this-creates-demo-credentials
 ```
 
-| URL | Address |
-|-----|---------|
+**Step 5 — Verify**
+
+```bash
+docker compose ps
+curl -s http://localhost:8000/health
+curl -s http://localhost:3000 | head -5
+```
+
+**Step 6 — Open in browser**
+
+```bash
+open http://localhost:3000
+```
+
+Dev credentials are printed in the terminal after seed (not in README).
+
+**URLs (macOS dev)**
+
+| Service | URL |
+|---------|-----|
 | Frontend | http://localhost:3000 |
 | API | http://localhost:8000 |
 | API docs | http://localhost:8000/docs |
-| PostgreSQL (host) | `localhost:5433` (avoids port 5432 conflicts) |
+| PostgreSQL (host) | `localhost:5433` |
 
-**macOS — staging (HTTPS, local)**
+**Stop / restart (macOS dev)**
 
 ```bash
+docker compose down
+docker compose down -v
+./scripts/restart-fresh.sh dev
+docker compose logs backend --tail 80
+./scripts/show-mfa-qr.sh
+```
+
+---
+
+### 5. macOS — staging
+
+```bash
+cd CURSOR
+chmod +x scripts/start.sh
 ./scripts/start.sh staging
-# Add to /etc/hosts: 127.0.0.1 tamor.staging.local
 sudo sh -c 'echo "127.0.0.1 tamor.staging.local" >> /etc/hosts'
 open https://tamor.staging.local
+./scripts/verify-staging.sh
 ```
 
-**macOS — useful commands**
+Stop:
 
 ```bash
-docker compose down                    # stop dev
-docker compose down -v                 # stop + wipe DB
-./scripts/restart-fresh.sh dev         # full reset and restart
-docker compose logs backend --tail 80  # recent backend output
-./scripts/show-mfa-qr.sh               # MFA QR for admin.tmb
+docker compose -f docker-compose.staging.yml --env-file .env.staging down
 ```
 
 ---
 
-### Linux (development)
+### 6. Linux (Kali/Ubuntu/Debian) — development (full)
 
-Same commands as macOS. Requires Docker Engine and the Compose plugin:
+**Requirements:** Kali, Ubuntu 22.04+, or Debian 12+. Docker Engine + Compose plugin + Git.
 
-```bash
-sudo apt update && sudo apt install -y docker.io docker-compose-plugin git
-sudo usermod -aG docker $USER   # log out and back in
-```
-
-**Recommended — one command (Kali/Ubuntu/Debian):**
+**Step 1 — Install Docker** (once per machine)
 
 ```bash
-chmod +x scripts/linux-dev-setup.sh
-./scripts/linux-dev-setup.sh
+sudo apt update
+sudo apt install -y docker.io docker-compose-plugin git curl
+sudo usermod -aG docker $USER
 ```
 
-Or follow the **macOS** steps above (`./scripts/start.sh dev`).
+Log out and log back in (or `newgrp docker`), then verify:
 
----
+```bash
+docker info
+docker compose version
+```
 
-### Linux server (production)
+> Do **not** use `copy` or `scripts\windows\...` on Linux — those are Windows-only.
 
-Run on the production VPS (e.g. `tamor.toyloq.uz`). Production uses `docker-compose.prod.yml` and `.env.production`.
-
-**1. Clone and configure secrets**
+**Step 2 — Clone**
 
 ```bash
 git clone https://github.com/Kamol0303/CURSOR.git
 cd CURSOR
-cp .env.production.example .env.production
-nano .env.production   # fill ALL CHANGE_ME values: DB password, JWT secret, LLM keys, etc.
 ```
 
-**2. Install CA-signed TLS certificates** (not dev self-signed)
+Use the full path if needed, e.g. `/home/YOUR_USER/CURSOR` (not `/root/CURSOR` unless you always work as root).
+
+**Step 3 — Environment**
 
 ```bash
-# Place your CA certificates:
-#   infra/nginx/tls/fullchain.pem
-#   infra/nginx/tls/privkey.pem
-ls -la infra/nginx/tls/
+cp .env.example .env
+nano .env
 ```
 
-**3. Go live** (build, migrate, purge demo data, pre-deploy gate, verify)
+Optional: `LLM_API_KEY`, `GEMINI_API_KEY`, `MISTRAL_API_KEY`.
+
+**Step 4 — Start (recommended)**
+
+```bash
+chmod +x scripts/linux-dev-setup.sh scripts/start.sh
+./scripts/linux-dev-setup.sh
+```
+
+This script: stops prod/staging conflicts, frees ports 5432/5433/6379, creates `.env`, starts dev.
+
+**Step 4 (alternative) — Manual start**
+
+```bash
+docker compose down --remove-orphans 2>/dev/null || true
+docker compose up -d --build
+docker compose exec backend alembic upgrade head
+docker compose exec backend python scripts/seed_demo_users.py --i-understand-this-creates-demo-credentials
+```
+
+**Step 5 — Verify**
+
+```bash
+docker compose ps
+curl -s http://localhost:8000/health
+curl -s http://localhost:3000 | head -5
+```
+
+**Step 6 — Open in browser**
+
+Open **on this machine**: http://localhost:3000
+
+Do **not** run Firefox/Chrome as `root`. Use your normal user:
+
+```bash
+exit
+firefox http://localhost:3000 &
+```
+
+Or from a root shell:
+
+```bash
+su - YOUR_USER -c "firefox http://localhost:3000 &"
+```
+
+Dev credentials are printed in the terminal after seed (not in README).
+
+**URLs (Linux dev)**
+
+| Service | URL |
+|---------|-----|
+| Frontend | http://localhost:3000 |
+| API | http://localhost:8000 |
+| API docs | http://localhost:8000/docs |
+| PostgreSQL (host) | `localhost:5433` |
+
+**Stop / restart (Linux dev)**
+
+```bash
+docker compose down
+docker compose down -v
+./scripts/linux-dev-setup.sh
+docker compose logs backend --tail 80
+```
+
+**Port 5432 conflict?**
+
+Dev uses host port **5433**. If startup still fails:
+
+```bash
+docker ps --format '{{.Names}} {{.Ports}}' | grep 5432
+docker stop CONTAINER_NAME
+sudo systemctl stop postgresql
+./scripts/linux-dev-setup.sh
+```
+
+---
+
+### 7. Linux — staging
+
+```bash
+cd CURSOR
+cp .env.staging.example .env.staging
+nano .env.staging
+bash infra/nginx/generate-dev-certs.sh
+chmod +x scripts/start.sh scripts/verify-staging.sh
+./scripts/start.sh staging
+echo "127.0.0.1 tamor.staging.local" | sudo tee -a /etc/hosts
+./scripts/verify-staging.sh
+```
+
+Open: https://tamor.staging.local
+
+Stop:
+
+```bash
+docker compose -f docker-compose.staging.yml --env-file .env.staging down
+```
+
+---
+
+### 8. Linux server — production (full)
+
+**Requirements:** Ubuntu/Debian VPS in Uzbekistan, Docker Engine, domain (e.g. `tamor.toyloq.uz`), CA TLS certificates, HashiCorp Vault.
+
+**Not for local laptops** — use §6 for Kali/Ubuntu dev.
+
+**Step 1 — Clone on the server**
+
+```bash
+git clone https://github.com/Kamol0303/CURSOR.git
+cd CURSOR
+```
+
+**Step 2 — Production secrets**
+
+```bash
+cp .env.production.example .env.production
+nano .env.production
+```
+
+Fill **all** `CHANGE_ME` values:
+
+- `POSTGRES_PASSWORD`, `DATABASE_URL`
+- `VAULT_ADDR`, `VAULT_TOKEN`
+- `TOTP_ENCRYPTION_KEY`, `PINFL_ENCRYPTION_KEY` (32+ chars)
+- `CLICK_*`, `PAYME_*` payment keys
+- `LLM_API_KEY`, `GEMINI_API_KEY`, `MISTRAL_API_KEY`
+
+**Step 3 — TLS certificates (CA-signed)**
+
+```bash
+ls -la infra/nginx/tls/fullchain.pem infra/nginx/tls/privkey.pem
+```
+
+Place CA-signed files (not `generate-dev-certs.sh` for production):
+
+- `infra/nginx/tls/fullchain.pem`
+- `infra/nginx/tls/privkey.pem`
+
+**Step 4 — Go live**
 
 ```bash
 chmod +x scripts/go-live.sh scripts/verify-prod.sh
 ./scripts/go-live.sh
 ```
 
-Non-interactive purge (CI / automation):
+Non-interactive demo purge:
 
 ```bash
 GO_LIVE_PURGE=yes ./scripts/go-live.sh
 ```
 
-**4. Post-deploy verification**
+**Step 5 — Verify**
 
 ```bash
 PUBLIC_HOST=tamor.toyloq.uz ./scripts/verify-prod.sh
 python3 scripts/red_team_verify.py --url https://tamor.toyloq.uz --production
+curl -fsS https://tamor.toyloq.uz/health
 ```
 
-**Linux server — production management**
+**Production management**
 
 ```bash
-# Status
 docker compose -f docker-compose.prod.yml --env-file .env.production ps
-
-# Logs
 docker compose -f docker-compose.prod.yml --env-file .env.production logs -f backend
-
-# Restart stack
 docker compose -f docker-compose.prod.yml --env-file .env.production up -d --build
-
-# Run migrations after update
-docker compose -f docker-compose.prod.yml --env-file .env.production \
-  exec backend alembic upgrade head
-
-# Stop
+docker compose -f docker-compose.prod.yml --env-file .env.production exec backend alembic upgrade head
 docker compose -f docker-compose.prod.yml --env-file .env.production down
 ```
 
-**Linux server — staging**
+**Production staging on server**
 
 ```bash
 cp .env.staging.example .env.staging
 nano .env.staging
-bash infra/nginx/generate-dev-certs.sh   # or install real certs for staging host
 ./scripts/start.sh staging
 ./scripts/verify-staging.sh
 ```

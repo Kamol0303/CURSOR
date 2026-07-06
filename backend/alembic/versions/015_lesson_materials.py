@@ -1,5 +1,5 @@
 """Revision ID: 015_lesson_materials
-Revises: 014_certificate_file_id
+Revises: 014_certificate_file
 """
 
 from typing import Sequence, Union
@@ -9,7 +9,7 @@ from alembic import op
 from sqlalchemy.dialects import postgresql
 
 revision: str = "015_lesson_materials"
-down_revision: Union[str, None] = "014_certificate_file_id"
+down_revision: Union[str, None] = "014_certificate_file"
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 

@@ -27,8 +27,8 @@ export function LanguageSwitcher() {
           onClick={() => switchLocale(code)}
           className={`px-2 py-1 rounded transition-colors ${
             locale === code
-              ? "bg-naqsh-primary text-white"
-              : "text-naqsh-primary hover:bg-naqsh-primary/10"
+              ? "bg-naqsh-primary text-white dark:bg-naqsh-accent dark:text-gray-900"
+              : "text-naqsh-primary hover:bg-naqsh-primary/10 dark:text-naqsh-accent dark:hover:bg-white/10"
           }`}
         >
           {label}

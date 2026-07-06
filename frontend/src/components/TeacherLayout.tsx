@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { ChangePasswordForm } from "@/components/ChangePasswordForm";
 import { useAuth } from "@/contexts/AuthContext";
 import { getApiBaseUrl } from "@/lib/api";
@@ -41,7 +42,7 @@ export function TeacherLayout({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 flex">
       <aside className="w-56 bg-naqsh-primary text-white flex flex-col shrink-0 min-h-screen">
         <div className="p-4 border-b border-white/10">
           <div className="font-bold text-lg">TMB</div>
@@ -73,12 +74,13 @@ export function TeacherLayout({ children }: { children: React.ReactNode }) {
         </div>
       </aside>
       <div className="flex-1 flex flex-col min-w-0">
-        <header className="bg-white border-b px-6 py-3 flex justify-end">
+        <header className="bg-white dark:bg-gray-900 border-b dark:border-gray-800 px-6 py-3 flex justify-end items-center gap-2">
+          <ThemeToggle />
           <LanguageSwitcher />
         </header>
-        <main className="flex-1 p-6 overflow-auto">
+        <main className="flex-1 p-6 overflow-auto text-gray-900 dark:text-gray-100">
           {mustChangePassword ? (
-            <div className="max-w-lg mx-auto bg-white rounded-xl border p-6 space-y-4">
+            <div className="max-w-lg mx-auto bg-white dark:bg-gray-900 rounded-xl border dark:border-gray-700 p-6 space-y-4">
               <h2 className="text-xl font-bold text-naqsh-primary">{t("changePasswordTitle")}</h2>
               <p className="text-sm text-gray-500">{t("changePasswordHint")}</p>
               <ChangePasswordForm onSuccess={() => void refresh()} />

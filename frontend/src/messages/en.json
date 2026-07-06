@@ -23,10 +23,7 @@
       "ACCOUNT_LOCKED": "Account temporarily locked. Reset: ./scripts/reset-demo-login.sh",
       "PASSWORD_CHANGE_REQUIRED": "You must change your password first",
       "NETWORK_ERROR": "Cannot reach server. Is backend running? (localhost:8000)"
-    },
-    "demoHint": "Demo login (no MFA)",
-    "demoUser": "admin.aspect",
-    "demoPass": "CenterAdmin#26!"
+    }
   },
   "security": {
     "title": "Security",
@@ -504,7 +501,10 @@
     "empty": "No grades"
   },
   "common": {
-    "language": "Language"
+    "language": "Language",
+    "themeLight": "Day mode",
+    "themeDark": "Night mode",
+    "themeToggle": "Toggle day/night mode"
   },
   "forbidden": {
     "title": "Access denied",

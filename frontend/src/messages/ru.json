@@ -23,10 +23,7 @@
       "ACCOUNT_LOCKED": "Аккаунт заблокирован. Сброс: ./scripts/reset-demo-login.sh",
       "PASSWORD_CHANGE_REQUIRED": "Сначала смените пароль",
       "NETWORK_ERROR": "Сервер недоступен. Backend запущен? (localhost:8000)"
-    },
-    "demoHint": "Демо вход (без MFA)",
-    "demoUser": "admin.aspect",
-    "demoPass": "CenterAdmin#26!"
+    }
   },
   "security": {
     "title": "Безопасность",
@@ -504,7 +501,10 @@
     "empty": "Оценки не найдены"
   },
   "common": {
-    "language": "Язык"
+    "language": "Язык",
+    "themeLight": "Дневной режим",
+    "themeDark": "Ночной режим",
+    "themeToggle": "Переключить день/ночь"
   },
   "forbidden": {
     "title": "Доступ запрещён",

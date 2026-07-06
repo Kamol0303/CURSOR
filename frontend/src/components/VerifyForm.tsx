@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { apiFetch } from "@/lib/api";
 
 type VerifyResult = {
@@ -43,13 +44,14 @@ export default function VerifyPage({ certNumber }: { certNumber?: string }) {
 
   return (
     <div className="min-h-screen girih-bg flex flex-col">
-      <header className="flex justify-end p-4">
+      <header className="flex justify-end items-center gap-2 p-4">
+        <ThemeToggle />
         <LanguageSwitcher />
       </header>
       <main className="flex-1 flex items-center justify-center p-4">
-        <div className="w-full max-w-lg bg-white/95 rounded-2xl shadow-xl border border-naqsh-primary/10 p-8">
-          <h1 className="text-xl font-bold text-naqsh-primary mb-2">{t("title")}</h1>
-          <p className="text-sm text-gray-600 mb-6">{t("subtitle")}</p>
+        <div className="w-full max-w-lg bg-white/95 dark:bg-gray-900/95 rounded-2xl shadow-xl border border-naqsh-primary/10 dark:border-white/10 p-8">
+          <h1 className="text-xl font-bold text-naqsh-primary dark:text-naqsh-accent mb-2">{t("title")}</h1>
+          <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">{t("subtitle")}</p>
           <form
             onSubmit={(e) => {
               e.preventDefault();

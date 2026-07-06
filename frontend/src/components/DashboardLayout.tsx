@@ -5,6 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { useTranslations } from "next-intl";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { NotificationBell } from "@/components/NotificationBell";
 import { useAuth } from "@/contexts/AuthContext";
 import { getApiBaseUrl } from "@/lib/api";
@@ -45,7 +46,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
   const isOnboarding = pathname === "/dashboard/onboarding";
 
   return (
-    <div className="min-h-screen bg-gray-50 flex">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 flex">
       {!isOnboarding && (
       <aside className="w-56 bg-naqsh-primary text-white flex flex-col shrink-0 min-h-screen">
         <div className="p-4 border-b border-white/10">
@@ -81,16 +82,18 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
       )}
       <div className="flex-1 flex flex-col min-w-0">
         {!isOnboarding && (
-        <header className="bg-white border-b px-6 py-3 flex justify-between items-center">
-          <h1 className="text-lg font-semibold text-naqsh-primary">{t("platform")}</h1>
+        <header className="bg-white dark:bg-gray-900 border-b dark:border-gray-800 px-6 py-3 flex justify-between items-center">
+          <h1 className="text-lg font-semibold text-naqsh-primary dark:text-naqsh-accent">{t("platform")}</h1>
           <div className="flex items-center gap-2">
             <NotificationBell />
+            <ThemeToggle />
             <LanguageSwitcher />
           </div>
         </header>
         )}
         {isOnboarding && (
-        <header className="bg-white border-b px-6 py-3 flex justify-end items-center">
+        <header className="bg-white dark:bg-gray-900 border-b dark:border-gray-800 px-6 py-3 flex justify-end items-center gap-2">
+          <ThemeToggle />
           <LanguageSwitcher />
         </header>
         )}

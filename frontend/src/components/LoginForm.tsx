@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { MfaSetupForm } from "@/components/MfaSetupForm";
 
 import { getApiBaseUrl } from "@/lib/api";
@@ -116,11 +117,12 @@ export function LoginForm() {
 
   return (
     <div className="min-h-screen girih-bg flex flex-col">
-      <header className="flex justify-end p-4">
+      <header className="flex justify-end items-center gap-2 p-4">
+        <ThemeToggle />
         <LanguageSwitcher />
       </header>
       <main className="flex-1 flex items-center justify-center p-4">
-        <div className="w-full max-w-md bg-white/95 dark:bg-gray-900/95 backdrop-blur rounded-2xl shadow-xl border border-naqsh-primary/10 p-8">
+        <div className="w-full max-w-md bg-white/95 dark:bg-gray-900/95 backdrop-blur rounded-2xl shadow-xl border border-naqsh-primary/10 dark:border-white/10 p-8">
           <div className="flex items-center gap-3 mb-6">
             <svg viewBox="0 0 48 48" className="w-12 h-12 text-naqsh-primary" aria-hidden="true">
               <path
@@ -148,7 +150,7 @@ export function LoginForm() {
                   autoComplete="username"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
-                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-naqsh-primary/30 focus:border-naqsh-primary outline-none"
+                  className="w-full px-3 py-2 border rounded-lg bg-white dark:bg-gray-800 dark:border-gray-600 dark:text-gray-100 focus:ring-2 focus:ring-naqsh-primary/30 focus:border-naqsh-primary outline-none"
                   required
                 />
               </div>
@@ -162,7 +164,7 @@ export function LoginForm() {
                   autoComplete="current-password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-naqsh-primary/30 focus:border-naqsh-primary outline-none"
+                  className="w-full px-3 py-2 border rounded-lg bg-white dark:bg-gray-800 dark:border-gray-600 dark:text-gray-100 focus:ring-2 focus:ring-naqsh-primary/30 focus:border-naqsh-primary outline-none"
                   required
                 />
               </div>
@@ -178,15 +180,6 @@ export function LoginForm() {
               >
                 {t("login")}
               </button>
-              {process.env.NEXT_PUBLIC_SHOW_DEMO_HINT === "true" && (
-                <div className="mt-4 p-3 bg-amber-50 border border-amber-200 rounded-lg text-xs text-amber-900">
-                  <p className="font-semibold mb-1">{t("demoHint")}</p>
-                  <p>
-                    <span className="font-mono">{t("demoUser")}</span> /{" "}
-                    <span className="font-mono">{t("demoPass")}</span>
-                  </p>
-                </div>
-              )}
             </form>
           ) : step === "mfa_setup" && setupToken ? (
             <MfaSetupForm
@@ -233,7 +226,7 @@ export function LoginForm() {
             </form>
           )}
         </div>
-        <p className="text-center mt-4 text-sm text-gray-600">
+        <p className="text-center mt-4 text-sm text-gray-600 dark:text-gray-400">
           <a href="/parent/login" className="text-naqsh-accent hover:underline">
             Ota-ona portali →
           </a>

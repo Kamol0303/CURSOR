@@ -23,10 +23,7 @@
       "ACCOUNT_LOCKED": "Hisob vaqtincha bloklangan. Parolni tiklang: ./scripts/reset-demo-login.sh",
       "PASSWORD_CHANGE_REQUIRED": "Avval parolni yangilashingiz kerak",
       "NETWORK_ERROR": "Serverga ulanib bo'lmadi. Backend ishlayaptimi? (localhost:8000)"
-    },
-    "demoHint": "Demo kirish (MFA yo'q)",
-    "demoUser": "admin.aspect",
-    "demoPass": "CenterAdmin#26!"
+    }
   },
   "security": {
     "title": "Xavfsizlik",
@@ -504,7 +501,10 @@
     "empty": "Baholar yo'q"
   },
   "common": {
-    "language": "Til"
+    "language": "Til",
+    "themeLight": "Kunduzgi rejim",
+    "themeDark": "Tungi rejim",
+    "themeToggle": "Kun/tun rejimini almashtirish"
   },
   "forbidden": {
     "title": "Kirish taqiqlangan",

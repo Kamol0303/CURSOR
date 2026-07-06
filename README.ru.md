@@ -50,18 +50,229 @@ cd backend && pytest tests/security/ -v
 
 ---
 
-## Быстрый старт (Docker)
+## Требования
+
+| Инструмент | Windows | macOS | Linux-сервер |
+|------------|---------|-------|--------------|
+| **Docker** | [Docker Desktop](https://www.docker.com/products/docker-desktop/) | Docker Desktop for Mac | Docker Engine + Compose plugin |
+| **Git** | Git for Windows | Xcode CLI или Homebrew `git` | `apt install git` / `dnf install git` |
+| **Node.js 20+** | Опционально (локальный frontend) | Опционально | Опционально |
+
+---
+
+## Запуск проекта
+
+### Windows (development)
+
+**1. Клонирование репозитория**
+
+```cmd
+git clone https://github.com/Kamol0303/CURSOR.git
+cd CURSOR
+```
+
+**2. Файл окружения и LLM-ключи**
+
+```cmd
+copy .env.example .env
+scripts\windows\setup-llm-env.cmd
+```
+
+**3. Запуск полного dev-стека** (обновляет `main`, собирает Docker, миграции, seed)
+
+```cmd
+scripts\windows\update-main.cmd
+```
+
+**4. Показать демо-логины**
+
+```cmd
+scripts\windows\show-credentials.cmd
+```
+
+| URL | Адрес |
+|-----|-------|
+| Frontend | http://localhost:3000 |
+| API | http://localhost:8000 |
+| API docs | http://localhost:8000/docs |
+
+**Windows — staging (HTTPS, локально)**
+
+```cmd
+scripts\windows\setup-staging-env.cmd
+bash infra/nginx/generate-dev-certs.sh
+scripts\windows\staging-up.cmd
+```
+
+Добавьте в `C:\Windows\System32\drivers\etc\hosts`: `127.0.0.1 tamor.staging.local`  
+Откройте: https://tamor.staging.local
+
+**Windows — полезные команды**
+
+```cmd
+scripts\windows\backend-logs.cmd              REM логи backend (dev)
+scripts\windows\backend-logs.cmd staging      REM логи backend (staging)
+docker compose down                           REM остановить dev
+docker compose down -v                        REM остановить dev + очистить БД
+docker compose logs backend --tail 80           REM последние строки backend
+```
+
+**Windows — подготовка production** (локальный тест prod-сборки; реальный prod — на Linux)
+
+```cmd
+copy .env.production.example .env.production
+REM Отредактируйте .env.production — заполните все CHANGE_ME
+scripts\windows\go-live-prep.cmd
+scripts\windows\verify-prod-build.cmd
+```
+
+> Если `docker info` выдаёт ошибку: откройте **Docker Desktop** из меню Пуск и дождитесь зелёного кита в трее (2–3 минуты).
+
+---
+
+### macOS (development)
+
+**1. Клонирование и настройка**
 
 ```bash
-docker compose up --build
+git clone https://github.com/Kamol0303/CURSOR.git
+cd CURSOR
+cp .env.example .env
+# Отредактируйте .env — LLM_API_KEY, GEMINI_API_KEY, MISTRAL_API_KEY (опционально)
+```
+
+**2. Запуск одной командой** (рекомендуется)
+
+```bash
+chmod +x scripts/start.sh scripts/restart-fresh.sh
+./scripts/start.sh dev
+```
+
+**3. Или запуск вручную**
+
+```bash
+docker compose up -d --build
 docker compose exec backend alembic upgrade head
 docker compose exec backend python scripts/seed_demo_users.py --i-understand-this-creates-demo-credentials
 ```
 
-- Frontend: http://localhost:3000  
-- API: http://localhost:8000
+| URL | Адрес |
+|-----|-------|
+| Frontend | http://localhost:3000 |
+| API | http://localhost:8000 |
+| API docs | http://localhost:8000/docs |
 
-### Настройка LLM (`.env` — не коммитьте ключи!)
+**macOS — staging (HTTPS, локально)**
+
+```bash
+./scripts/start.sh staging
+# Добавьте в /etc/hosts: 127.0.0.1 tamor.staging.local
+sudo sh -c 'echo "127.0.0.1 tamor.staging.local" >> /etc/hosts'
+open https://tamor.staging.local
+```
+
+**macOS — полезные команды**
+
+```bash
+docker compose down                    # остановить dev
+docker compose down -v                 # остановить + очистить БД
+./scripts/restart-fresh.sh dev         # полный сброс и перезапуск
+docker compose logs backend --tail 80  # последние строки backend
+./scripts/show-mfa-qr.sh               # MFA QR для admin.tmb
+```
+
+---
+
+### Linux (development)
+
+Те же команды, что и на macOS. Нужны Docker Engine и Compose plugin:
+
+```bash
+sudo apt update && sudo apt install -y docker.io docker-compose-plugin git
+sudo usermod -aG docker $USER   # выйдите и войдите снова
+```
+
+Затем выполните шаги **macOS** выше (`./scripts/start.sh dev`).
+
+---
+
+### Linux-сервер (production)
+
+Запуск на production VPS (например, `tamor.toyloq.uz`). Используются `docker-compose.prod.yml` и `.env.production`.
+
+**1. Клонирование и секреты**
+
+```bash
+git clone https://github.com/Kamol0303/CURSOR.git
+cd CURSOR
+cp .env.production.example .env.production
+nano .env.production   # заполните ВСЕ CHANGE_ME: пароль БД, JWT secret, LLM-ключи и т.д.
+```
+
+**2. TLS-сертификаты от CA** (не dev self-signed)
+
+```bash
+# Разместите CA-сертификаты:
+#   infra/nginx/tls/fullchain.pem
+#   infra/nginx/tls/privkey.pem
+ls -la infra/nginx/tls/
+```
+
+**3. Go-live** (сборка, миграции, очистка demo, pre-deploy, проверка)
+
+```bash
+chmod +x scripts/go-live.sh scripts/verify-prod.sh
+./scripts/go-live.sh
+```
+
+Неинтерактивная очистка (CI / автоматизация):
+
+```bash
+GO_LIVE_PURGE=yes ./scripts/go-live.sh
+```
+
+**4. Проверка после деплоя**
+
+```bash
+PUBLIC_HOST=tamor.toyloq.uz ./scripts/verify-prod.sh
+python3 scripts/red_team_verify.py --url https://tamor.toyloq.uz --production
+```
+
+**Linux-сервер — управление production**
+
+```bash
+# Статус
+docker compose -f docker-compose.prod.yml --env-file .env.production ps
+
+# Логи
+docker compose -f docker-compose.prod.yml --env-file .env.production logs -f backend
+
+# Перезапуск
+docker compose -f docker-compose.prod.yml --env-file .env.production up -d --build
+
+# Миграции после обновления
+docker compose -f docker-compose.prod.yml --env-file .env.production \
+  exec backend alembic upgrade head
+
+# Остановка
+docker compose -f docker-compose.prod.yml --env-file .env.production down
+```
+
+**Linux-сервер — staging**
+
+```bash
+cp .env.staging.example .env.staging
+nano .env.staging
+bash infra/nginx/generate-dev-certs.sh   # или реальные сертификаты для staging-хоста
+./scripts/start.sh staging
+./scripts/verify-staging.sh
+```
+
+---
+
+### Настройка LLM (все платформы)
+
+Добавьте в `.env` (dev) или `.env.production` (prod). **Не коммитьте реальные ключи в git!**
 
 ```env
 LLM_API_KEY=sk-bl-...              # BazaarLink (основной)
@@ -70,7 +281,18 @@ MISTRAL_API_KEY=...                # резерв 2
 AI_ENABLED=true
 ```
 
-Windows: `scripts\windows\setup-llm-env.cmd`
+| Платформа | Вспомогательный скрипт |
+|-----------|------------------------|
+| Windows | `scripts\windows\setup-llm-env.cmd` |
+| macOS / Linux | Редактировать `.env` вручную |
+
+После изменения `.env` перезапустите стек:
+
+```bash
+docker compose up -d --build          # dev
+# или
+docker compose -f docker-compose.prod.yml --env-file .env.production up -d --build  # prod
+```
 
 ---
 
@@ -83,18 +305,6 @@ Windows: `scripts\windows\setup-llm-env.cmd`
 | Админ центра | `admin.aspect` | `CenterAdmin#26!` |
 | Учитель | `teacher.dilnoza` | `Teach#Dil2026!` |
 | Ученик | `student.sardor` | `Student#2026!` |
-
----
-
-## Production go-live
-
-```bash
-cp .env.production.example .env.production
-./scripts/go-live.sh
-```
-
-Windows: `scripts\windows\go-live-prep.cmd`  
-Проверка сборки: `scripts\windows\verify-prod-build.cmd`
 
 ---
 

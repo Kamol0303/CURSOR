@@ -192,7 +192,14 @@ sudo apt update && sudo apt install -y docker.io docker-compose-plugin git
 sudo usermod -aG docker $USER   # chiqib qayta kiring
 ```
 
-Keyin yuqoridagi **macOS** qadamlarini bajaring (`./scripts/start.sh dev`).
+**Linux (Kali/Ubuntu) — eng oson yo'l:**
+
+```bash
+chmod +x scripts/linux-dev-setup.sh
+./scripts/linux-dev-setup.sh
+```
+
+Bu skript production stackni to'xtatadi, port ziddiyatini tekshiradi va dev ni ishga tushiradi.
 
 ---
 
@@ -292,6 +299,67 @@ AI_ENABLED=true
 docker compose up -d --build          # dev
 # yoki
 docker compose -f docker-compose.prod.yml --env-file .env.production up -d --build  # prod
+```
+
+---
+
+## Muammolarni bartaraf etish
+
+### Linuxda Windows buyruqlarini ishlatdingizmi?
+
+**Linux/macOS** da `copy` emas, `cp` ishlating:
+
+```bash
+cp .env.example .env
+./scripts/linux-dev-setup.sh    # Kali/Ubuntu/Debian uchun tavsiya
+# yoki
+./scripts/start.sh dev
+```
+
+Windows `.cmd` skriptlari (`scripts\windows\...`) **faqat Windows** da ishlaydi.
+
+### Production da `backend is unhealthy`
+
+Production uchun to'liq sozlangan `.env.production` kerak:
+
+- Haqiqiy parollar (`CHANGE_ME_...` emas)
+- **HashiCorp Vault** (`VAULT_ADDR` + `VAULT_TOKEN`)
+- JWT kalitlar `/secrets/` da
+- CA TLS sertifikatlar `infra/nginx/tls/` da
+- To'lov kalitlari (`CLICK_*`, `PAYME_*`)
+
+**Mahalliy kompyuterda (Kali, Ubuntu) dev rejimini ishlating, production emas:**
+
+```bash
+./scripts/linux-dev-setup.sh
+```
+
+Backend loglari:
+
+```bash
+docker compose -f docker-compose.prod.yml --env-file .env.production logs backend --tail 100
+```
+
+### `port 5432 is already allocated`
+
+5432 port boshqa PostgreSQL tomonidan band. Yechim:
+
+```bash
+docker compose -f docker-compose.prod.yml --env-file .env.production down 2>/dev/null || true
+docker compose down --remove-orphans
+sudo systemctl stop postgresql
+ss -tlnp | grep 5432
+./scripts/linux-dev-setup.sh
+```
+
+### `orphan containers (cursor-nginx-1)`
+
+Prod dan dev ga o'tganda:
+
+```bash
+docker compose -f docker-compose.prod.yml --env-file .env.production down --remove-orphans
+docker compose down --remove-orphans
+./scripts/start.sh dev
 ```
 
 ---

@@ -192,7 +192,14 @@ sudo apt update && sudo apt install -y docker.io docker-compose-plugin git
 sudo usermod -aG docker $USER   # выйдите и войдите снова
 ```
 
-Затем выполните шаги **macOS** выше (`./scripts/start.sh dev`).
+**Linux (Kali/Ubuntu) — самый простой способ:**
+
+```bash
+chmod +x scripts/linux-dev-setup.sh
+./scripts/linux-dev-setup.sh
+```
+
+Скрипт останавливает production-стек, проверяет конфликт портов и запускает dev.
 
 ---
 
@@ -292,6 +299,67 @@ AI_ENABLED=true
 docker compose up -d --build          # dev
 # или
 docker compose -f docker-compose.prod.yml --env-file .env.production up -d --build  # prod
+```
+
+---
+
+## Устранение неполадок
+
+### Использовали Windows-команды на Linux?
+
+На **Linux/macOS** используйте `cp` (не `copy`) и прямые слэши:
+
+```bash
+cp .env.example .env
+./scripts/linux-dev-setup.sh    # рекомендуется для Kali/Ubuntu/Debian
+# или
+./scripts/start.sh dev
+```
+
+Windows-скрипты `.cmd` (`scripts\windows\...`) работают **только на Windows**.
+
+### `backend is unhealthy` в production
+
+Production требует полностью настроенный `.env.production`:
+
+- Реальные пароли (не `CHANGE_ME_...`)
+- **HashiCorp Vault** (`VAULT_ADDR` + `VAULT_TOKEN`)
+- JWT-ключи в `/secrets/`
+- CA TLS-сертификаты в `infra/nginx/tls/`
+- Ключи платёжных систем (`CLICK_*`, `PAYME_*`)
+
+**На локальном ПК (Kali, Ubuntu) используйте dev, а не production:**
+
+```bash
+./scripts/linux-dev-setup.sh
+```
+
+Логи backend:
+
+```bash
+docker compose -f docker-compose.prod.yml --env-file .env.production logs backend --tail 100
+```
+
+### `port 5432 is already allocated`
+
+Порт 5432 занят другим PostgreSQL. Решение:
+
+```bash
+docker compose -f docker-compose.prod.yml --env-file .env.production down 2>/dev/null || true
+docker compose down --remove-orphans
+sudo systemctl stop postgresql
+ss -tlnp | grep 5432
+./scripts/linux-dev-setup.sh
+```
+
+### `orphan containers (cursor-nginx-1)`
+
+При переключении с prod на dev:
+
+```bash
+docker compose -f docker-compose.prod.yml --env-file .env.production down --remove-orphans
+docker compose down --remove-orphans
+./scripts/start.sh dev
 ```
 
 ---

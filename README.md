@@ -192,7 +192,14 @@ sudo apt update && sudo apt install -y docker.io docker-compose-plugin git
 sudo usermod -aG docker $USER   # log out and back in
 ```
 
-Then follow the **macOS** steps above (`./scripts/start.sh dev`).
+**Recommended — one command (Kali/Ubuntu/Debian):**
+
+```bash
+chmod +x scripts/linux-dev-setup.sh
+./scripts/linux-dev-setup.sh
+```
+
+Or follow the **macOS** steps above (`./scripts/start.sh dev`).
 
 ---
 
@@ -292,6 +299,74 @@ After changing `.env`, restart the stack:
 docker compose up -d --build          # dev
 # or
 docker compose -f docker-compose.prod.yml --env-file .env.production up -d --build  # prod
+```
+
+---
+
+## Troubleshooting
+
+### Used Windows commands on Linux?
+
+On **Linux/macOS** use `cp` (not `copy`) and forward slashes:
+
+```bash
+cp .env.example .env
+./scripts/linux-dev-setup.sh    # recommended on Kali/Ubuntu/Debian
+# or
+./scripts/start.sh dev
+```
+
+Windows `.cmd` scripts (`scripts\windows\...`) work **only on Windows**.
+
+### `backend is unhealthy` in production
+
+Production requires a fully configured `.env.production`:
+
+- Real passwords (not `CHANGE_ME_...`)
+- **HashiCorp Vault** reachable at `VAULT_ADDR` with valid `VAULT_TOKEN`
+- JWT keys materialized to `/secrets/jwt_private.pem` and `/secrets/jwt_public.pem`
+- CA TLS certs in `infra/nginx/tls/`
+- Payment gateway keys (`CLICK_*`, `PAYME_*`)
+
+**On a local laptop (Kali, Ubuntu, etc.) use dev mode, not production:**
+
+```bash
+./scripts/linux-dev-setup.sh
+```
+
+Check backend logs:
+
+```bash
+docker compose -f docker-compose.prod.yml --env-file .env.production logs backend --tail 100
+```
+
+### `port 5432 is already allocated`
+
+Another PostgreSQL instance is using port 5432. Fix:
+
+```bash
+# Stop TMB stacks first
+docker compose -f docker-compose.prod.yml --env-file .env.production down 2>/dev/null || true
+docker compose down --remove-orphans
+
+# Stop system PostgreSQL (if installed)
+sudo systemctl stop postgresql
+
+# See what uses the port
+ss -tlnp | grep 5432
+
+# Then start dev again
+./scripts/linux-dev-setup.sh
+```
+
+### `orphan containers (cursor-nginx-1)`
+
+After switching from prod to dev:
+
+```bash
+docker compose -f docker-compose.prod.yml --env-file .env.production down --remove-orphans
+docker compose down --remove-orphans
+./scripts/start.sh dev
 ```
 
 ---

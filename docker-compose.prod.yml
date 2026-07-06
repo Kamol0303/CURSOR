@@ -42,30 +42,27 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
+      args:
+        HTTP_PROXY: ""
+        HTTPS_PROXY: ""
+        http_proxy: ""
+        https_proxy: ""
     restart: unless-stopped
     env_file: .env.production
     environment:
       ENVIRONMENT: production
       DEBUG: "false"
+      SECRETS_BACKEND: vault
+      FILE_UPLOAD_DIR: /data/uploads
     volumes:
       - jwt_secrets:/secrets
+      - upload_data:/data/uploads
     depends_on:
       postgres:
         condition: service_healthy
       redis:
         condition: service_healthy
-    command: >
-      sh -c "
-        for i in $$(seq 1 30); do
-          if alembic upgrade head; then
-            exec uvicorn app.main:app --host 0.0.0.0 --port 8000 --workers 4 --proxy-headers --forwarded-allow-ips='*';
-          fi;
-          echo \"Migration attempt $$i failed, retrying in 2s...\";
-          sleep 2;
-        done;
-        echo 'ERROR: migrations failed after 30 attempts';
-        exit 1
-      "
+    command: ["sh", "./scripts/production_bootstrap.sh"]
     healthcheck:
       test:
         [
@@ -77,17 +74,22 @@ services:
       interval: 15s
       timeout: 5s
       retries: 5
-      start_period: 60s
+      start_period: 90s
     networks:
       - internal
 
   frontend:
     build:
       context: ./frontend
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.prod
+      args:
+        NEXT_PUBLIC_API_URL: https://${PUBLIC_HOST:-tamor.toyloq.uz}
     restart: unless-stopped
     environment:
       NEXT_PUBLIC_API_URL: https://${PUBLIC_HOST:-tamor.toyloq.uz}
+      INTERNAL_API_URL: http://backend:8000
+      HOSTNAME: "0.0.0.0"
+      PORT: "3000"
     depends_on:
       backend:
         condition: service_healthy
@@ -95,7 +97,11 @@ services:
       - internal
 
   ai-analytics:
-    build: ./ai-analytics-service
+    build:
+      context: ./ai-analytics-service
+      args:
+        HTTP_PROXY: ""
+        HTTPS_PROXY: ""
     restart: unless-stopped
     env_file: .env.production
     environment:
@@ -109,13 +115,20 @@ services:
       - internal
 
   celery-worker:
-    build: ./backend
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      args:
+        HTTP_PROXY: ""
+        HTTPS_PROXY: ""
     restart: unless-stopped
     env_file: .env.production
     environment:
       ENVIRONMENT: production
+      FILE_UPLOAD_DIR: /data/uploads
     volumes:
       - jwt_secrets:/secrets:ro
+      - upload_data:/data/uploads
     depends_on:
       postgres:
         condition: service_healthy
@@ -126,7 +139,9 @@ services:
       - internal
 
   celery-beat:
-    build: ./backend
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
     restart: unless-stopped
     env_file: .env.production
     depends_on:
@@ -163,3 +178,4 @@ volumes:
   postgres_data:
   redis_data:
   jwt_secrets:
+  upload_data:

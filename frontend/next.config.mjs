@@ -8,6 +8,7 @@ const internalApi =
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  output: "standalone",
   async rewrites() {
     // Fallback: proxy /api/* to backend when NEXT_PUBLIC_API_URL is not set (same-origin mode)
     return [

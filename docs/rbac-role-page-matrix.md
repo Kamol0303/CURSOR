@@ -23,6 +23,22 @@
 | Analytics | ✅ | ✅ | ✅ | — | — | ✅ |
 | Security | ✅ | — | ✅ | — | — | — |
 
+### `hokimiyat_operator` — monitoring-only (2026-07)
+
+District operator uses a **restricted** sidebar and API surface (read + analytics only):
+
+| Page | hokimiyat_operator | API |
+|------|:------------------:|-----|
+| Operator dashboard (`/dashboard`) | ✅ | `GET /api/v1/dashboard/operator-summary` |
+| Centers | ✅ read | `centers.read` — no `centers.create` |
+| Teachers | ✅ read | `teachers.read` |
+| Students | ✅ read | `students.read` |
+| Certificates | ✅ read | `certificates.read` |
+| Analytics | ✅ | `analytics.view` |
+| Groups, courses, subjects, messages, attendance, payments, exams, grades, ratings, security | — | Denied at API + `OPERATOR_NAV_ROUTES` in `route-guards.ts` |
+
+Source: `backend/app/core/permissions.py` (`hokimiyat_operator`), `frontend/src/lib/route-guards.ts` (`OPERATOR_NAV_ROUTES`).
+
 Portal-only roles (`teacher`, `student`, `parent`) are **denied** all `/dashboard/*` routes (middleware + API).
 
 ## Teacher portal (`/teacher/*`)

@@ -25,7 +25,7 @@ RUN pip install --upgrade pip setuptools wheel \
 
 COPY . .
 
-RUN chmod +x scripts/entrypoint.sh scripts/dev_bootstrap.sh scripts/staging_bootstrap.sh
+RUN chmod +x scripts/entrypoint.sh scripts/dev_bootstrap.sh scripts/staging_bootstrap.sh scripts/production_bootstrap.sh
 
 ENV PYTHONPATH=/app
 ENV JWT_PRIVATE_KEY_PATH=/secrets/jwt_private.pem

@@ -203,11 +203,12 @@ infra/            Nginx, deployment configs
 - [ ] External penetration test (use `docs/red-team-checklist.md`)
 
 ### Required Before Go-Live
-- Run `scripts/purge_demo_data.py` and `scripts/pre_deploy_check.py`
+- Run `scripts/purge_demo_data.py` and `scripts/pre_deploy_check.py` (or `./scripts/go-live.sh`)
 - Configure Vault secrets per `docs/go-live-runbook.md`
 - Complete `docs/red-team-checklist.md` with sign-off
 - CA-signed TLS certificates (not `generate-dev-certs.sh`)
 - Data localization on Uzbekistan infrastructure
+- Step-by-step (UZ): `docs/go-live-steps-uz.md` · Windows prep: `scripts/windows/go-live-prep.cmd`
 
 ## License
 

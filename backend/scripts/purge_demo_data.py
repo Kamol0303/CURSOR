@@ -12,7 +12,7 @@ import argparse
 import asyncio
 import sys
 
-from sqlalchemy import delete, func, or_, select
+from sqlalchemy import delete, func, or_, select, update
 from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 
 sys.path.insert(0, ".")
@@ -235,6 +235,9 @@ async def purge_demo_rows(session) -> None:
                 Message.recipient_id.in_(demo_users),
             )
         )
+    )
+    await session.execute(
+        update(Student).where(Student.id.in_(demo_students)).values(photo_file_id=None)
     )
     await session.execute(
         delete(StoredFile).where(

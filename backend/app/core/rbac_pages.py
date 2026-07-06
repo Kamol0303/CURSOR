@@ -55,6 +55,7 @@ ADMIN_DASHBOARD_PAGES: tuple[PageDef, ...] = (
         "POST",
         "/api/v1/auth/admin/reset-password",
     ),
+    PageDef("audit", "/dashboard/audit", NAV_PERMISSIONS["audit"], "GET", "/api/v1/audit-logs"),
 )
 
 TEACHER_PORTAL_PAGES: tuple[PageDef, ...] = (

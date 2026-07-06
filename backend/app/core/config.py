@@ -33,10 +33,18 @@ class Settings(BaseSettings):
     SEED_NON_DEMO_USER_THRESHOLD: int = 5
 
     AI_ANALYTICS_URL: str = "http://ai-analytics:8001"
+    # LLM gateway (BazaarLink OpenAI-compatible or direct OpenAI)
+    LLM_API_KEY: str = ""
+    LLM_BASE_URL: str = "https://bazaarlink.ai/api/v1"
+    LLM_MODEL: str = "openai/gpt-4o-mini"
+    AI_ENABLED: bool = True
+    # Legacy aliases — LLM_API_KEY takes precedence when set
     OPENAI_API_KEY: str = ""
     OPENAI_MODEL: str = "gpt-4o-mini"
     AI_EXAM_ENABLED: bool = True
     AI_EXAM_MAX_QUESTIONS: int = 30
+    AI_LESSON_MAX_SLIDES: int = 12
+    AI_LESSON_MAX_ROUNDS: int = 10
     SMS_WEBHOOK_SECRET: str = "dev-sms-webhook-secret-change-me"
     ESKIZ_API_TOKEN: str = ""
     SMTP_HOST: str = ""

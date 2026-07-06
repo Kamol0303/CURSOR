@@ -67,7 +67,7 @@ async def generate_exam(
             "topic": body.topic,
             "question_count": len(questions),
             "difficulty": body.difficulty,
-            "ai_provider": "openai" if settings.OPENAI_API_KEY and settings.AI_EXAM_ENABLED else "mock",
+            "ai_provider": llm_service.llm_provider_label(),
         },
     )
     return exam

@@ -117,3 +117,23 @@ class Grade(Base, TimestampMixin):
 
     student: Mapped[Student] = relationship()
     subject: Mapped[Subject] = relationship()
+
+
+class LessonMaterial(Base, TimestampMixin):
+    """AI-generated lesson content (presentation or classroom game)."""
+
+    __tablename__ = "lesson_materials"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    center_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("training_centers.id"), nullable=False)
+    teacher_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=False)
+    group_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), ForeignKey("groups.id"), nullable=True)
+    subject_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("subjects.id"), nullable=False)
+    topic: Mapped[str] = mapped_column(String(500), nullable=False)
+    content_type: Mapped[str] = mapped_column(String(20), nullable=False)
+    locale: Mapped[str] = mapped_column(String(5), default="uz")
+    title: Mapped[str] = mapped_column(String(255), nullable=False)
+    content_json: Mapped[dict] = mapped_column(JSONB, nullable=False)
+    status: Mapped[str] = mapped_column(String(20), default="draft")
+    ai_provider: Mapped[str | None] = mapped_column(String(30), nullable=True)
+    started_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)

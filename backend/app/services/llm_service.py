@@ -1,4 +1,4 @@
-"""LLM helpers for AI exam question generation."""
+"""LLM helpers — BazaarLink gateway (OpenAI-compatible) with mock fallback."""
 
 from __future__ import annotations
 
@@ -12,7 +12,67 @@ from app.core.config import settings
 from app.schemas.exams import ExamQuestionCreate
 
 
-def _build_prompt(
+def resolve_llm_settings() -> tuple[str, str, str]:
+    """Return (api_key, base_url, model) for chat completions."""
+    api_key = (settings.LLM_API_KEY or settings.OPENAI_API_KEY or "").strip()
+    if not api_key:
+        return "", "", ""
+
+    if settings.LLM_API_KEY:
+        base_url = settings.LLM_BASE_URL.rstrip("/")
+        model = settings.LLM_MODEL
+        if "/" not in model and not model.startswith("auto:"):
+            model = f"openai/{model}"
+    else:
+        base_url = "https://api.openai.com/v1"
+        model = settings.OPENAI_MODEL
+
+    return api_key, base_url, model
+
+
+def llm_provider_label() -> str:
+    api_key, base_url, _ = resolve_llm_settings()
+    if not api_key or not settings.AI_ENABLED:
+        return "mock"
+    if "bazaarlink" in base_url.lower():
+        return "bazaarlink"
+    return "openai"
+
+
+async def chat_json_completion(
+    *,
+    system_prompt: str,
+    user_prompt: str,
+    temperature: float = 0.4,
+    timeout: float = 90.0,
+) -> str:
+    api_key, base_url, model = resolve_llm_settings()
+    if not api_key or not settings.AI_ENABLED:
+        raise HTTPException(status_code=503, detail={"code": "AI_NOT_CONFIGURED"})
+
+    async with httpx.AsyncClient(timeout=timeout) as client:
+        response = await client.post(
+            f"{base_url}/chat/completions",
+            headers={
+                "Authorization": f"Bearer {api_key}",
+                "Content-Type": "application/json",
+            },
+            json={
+                "model": model,
+                "messages": [
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": user_prompt},
+                ],
+                "response_format": {"type": "json_object"},
+                "temperature": temperature,
+            },
+        )
+    if response.status_code != 200:
+        raise HTTPException(status_code=502, detail={"code": "AI_PROVIDER_ERROR"})
+    return response.json()["choices"][0]["message"]["content"]
+
+
+def _build_exam_prompt(
     *,
     subject_name: str,
     topic: str,
@@ -45,6 +105,50 @@ Rules:
 """
 
 
+def _build_lesson_prompt(
+    *,
+    subject_name: str,
+    topic: str,
+    content_type: str,
+    locale: str,
+    max_slides: int,
+    max_rounds: int,
+) -> str:
+    lang = {"uz": "Uzbek", "ru": "Russian", "en": "English"}.get(locale, "Uzbek")
+    if content_type == "game":
+        return f"""Create an educational classroom game for subject "{subject_name}" on topic "{topic}".
+Write all learner-facing text in {lang}. Max {max_rounds} rounds.
+
+Return ONLY valid JSON:
+{{
+  "title": "short game title",
+  "rules": "how to play in class",
+  "rounds": [
+    {{
+      "question": "challenge for students",
+      "hint": "optional hint",
+      "answer": "expected answer"
+    }}
+  ]
+}}
+"""
+    return f"""Create a classroom presentation for subject "{subject_name}" on topic "{topic}".
+Write all slide text in {lang}. Max {max_slides} slides.
+
+Return ONLY valid JSON:
+{{
+  "title": "presentation title",
+  "slides": [
+    {{
+      "title": "slide heading",
+      "bullets": ["point 1", "point 2"],
+      "speaker_notes": "what the teacher says"
+    }}
+  ]
+}}
+"""
+
+
 def generate_questions_mock(
     *,
     topic: str,
@@ -66,7 +170,43 @@ def generate_questions_mock(
     return questions
 
 
-def _parse_questions_payload(raw: str) -> list[ExamQuestionCreate]:
+def generate_lesson_mock(*, topic: str, content_type: str, subject_name: str) -> dict:
+    if content_type == "game":
+        return {
+            "title": f"{subject_name}: {topic} o'yini",
+            "rules": "Jamoa bo'ling, savollarga javob bering.",
+            "rounds": [
+                {
+                    "question": f"{topic} haqida savol {i + 1}",
+                    "hint": "O'ylab ko'ring",
+                    "answer": f"Javob {i + 1}",
+                }
+                for i in range(3)
+            ],
+        }
+    return {
+        "title": f"{subject_name}: {topic}",
+        "slides": [
+            {
+                "title": f"Kirish — {topic}",
+                "bullets": [f"{topic} nima?", f"Nega {subject_name} muhim?"],
+                "speaker_notes": "Talabalarni jalb qiling.",
+            },
+            {
+                "title": f"Asosiy qism — {topic}",
+                "bullets": ["Tushuncha 1", "Tushuncha 2", "Misol"],
+                "speaker_notes": "Misollar bilan tushuntiring.",
+            },
+            {
+                "title": "Xulosa",
+                "bullets": ["Asosiy fikrlar", "Savollar uchun vaqt"],
+                "speaker_notes": "Qisqa takrorlash.",
+            },
+        ],
+    }
+
+
+def _clean_json_payload(raw: str) -> dict:
     cleaned = raw.strip()
     if cleaned.startswith("```"):
         cleaned = re.sub(r"^```(?:json)?\s*", "", cleaned)
@@ -75,8 +215,14 @@ def _parse_questions_payload(raw: str) -> list[ExamQuestionCreate]:
         payload = json.loads(cleaned)
     except json.JSONDecodeError as exc:
         raise HTTPException(status_code=502, detail={"code": "AI_INVALID_JSON"}) from exc
+    if not isinstance(payload, dict):
+        raise HTTPException(status_code=502, detail={"code": "AI_INVALID_RESPONSE"})
+    return payload
 
-    items = payload.get("questions") if isinstance(payload, dict) else None
+
+def _parse_questions_payload(raw: str) -> list[ExamQuestionCreate]:
+    payload = _clean_json_payload(raw)
+    items = payload.get("questions")
     if not isinstance(items, list) or not items:
         raise HTTPException(status_code=502, detail={"code": "AI_INVALID_RESPONSE"})
 
@@ -104,6 +250,28 @@ def _parse_questions_payload(raw: str) -> list[ExamQuestionCreate]:
     return questions
 
 
+def _parse_lesson_payload(raw: str, *, content_type: str) -> dict:
+    payload = _clean_json_payload(raw)
+    title = str(payload.get("title", "")).strip()
+    if not title:
+        raise HTTPException(status_code=502, detail={"code": "AI_INVALID_RESPONSE"})
+
+    if content_type == "game":
+        rounds = payload.get("rounds")
+        if not isinstance(rounds, list) or not rounds:
+            raise HTTPException(status_code=502, detail={"code": "AI_INVALID_RESPONSE"})
+        return {
+            "title": title,
+            "rules": str(payload.get("rules", "")).strip(),
+            "rounds": rounds,
+        }
+
+    slides = payload.get("slides")
+    if not isinstance(slides, list) or not slides:
+        raise HTTPException(status_code=502, detail={"code": "AI_INVALID_RESPONSE"})
+    return {"title": title, "slides": slides}
+
+
 async def generate_exam_questions(
     *,
     subject_name: str,
@@ -115,34 +283,49 @@ async def generate_exam_questions(
     if question_count < 1 or question_count > settings.AI_EXAM_MAX_QUESTIONS:
         raise HTTPException(status_code=422, detail={"code": "QUESTION_COUNT_OUT_OF_RANGE"})
 
-    if settings.OPENAI_API_KEY and settings.AI_EXAM_ENABLED:
-        prompt = _build_prompt(
+    api_key, _, _ = resolve_llm_settings()
+    if api_key and settings.AI_ENABLED and settings.AI_EXAM_ENABLED:
+        prompt = _build_exam_prompt(
             subject_name=subject_name,
             topic=topic,
             question_count=question_count,
             difficulty=difficulty,
             locale=locale,
         )
-        async with httpx.AsyncClient(timeout=60.0) as client:
-            response = await client.post(
-                "https://api.openai.com/v1/chat/completions",
-                headers={
-                    "Authorization": f"Bearer {settings.OPENAI_API_KEY}",
-                    "Content-Type": "application/json",
-                },
-                json={
-                    "model": settings.OPENAI_MODEL,
-                    "messages": [
-                        {"role": "system", "content": "You are an educational assessment author. Output JSON only."},
-                        {"role": "user", "content": prompt},
-                    ],
-                    "response_format": {"type": "json_object"},
-                    "temperature": 0.4,
-                },
-            )
-        if response.status_code != 200:
-            raise HTTPException(status_code=502, detail={"code": "AI_PROVIDER_ERROR"})
-        content = response.json()["choices"][0]["message"]["content"]
+        content = await chat_json_completion(
+            system_prompt="You are an educational assessment author. Output JSON only.",
+            user_prompt=prompt,
+        )
         return _parse_questions_payload(content)
 
     return generate_questions_mock(topic=topic, question_count=question_count, difficulty=difficulty)
+
+
+async def generate_lesson_content(
+    *,
+    subject_name: str,
+    topic: str,
+    content_type: str,
+    locale: str,
+) -> dict:
+    if content_type not in {"presentation", "game"}:
+        raise HTTPException(status_code=422, detail={"code": "INVALID_CONTENT_TYPE"})
+
+    api_key, _, _ = resolve_llm_settings()
+    if api_key and settings.AI_ENABLED:
+        prompt = _build_lesson_prompt(
+            subject_name=subject_name,
+            topic=topic,
+            content_type=content_type,
+            locale=locale,
+            max_slides=settings.AI_LESSON_MAX_SLIDES,
+            max_rounds=settings.AI_LESSON_MAX_ROUNDS,
+        )
+        content = await chat_json_completion(
+            system_prompt="You are an expert teacher assistant. Output JSON only.",
+            user_prompt=prompt,
+            temperature=0.5,
+        )
+        return _parse_lesson_payload(content, content_type=content_type)
+
+    return generate_lesson_mock(topic=topic, content_type=content_type, subject_name=subject_name)

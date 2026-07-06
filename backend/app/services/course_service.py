@@ -10,6 +10,7 @@ from app.models.academics import Course, Lesson
 from app.models.education import Subject
 from app.models.identity import User
 from app.schemas.courses import CourseCreate, CourseResponse, CourseUpdate, LessonCreate, LessonResponse, LessonUpdate
+from app.services.audit_service import write_audit_log
 
 
 def course_to_response(course: Course, *, lesson_count: int | None = None) -> CourseResponse:
@@ -101,6 +102,14 @@ async def create_course(db: AsyncSession, user: User, body: CourseCreate) -> Cou
     db.add(course)
     await db.flush()
     course.subject = subject
+    await write_audit_log(
+        db,
+        user_id=user.id,
+        action="course.create",
+        resource_type="course",
+        resource_id=course.id,
+        details={"name": course.name, "subject_id": str(course.subject_id)},
+    )
     return course_to_response(course)
 
 
@@ -119,6 +128,14 @@ async def update_course(db: AsyncSession, user: User, course_id: UUID, body: Cou
     for key, value in data.items():
         setattr(course, key, value)
     await db.flush()
+    await write_audit_log(
+        db,
+        user_id=user.id,
+        action="course.update",
+        resource_type="course",
+        resource_id=course.id,
+        details={"changed_fields": list(data.keys())},
+    )
     return course_to_response(course)
 
 
@@ -127,6 +144,14 @@ async def delete_course(db: AsyncSession, user: User, course_id: UUID) -> None:
 
     course = await get_course(db, user, course_id)
     course.deleted_at = datetime.now(UTC)
+    await write_audit_log(
+        db,
+        user_id=user.id,
+        action="course.delete",
+        resource_type="course",
+        resource_id=course.id,
+        details={"name": course.name},
+    )
 
 
 async def list_lessons(db: AsyncSession, user: User, course_id: UUID) -> list[LessonResponse]:
@@ -152,6 +177,14 @@ async def create_lesson(db: AsyncSession, user: User, course_id: UUID, body: Les
     )
     db.add(lesson)
     await db.flush()
+    await write_audit_log(
+        db,
+        user_id=user.id,
+        action="lesson.create",
+        resource_type="lesson",
+        resource_id=lesson.id,
+        details={"title": lesson.title, "course_id": str(course.id)},
+    )
     return lesson_to_response(lesson)
 
 
@@ -170,6 +203,14 @@ async def update_lesson(
     for key, value in data.items():
         setattr(lesson, key, value)
     await db.flush()
+    await write_audit_log(
+        db,
+        user_id=user.id,
+        action="lesson.update",
+        resource_type="lesson",
+        resource_id=lesson.id,
+        details={"changed_fields": list(data.keys())},
+    )
     return lesson_to_response(lesson)
 
 
@@ -185,3 +226,11 @@ async def delete_lesson(db: AsyncSession, user: User, course_id: UUID, lesson_id
         raise HTTPException(status_code=404, detail={"code": "NOT_FOUND"})
     assert_center_access(user, lesson.center_id)
     lesson.deleted_at = datetime.now(UTC)
+    await write_audit_log(
+        db,
+        user_id=user.id,
+        action="lesson.delete",
+        resource_type="lesson",
+        resource_id=lesson.id,
+        details={"title": lesson.title},
+    )

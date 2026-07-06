@@ -11,6 +11,7 @@ import { clearAuthCookie } from "@/lib/auth-cookie";
 
 const NAV = [
   { href: "/teacher/dashboard", key: "dashboard", exact: true },
+  { href: "/teacher/lesson-start", key: "lessonStart" },
   { href: "/teacher/groups", key: "groups" },
   { href: "/teacher/attendance", key: "attendance" },
   { href: "/teacher/grades", key: "grades" },

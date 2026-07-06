@@ -24,6 +24,7 @@ from app.schemas.exams import (
     ExamSubmitRequest,
     ExamUpdate,
 )
+from app.services.audit_service import write_audit_log
 
 logger = get_logger(__name__)
 
@@ -158,6 +159,24 @@ async def update_exam(db: AsyncSession, user: User, exam_id: UUID, body: ExamUpd
     if body.is_published is not None:
         exam.is_published = body.is_published
     await db.flush()
+    if body.is_published is not None:
+        await write_audit_log(
+            db,
+            user_id=user.id,
+            action="exam.publish" if body.is_published else "exam.unpublish",
+            resource_type="exam",
+            resource_id=exam.id,
+            details={"title": exam.title, "is_published": exam.is_published},
+        )
+    elif any(v is not None for v in [body.title, body.description, body.pass_score, body.duration_minutes]):
+        await write_audit_log(
+            db,
+            user_id=user.id,
+            action="exam.update",
+            resource_type="exam",
+            resource_id=exam.id,
+            details={"title": exam.title},
+        )
     return exam_to_response(exam)
 
 

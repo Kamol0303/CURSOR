@@ -2,6 +2,7 @@ from fastapi import APIRouter
 
 from app.api.v1.analytics import router as analytics_router
 from app.api.v1.attendance import router as attendance_router
+from app.api.v1.audit import router as audit_router
 from app.api.v1.auth import router as auth_router
 from app.api.v1.centers import router as centers_router
 from app.api.v1.certificates import router as certificates_router
@@ -45,6 +46,7 @@ api_router.include_router(ratings_router)
 api_router.include_router(certificates_router)
 api_router.include_router(reports_router)
 api_router.include_router(analytics_router)
+api_router.include_router(audit_router)
 api_router.include_router(notifications_router)
 api_router.include_router(messages_router)
 api_router.include_router(parent_router)

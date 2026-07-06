@@ -221,4 +221,5 @@ NAV_PERMISSIONS: dict[str, str] = {
     "security": "users.password_reset",
     "messages": "messages.read",
     "messagesMonitor": "messages.monitor",
+    "audit": "audit.read",
 }

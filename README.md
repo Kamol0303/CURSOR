@@ -1,216 +1,127 @@
-# TMB — Ta'lim Monitoringi Boshqaruvi
+# TMB — Education Monitoring & Management Platform
 
-Government-grade education management monitoring platform for Toyloq District, Samarkand Region, Uzbekistan.
+**Languages:** [English](README.md) · [O'zbek](README.uz.md) · [Русский](README.ru.md)
 
-## Phase 0 Status (Complete)
+Government-grade education management and monitoring platform for **Toyloq District**, Samarkand Region, Uzbekistan.
 
-Phase 0 delivers the security foundation:
+---
 
-- STRIDE threat model (`docs/threat-model.md`)
-- Incident response runbook (`docs/incident-response.md`)
-- ER diagram (`docs/er-diagram.md`)
-- Architecture Decision Records (`docs/adr/`)
-- PostgreSQL schema + Alembic migrations
-- Full authentication system (JWT RS256, refresh rotation, MFA/TOTP, RBAC)
-- Demo seed script with production safety guards
-- Next.js frontend with trilingual i18n skeleton (UZ/RU/EN)
-- Login page with girih ornamental design
-- Docker Compose dev environment
-- CI/CD pipeline (GitHub Actions)
+## Final status (July 2026)
 
-## Phase 1 Status (Complete)
+| Area | Readiness | Notes |
+|------|-----------|-------|
+| **Application code** | **~100%** | All phases 0–7, OCMS, Hokimiyat dashboard, AI, audit |
+| **Security (automated)** | **12/12 passed** | `python3 scripts/red_team_verify.py --offline` |
+| **Go-live (infrastructure)** | **~85%** | Vault, CA TLS, UZ VPS, external pentest sign-off remain |
 
-- Centers/Students/Teachers CRUD with RBAC + tenant scoping
-- Dashboard KPIs, PINFL encryption/masking
-- Trilingual frontend (UZ/RU/EN)
+Full security report: [`docs/security-audit-report.md`](docs/security-audit-report.md)  
+Go-live checklist: [`docs/production-100-checklist-uz.md`](docs/production-100-checklist-uz.md)
 
-## Phase 2 Status (Complete)
+---
 
-- **Rating engine** — configurable weights, daily compute, tamper-evident `inputs_hash`
-- **Certificates** — issue with QR code + integrity hash, idempotency key support
-- **Public verification** — `/api/v1/public/verify/{number}` (10 req/min/IP)
-- **Reports** — PDF and Excel rating exports
-- **Frontend** — ratings table, certificates gallery, public `/verify` page
+## Key features
 
-## Phase 3 Status (Complete)
+- **RBAC** — 10+ roles, PostgreSQL RLS, tenant isolation
+- **Hokimiyat operator** — monitoring-only dashboard (6 menu items)
+- **Certificates** — QR verify, integrity hash, public `/verify`
+- **AI** — exam generator + teacher lesson materials (presentation / classroom game)
+- **LLM providers** — BazaarLink → Gemini → Mistral (automatic fallback)
+- **Audit log** — `/dashboard/audit` — who changed what and when
+- **Production stack** — `Dockerfile.prod`, `docker-compose.prod.yml`, Nginx TLS
 
-- **AI analytics microservice** — fastest-growing center, declining centers, high-demand subjects, education gap index
-- **RS256 JWT verification** — public key only; read-only DB role without PINFL access
-- **Notifications** — in-app, SMS (eskiz.uz stub), email stub; locale-aware templates
-- **Integrations** — SSRF-safe HTTP client, SMS webhook signature validation
-- **Frontend** — `/dashboard/analytics`, notification bell with unread count
-- **Scheduler** — APScheduler daily cron in ai-analytics-service
+---
 
-## Phase 4 Status (Complete)
-
-- **Parent portal** — SMS OTP login, children list, certificates view (`/parent/login`)
-- **PWA** — manifest, service worker, installable mobile shell
-- **PostgreSQL RLS** — FORCE policies on students, enrollments, certificates, guardians
-- **Telegram bot** — webhook with `/verify` and `/status` commands
-- **Celery** — daily rating recompute (03:00 Asia/Samarkand)
-- **Security hardening** — HSTS/CSP in production, Permissions-Policy
-- **Load test** — `scripts/load_test.py`
-
-## Phase 5 Status (Complete)
-
-- **Vault secrets** — KV v2 provider, JWT materialization at startup (ADR-008)
-- **Production validation** — fail-fast on dev secrets, DEBUG=true, localhost CORS
-- **Nginx edge** — TLS 1.2+, rate limits, reverse proxy (`infra/nginx/`)
-- **docker-compose.prod.yml** — production stack with internal network
-- **Go-live tooling** — `purge_demo_data.py`, `pre_deploy_check.py`
-- **Eskiz.uz SMS** — production API integration path
-- **CI gates** — production-gate workflow, Cosign image signing skeleton
-- **Docs** — go-live runbook, red-team checklist (Section 24A)
-
-## Phase 7 — OCMS Platform Extension
-
-Full education center management modules on Clean Architecture:
-
-- **Migration `008_ocms`** — courses, lessons, exams, grades, payment_transactions, files, messages
-- **Roles** — `accountant`, `student` (+ existing 8-role RBAC)
-- **Dashboard** — active students, monthly revenue, debtors, daily/weekly/monthly charts
-- **Exams API/UI** — create tests, question bank, submit & score results
-- **Grades API/UI** — student grade tracking
-- **Payments** — Click/Payme webhook endpoints (`/integrations/click|payme/webhook`)
-- **Logging** — structured `core/logging_config.py`
-- **Architecture doc** — `docs/ocms-master-architecture.md`
+## Security verification
 
 ```bash
-docker compose exec backend alembic upgrade head
-```
-
-## Security Verification
-
-```bash
-# Offline (CI / no server)
+# Automated red-team (offline — no server required)
 python3 scripts/red_team_verify.py --offline
 
-# Against running staging
-python3 scripts/red_team_verify.py --url https://staging.tamor.uz --production
+# Against staging/production
+python3 scripts/red_team_verify.py --url https://tamor.toyloq.uz --production
 
-# Integration security tests (PostgreSQL + Redis required)
+# Integration security tests (PostgreSQL required)
 cd backend && pytest tests/security/ -v
 ```
 
-## Staging deployment
+**Latest offline result:** 12/12 automated checks passed (see `docs/security-audit-report.md`).
 
-See `docs/staging-deploy.md` and `.env.staging.example`.
+**Still required before production:** external penetration test sign-off (`docs/red-team-checklist.md`), CA TLS, Vault secrets, demo data purge on prod host.
 
-```bash
-cp .env.staging.example .env.staging
-docker compose -f docker-compose.staging.yml --env-file .env.staging up -d --build
-```
+---
 
-## Integrations
-
-SMS (eskiz.uz) works in staging/production when configured. **Email is not implemented** — see `docs/integrations.md`.
-
-## Quick Start
-
-### Prerequisites
-
-- Docker & Docker Compose
-- Node.js 20+ (optional, for local frontend dev)
-- Python 3.12+ (optional, for local backend dev)
-
-### Run with Docker
+## Quick start (Docker)
 
 ```bash
 docker compose up --build
-```
-
-Services:
-- Frontend: http://localhost:3000
-- Backend API: http://localhost:8000
-- AI Analytics: http://localhost:8001
-- API Docs (dev): http://localhost:8000/docs
-
-### Seed Demo Users
-
-After services are running:
-
-```bash
+docker compose exec backend alembic upgrade head
 docker compose exec backend python scripts/seed_demo_users.py --i-understand-this-creates-demo-credentials
 ```
 
-Demo credentials are printed to the console only. **Never run in production.**
+- Frontend: http://localhost:3000  
+- API: http://localhost:8000  
+- Docs (dev): http://localhost:8000/docs
 
-| Role | Username | Password | MFA |
-|------|----------|----------|-----|
-| Super Admin | `admin.tmb` | `Tmb#2026Admin!` | TOTP (QR in console) |
-| Hokimiyat Operator | `operator.hokimiyat` | `Hokim#Op2026!` | TOTP |
-| Center Director | `director.aspect` | `Direktor#2026!` | TOTP |
-| Center Admin | `admin.aspect` | `CenterAdmin#26!` | — |
-| Teacher | `teacher.dilnoza` | `Teach#Dil2026!` | — |
-| Auditor | `auditor.tuman` | `Audit#Check26!` | — |
-| Parent | phone `+998901234567` | SMS OTP (dev console) | — |
+### LLM configuration (`.env` — never commit keys)
 
-Parent portal: http://localhost:3000/parent/login
+```env
+LLM_API_KEY=sk-bl-...              # BazaarLink (primary)
+GEMINI_API_KEY=...                 # fallback 1
+MISTRAL_API_KEY=...                # fallback 2
+AI_ENABLED=true
+```
 
-### Local Development (without Docker)
+Windows: `scripts\windows\setup-llm-env.cmd`
 
-**Backend:**
+---
+
+## Demo credentials (development only)
+
+| Role | Username | Password |
+|------|----------|----------|
+| Super Admin | `admin.tmb` | `Tmb#2026Admin!` |
+| Hokimiyat Operator | `operator.hokimiyat` | `Hokim#Op2026!` |
+| Center Admin | `admin.aspect` | `CenterAdmin#26!` |
+| Teacher | `teacher.dilnoza` | `Teach#Dil2026!` |
+| Student | `student.sardor` | `Student#2026!` |
+
+---
+
+## Production go-live
 
 ```bash
-cd backend
-python -m venv .venv && source .venv/bin/activate
-pip install -r requirements.txt
-mkdir -p /tmp/secrets
-openssl genrsa -out /tmp/secrets/jwt_private.pem 2048
-openssl rsa -in /tmp/secrets/jwt_private.pem -pubout -out /tmp/secrets/jwt_public.pem
-cp .env.example .env
-# Start PostgreSQL and Redis, then:
-alembic upgrade head
-uvicorn app.main:app --reload
+cp .env.production.example .env.production   # fill secrets
+./scripts/go-live.sh                          # Linux server
 ```
 
-**Frontend:**
+Windows prep: `scripts\windows\go-live-prep.cmd`  
+Build verify: `scripts\windows\verify-prod-build.cmd`
 
-```bash
-cd frontend
-npm install
-npm run dev
-```
+---
 
-## Project Structure
+## Project structure
 
 ```
-backend/          FastAPI API (auth, RBAC, core schema)
-frontend/         Next.js 14 + next-intl (UZ/RU/EN)
-ai-analytics-service/  AI microservice skeleton (Phase 3)
-docs/             Threat model, ADRs, runbooks
-infra/            Nginx, deployment configs
+backend/                 FastAPI API
+frontend/                Next.js 14 (UZ/RU/EN)
+ai-analytics-service/    District analytics microservice
+docs/                    Threat model, ADRs, runbooks, security report
+infra/nginx/             TLS edge proxy
+scripts/                 Go-live, red-team, backup
 ```
 
-## Security Notes
+---
 
-- JWT private keys live in `/secrets/` (Vault/KMS in production)
-- Refresh tokens in httpOnly Secure SameSite=Strict cookies
-- Demo accounts tagged `is_demo_account=true`; CI blocks production deploy if any exist
-- See `docs/threat-model.md` for full STRIDE analysis
+## Documentation
 
-## Production Readiness Checklist
+| Document | Purpose |
+|----------|---------|
+| [`docs/threat-model.md`](docs/threat-model.md) | STRIDE analysis |
+| [`docs/red-team-checklist.md`](docs/red-team-checklist.md) | Section 24A checklist |
+| [`docs/go-live-runbook.md`](docs/go-live-runbook.md) | Production deployment |
+| [`docs/security-audit-report.md`](docs/security-audit-report.md) | Latest audit results |
 
-### Done (Phase 0–5)
-- [x] Phase 0: Auth, threat model, i18n skeleton
-- [x] Phase 1: CRUD, dashboard, PINFL masking
-- [x] Phase 2: Rating engine, certificates, QR verify, PDF/Excel reports
-- [x] Phase 3: AI analytics, notifications, integration adapters
-- [x] Phase 4: Parent portal, PWA, RLS, Telegram bot, Celery scheduler
-- [x] Phase 5: Vault secrets, Nginx/TLS, go-live runbook, deploy gates
-
-### Deferred
-- [ ] External penetration test (use `docs/red-team-checklist.md`)
-
-### Required Before Go-Live
-- Run `scripts/purge_demo_data.py` and `scripts/pre_deploy_check.py` (or `./scripts/go-live.sh`)
-- Configure Vault secrets per `docs/go-live-runbook.md`
-- Complete `docs/red-team-checklist.md` with sign-off
-- CA-signed TLS certificates (not `generate-dev-certs.sh`)
-- Data localization on Uzbekistan infrastructure
-- Step-by-step (UZ): `docs/go-live-steps-uz.md` · Windows prep: `scripts/windows/go-live-prep.cmd`
-- **100% checklist:** `docs/production-100-checklist-uz.md`
-- **LLM setup:** BazaarLink (primary) + Gemini (fallback) — `scripts/windows/setup-llm-env.cmd`
+---
 
 ## License
 

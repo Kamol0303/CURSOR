@@ -54,6 +54,8 @@ PUBLIC_HOST=tamor.staging.local ./scripts/verify-staging.sh
 
 Open: **https://tamor.staging.local**
 
+Uploaded files (student photos, certificate documents) persist in Docker volume `upload_staging` (`FILE_UPLOAD_DIR=/data/uploads`).
+
 **Important:** After a fresh deploy or `down -v`, seed demo users before logging in:
 
 ```bash

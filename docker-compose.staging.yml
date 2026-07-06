@@ -34,15 +34,23 @@ services:
     networks: [internal]
 
   backend:
-    build: ./backend
+    build:
+      context: ./backend
+      args:
+        HTTP_PROXY: ""
+        HTTPS_PROXY: ""
+        http_proxy: ""
+        https_proxy: ""
     restart: unless-stopped
     env_file: .env.staging
     environment:
       ENVIRONMENT: staging
       DEBUG: "false"
       SECRETS_BACKEND: file
+      FILE_UPLOAD_DIR: /data/uploads
     volumes:
       - jwt_secrets:/secrets
+      - upload_staging:/data/uploads
     depends_on:
       postgres:
         condition: service_healthy
@@ -111,3 +119,4 @@ networks:
 volumes:
   postgres_staging:
   jwt_secrets:
+  upload_staging:

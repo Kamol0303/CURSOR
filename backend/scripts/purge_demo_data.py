@@ -12,19 +12,23 @@ import argparse
 import asyncio
 import sys
 
-from sqlalchemy import delete, func, or_, select
+from sqlalchemy import delete, func, or_, select, update
 from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 
 sys.path.insert(0, ".")
 
 from app.core.config import settings
 from app.core.rls import apply_rls_context, set_rls_role
+from app.models.academics import Course, Exam, ExamQuestion, ExamResult, Grade, Lesson
 from app.models.analytics_notifications import (
     Notification,
     NotificationLog,
     NotificationPreference,
+    PushSubscription,
 )
 from app.models.education import Enrollment, Group, Guardian, Student, Teacher, TeacherSubject
+from app.models.files_messages import Message, StoredFile
+from app.models.finance import PaymentTransaction
 from app.models.identity import (
     AuditLog,
     DeviceFingerprint,
@@ -38,6 +42,7 @@ from app.models.identity import (
     User,
 )
 from app.models.integrations import TelegramSubscription
+from app.models.operations import AttendanceRecord, AttendanceSession, StudentPayment
 from app.models.ratings_certs import (
     Certificate,
     CertificateVerification,
@@ -72,7 +77,12 @@ async def collect_counts(session) -> dict[str, int]:
     demo_centers = select(TrainingCenter.id).where(TrainingCenter.is_demo_data.is_(True))
     demo_students = select(Student.id).where(Student.is_demo_data.is_(True))
     demo_teachers = select(Teacher.id).where(Teacher.is_demo_data.is_(True))
+    demo_groups = select(Group.id).where(Group.center_id.in_(demo_centers))
     demo_certs = select(Certificate.id).where(Certificate.is_demo_data.is_(True))
+    demo_payments = select(StudentPayment.id).where(
+        or_(StudentPayment.center_id.in_(demo_centers), StudentPayment.student_id.in_(demo_students))
+    )
+    demo_exams = select(Exam.id).where(Exam.center_id.in_(demo_centers))
 
     return {
         "demo_users": await _count(session, select(func.count()).select_from(User).where(User.is_demo_account.is_(True))),
@@ -97,6 +107,66 @@ async def collect_counts(session) -> dict[str, int]:
             .select_from(Enrollment)
             .where(or_(Enrollment.center_id.in_(demo_centers), Enrollment.student_id.in_(demo_students))),
         ),
+        "demo_exam_results": await _count(
+            session,
+            select(func.count())
+            .select_from(ExamResult)
+            .where(or_(ExamResult.center_id.in_(demo_centers), ExamResult.student_id.in_(demo_students))),
+        ),
+        "demo_exams": await _count(
+            session, select(func.count()).select_from(Exam).where(Exam.center_id.in_(demo_centers))
+        ),
+        "demo_grades": await _count(
+            session,
+            select(func.count())
+            .select_from(Grade)
+            .where(or_(Grade.center_id.in_(demo_centers), Grade.student_id.in_(demo_students))),
+        ),
+        "demo_payments": await _count(
+            session,
+            select(func.count())
+            .select_from(StudentPayment)
+            .where(or_(StudentPayment.center_id.in_(demo_centers), StudentPayment.student_id.in_(demo_students))),
+        ),
+        "demo_payment_transactions": await _count(
+            session, select(func.count()).select_from(PaymentTransaction).where(PaymentTransaction.payment_id.in_(demo_payments))
+        ),
+        "demo_attendance_records": await _count(
+            session,
+            select(func.count())
+            .select_from(AttendanceRecord)
+            .where(or_(AttendanceRecord.center_id.in_(demo_centers), AttendanceRecord.student_id.in_(demo_students))),
+        ),
+        "demo_attendance_sessions": await _count(
+            session,
+            select(func.count())
+            .select_from(AttendanceSession)
+            .where(or_(AttendanceSession.center_id.in_(demo_centers), AttendanceSession.group_id.in_(demo_groups))),
+        ),
+        "demo_courses": await _count(
+            session, select(func.count()).select_from(Course).where(Course.center_id.in_(demo_centers))
+        ),
+        "demo_lessons": await _count(
+            session, select(func.count()).select_from(Lesson).where(Lesson.center_id.in_(demo_centers))
+        ),
+        "demo_messages": await _count(
+            session,
+            select(func.count())
+            .select_from(Message)
+            .where(
+                or_(
+                    Message.center_id.in_(demo_centers),
+                    Message.sender_id.in_(demo_users),
+                    Message.recipient_id.in_(demo_users),
+                )
+            ),
+        ),
+        "demo_files": await _count(
+            session,
+            select(func.count())
+            .select_from(StoredFile)
+            .where(or_(StoredFile.center_id.in_(demo_centers), StoredFile.uploaded_by.in_(demo_users))),
+        ),
         "demo_refresh_tokens": await _count(
             session, select(func.count()).select_from(RefreshToken).where(RefreshToken.user_id.in_(demo_users))
         ),
@@ -115,7 +185,12 @@ async def purge_demo_rows(session) -> None:
     demo_centers = select(TrainingCenter.id).where(TrainingCenter.is_demo_data.is_(True))
     demo_students = select(Student.id).where(Student.is_demo_data.is_(True))
     demo_teachers = select(Teacher.id).where(Teacher.is_demo_data.is_(True))
+    demo_groups = select(Group.id).where(Group.center_id.in_(demo_centers))
     demo_certs = select(Certificate.id).where(Certificate.is_demo_data.is_(True))
+    demo_payments = select(StudentPayment.id).where(
+        or_(StudentPayment.center_id.in_(demo_centers), StudentPayment.student_id.in_(demo_students))
+    )
+    demo_exams = select(Exam.id).where(Exam.center_id.in_(demo_centers))
 
     await session.execute(
         delete(CertificateVerification).where(CertificateVerification.certificate_id.in_(demo_certs))
@@ -123,6 +198,53 @@ async def purge_demo_rows(session) -> None:
     await session.execute(delete(Certificate).where(Certificate.is_demo_data.is_(True)))
     await session.execute(delete(RatingHistory).where(RatingHistory.center_id.in_(demo_centers)))
     await session.execute(delete(Report).where(Report.requested_by.in_(demo_users)))
+
+    await session.execute(
+        delete(ExamResult).where(
+            or_(ExamResult.center_id.in_(demo_centers), ExamResult.student_id.in_(demo_students))
+        )
+    )
+    await session.execute(delete(ExamQuestion).where(ExamQuestion.exam_id.in_(demo_exams)))
+    await session.execute(delete(Exam).where(Exam.center_id.in_(demo_centers)))
+    await session.execute(
+        delete(Grade).where(or_(Grade.center_id.in_(demo_centers), Grade.student_id.in_(demo_students)))
+    )
+    await session.execute(delete(PaymentTransaction).where(PaymentTransaction.payment_id.in_(demo_payments)))
+    await session.execute(
+        delete(StudentPayment).where(
+            or_(StudentPayment.center_id.in_(demo_centers), StudentPayment.student_id.in_(demo_students))
+        )
+    )
+    await session.execute(
+        delete(AttendanceRecord).where(
+            or_(AttendanceRecord.center_id.in_(demo_centers), AttendanceRecord.student_id.in_(demo_students))
+        )
+    )
+    await session.execute(
+        delete(AttendanceSession).where(
+            or_(AttendanceSession.center_id.in_(demo_centers), AttendanceSession.group_id.in_(demo_groups))
+        )
+    )
+    await session.execute(delete(Lesson).where(Lesson.center_id.in_(demo_centers)))
+    await session.execute(delete(Course).where(Course.center_id.in_(demo_centers)))
+    await session.execute(
+        delete(Message).where(
+            or_(
+                Message.center_id.in_(demo_centers),
+                Message.sender_id.in_(demo_users),
+                Message.recipient_id.in_(demo_users),
+            )
+        )
+    )
+    await session.execute(
+        update(Student).where(Student.id.in_(demo_students)).values(photo_file_id=None)
+    )
+    await session.execute(
+        delete(StoredFile).where(
+            or_(StoredFile.center_id.in_(demo_centers), StoredFile.uploaded_by.in_(demo_users))
+        )
+    )
+
     await session.execute(
         delete(Enrollment).where(
             or_(Enrollment.center_id.in_(demo_centers), Enrollment.student_id.in_(demo_students))
@@ -138,6 +260,7 @@ async def purge_demo_rows(session) -> None:
     await session.execute(delete(NotificationLog).where(NotificationLog.notification_id.in_(demo_notifications)))
     await session.execute(delete(Notification).where(Notification.user_id.in_(demo_users)))
     await session.execute(delete(NotificationPreference).where(NotificationPreference.user_id.in_(demo_users)))
+    await session.execute(delete(PushSubscription).where(PushSubscription.user_id.in_(demo_users)))
     await session.execute(delete(TelegramSubscription).where(TelegramSubscription.user_id.in_(demo_users)))
 
     for model, column in [

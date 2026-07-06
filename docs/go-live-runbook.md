@@ -74,6 +74,12 @@ chmod +x scripts/go-live.sh scripts/verify-prod.sh scripts/purge-demo-data.sh sc
 
 This will: build → dry-run purge → confirm purge → pre-deploy gate → verify-prod.
 
+**O'zbekcha qadamlar:** `docs/go-live-steps-uz.md`  
+**Windows tayyorgarlik:** `scripts/windows/go-live-prep.cmd`  
+**Build tekshiruvi:** `scripts/verify-prod-build.sh` · Windows: `scripts/windows/verify-prod-build.cmd`
+
+Production frontend uses `frontend/Dockerfile.prod` (Next.js `output: "standalone"`). Uploads persist in Docker volume `upload_data` (`FILE_UPLOAD_DIR=/data/uploads`).
+
 ## 4. Manual Steps (alternative)
 
 ### Purge demo data

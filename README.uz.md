@@ -19,6 +19,19 @@ Go-live ro'yxati: [`docs/production-100-checklist-uz.md`](docs/production-100-ch
 
 ---
 
+## So'nggi o'zgarishlar (2026-yil iyul)
+
+| O'zgarish | Tafsilot |
+|-----------|----------|
+| **Uch tilli README** | `README.md`, `README.uz.md`, `README.ru.md` — Windows, macOS, Linux dev, Linux production buyruqlari |
+| **`scripts/linux-dev-setup.sh`** | Kali/Ubuntu/Debian: prod/staging to'xtatish, port tekshiruvi, dev ishga tushirish |
+| **PostgreSQL dev porti** | Host port **5433** (5432 emas) — boshqa Docker/tizim PostgreSQL bilan ziddiyatni oldini oladi |
+| **Alembic tuzatish** | `015_lesson_materials` zanjiri to'g'rilandi (`014_certificate_file`); test: `backend/tests/test_alembic_chain.py` |
+| **Muammolarni bartaraf etish** | Windows vs Linux buyruqlari, production `backend unhealthy`, 5432 port, orphan konteynerlar |
+| **Brauzer** | `http://localhost:3000` — Docker ishlayotgan **shu kompyuterda**; Cursor preview ishlamaydi; Linuxda brauzerni **root** emas, oddiy foydalanuvchi ochsin |
+
+---
+
 ## Asosiy imkoniyatlar
 
 - **RBAC** — 10+ rol, PostgreSQL RLS, tenant izolyatsiyasi
@@ -84,17 +97,21 @@ scripts\windows\setup-llm-env.cmd
 scripts\windows\update-main.cmd
 ```
 
-**4. Demo loginlarni ko'rsatish**
+**4. Stack holatini tekshirish**
 
 ```cmd
-scripts\windows\show-credentials.cmd
+docker compose ps
+curl -s http://localhost:8000/health
 ```
+
+Dev loginlar seeddan keyin **faqat mahalliy terminalda** ko'rsatiladi (repozitoriyada saqlanmaydi). Windows: `scripts\windows\show-credentials.cmd`
 
 | URL | Manzil |
 |-----|--------|
 | Frontend | http://localhost:3000 |
 | API | http://localhost:8000 |
 | API hujjatlari | http://localhost:8000/docs |
+| PostgreSQL (host) | `localhost:5433` |
 
 **Windows — staging (HTTPS, mahalliy)**
 
@@ -161,6 +178,7 @@ docker compose exec backend python scripts/seed_demo_users.py --i-understand-thi
 | Frontend | http://localhost:3000 |
 | API | http://localhost:8000 |
 | API hujjatlari | http://localhost:8000/docs |
+| PostgreSQL (host) | `localhost:5433` |
 
 **macOS — staging (HTTPS, mahalliy)**
 
@@ -353,7 +371,7 @@ Agar yana xato bersa:
 
 ```bash
 docker ps --format '{{.Names}} {{.Ports}}' | grep 5432
-docker stop <konteyner_nomi>
+docker stop some-postgres
 ./scripts/linux-dev-setup.sh
 ```
 
@@ -369,17 +387,42 @@ docker compose down --remove-orphans
 ./scripts/start.sh dev
 ```
 
+### Alembic `KeyError: '014_certificate_file_id'`
+
+Oxirgi `main` ni oling (migratsiya zanjiri tuzatildi), keyin dev bazani qayta yarating:
+
+```bash
+git pull origin main
+docker compose down -v
+./scripts/linux-dev-setup.sh
+```
+
+### Brauzerda ochish
+
+- Manzil: **http://localhost:3000** (Docker ishlayotgan shu kompyuterda)
+- Tekshiruv: `curl -s http://localhost:8000/health` → `{"status":"ok",...}`
+- Cursor/Cloud preview URL lari mahalliy Docker ga **ulanmaydi**
+- Linux/Kali: brauzerni **root** emas, oddiy foydalanuvchi (`xushnud`) ochsin:
+
+```bash
+exit
+firefox http://localhost:3000 &
+# yoki root dan:
+su - xushnud -c "firefox http://localhost:3000 &"
+```
+
 ---
 
-## Demo loginlar (faqat development)
+## Development kirish
 
-| Rol | Login | Parol |
-|-----|-------|-------|
-| Super Admin | `admin.tmb` | `Tmb#2026Admin!` |
-| Hokimiyat operatori | `operator.hokimiyat` | `Hokim#Op2026!` |
-| Markaz admini | `admin.aspect` | `CenterAdmin#26!` |
-| O'qituvchi | `teacher.dilnoza` | `Teach#Dil2026!` |
-| O'quvchi | `student.sardor` | `Student#2026!` |
+`seed_demo_users.py` (yoki `update-main.cmd` / `linux-dev-setup.sh`) dan keyin loginlar **faqat mahalliy terminalda** chiqadi:
+
+| Platforma | Buyruq |
+|-----------|--------|
+| Windows | `scripts\windows\show-credentials.cmd` |
+| Linux/macOS | `./scripts/start.sh dev` yoki `./scripts/linux-dev-setup.sh` chiqishi |
+
+Login va parollar **xavfsizlik uchun README da ko'rsatilmaydi**. Faqat mahalliy/staging muhitda ishlating.
 
 ---
 

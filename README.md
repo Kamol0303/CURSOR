@@ -19,6 +19,19 @@ Go-live checklist: [`docs/production-100-checklist-uz.md`](docs/production-100-c
 
 ---
 
+## Recent changes (July 2026)
+
+| Change | Details |
+|--------|---------|
+| **Trilingual README** | `README.md`, `README.uz.md`, `README.ru.md` — run commands for Windows, macOS, Linux dev, Linux production |
+| **`scripts/linux-dev-setup.sh`** | Kali/Ubuntu/Debian: stops prod/staging conflicts, checks ports, starts dev |
+| **PostgreSQL dev port** | Host port **5433** (not 5432) — avoids conflict with other Docker/system PostgreSQL |
+| **Alembic fix** | Migration `015_lesson_materials` chain corrected (`014_certificate_file`); test: `backend/tests/test_alembic_chain.py` |
+| **Troubleshooting** | Windows vs Linux commands, production `backend unhealthy`, port 5432, orphan containers |
+| **Browser access** | Open `http://localhost:3000` on the **same machine** where Docker runs — not Cursor cloud preview; do not run browser as **root** on Linux |
+
+---
+
 ## Key features
 
 - **RBAC** — 10+ roles, PostgreSQL RLS, tenant isolation
@@ -84,11 +97,14 @@ scripts\windows\setup-llm-env.cmd
 scripts\windows\update-main.cmd
 ```
 
-**4. Show demo logins**
+**4. Verify the stack**
 
 ```cmd
-scripts\windows\show-credentials.cmd
+docker compose ps
+curl -s http://localhost:8000/health
 ```
+
+Dev credentials are printed **locally** after seed (not stored in this repository). On Windows: `scripts\windows\show-credentials.cmd`
 
 | URL | Address |
 |-----|---------|
@@ -358,8 +374,8 @@ docker compose -f docker-compose.prod.yml --env-file .env.production down 2>/dev
 docker compose down --remove-orphans
 sudo systemctl stop postgresql
 docker ps --format '{{.Names}} {{.Ports}}' | grep 5432
-# stop the foreign container shown above:
-docker stop <container_name>
+# stop the foreign container shown above (example):
+docker stop some-postgres
 
 ./scripts/linux-dev-setup.sh
 ```
@@ -376,17 +392,42 @@ docker compose down --remove-orphans
 ./scripts/start.sh dev
 ```
 
+### Alembic `KeyError: '014_certificate_file_id'`
+
+Pull latest `main` (migration chain was fixed), then reset dev DB:
+
+```bash
+git pull origin main
+docker compose down -v
+./scripts/linux-dev-setup.sh
+```
+
+### Opening the app in a browser
+
+- URL: **http://localhost:3000** (same computer where Docker runs)
+- Verify: `curl -s http://localhost:8000/health` → `{"status":"ok",...}`
+- **Do not** use Cursor/Cloud preview URLs — they cannot reach your local Docker
+- On Linux/Kali: open the browser as your **normal user**, not `root`:
+
+```bash
+exit                          # leave root shell
+firefox http://localhost:3000 &
+# or from root:
+su - xushnud -c "firefox http://localhost:3000 &"
+```
+
 ---
 
-## Demo credentials (development only)
+## Development access
 
-| Role | Username | Password |
-|------|----------|----------|
-| Super Admin | `admin.tmb` | `Tmb#2026Admin!` |
-| Hokimiyat Operator | `operator.hokimiyat` | `Hokim#Op2026!` |
-| Center Admin | `admin.aspect` | `CenterAdmin#26!` |
-| Teacher | `teacher.dilnoza` | `Teach#Dil2026!` |
-| Student | `student.sardor` | `Student#2026!` |
+After `seed_demo_users.py` (or `update-main.cmd` / `linux-dev-setup.sh`), credentials are shown **only in your local terminal**:
+
+| Platform | Command |
+|----------|---------|
+| Windows | `scripts\windows\show-credentials.cmd` |
+| Linux/macOS | Printed by `./scripts/start.sh dev` or `./scripts/linux-dev-setup.sh` |
+
+Credentials are **not published in this repository** for security. Use only in local/staging environments.
 
 ---
 

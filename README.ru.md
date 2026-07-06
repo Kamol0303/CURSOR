@@ -19,6 +19,19 @@
 
 ---
 
+## Последние изменения (июль 2026)
+
+| Изменение | Описание |
+|-----------|----------|
+| **README на 3 языках** | `README.md`, `README.uz.md`, `README.ru.md` — команды для Windows, macOS, Linux dev, Linux production |
+| **`scripts/linux-dev-setup.sh`** | Kali/Ubuntu/Debian: остановка prod/staging, проверка портов, запуск dev |
+| **Порт PostgreSQL в dev** | Хост-порт **5433** (не 5432) — избегает конфликта с другим Docker/системным PostgreSQL |
+| **Исправление Alembic** | Цепочка `015_lesson_materials` (`014_certificate_file`); тест: `backend/tests/test_alembic_chain.py` |
+| **Устранение неполадок** | Windows vs Linux, production `backend unhealthy`, порт 5432, orphan-контейнеры |
+| **Браузер** | `http://localhost:3000` на **той же машине**, где Docker; preview Cursor не работает; на Linux не запускайте браузер от **root** |
+
+---
+
 ## Основные возможности
 
 - **RBAC** — 10+ ролей, PostgreSQL RLS, изоляция тенантов
@@ -84,17 +97,21 @@ scripts\windows\setup-llm-env.cmd
 scripts\windows\update-main.cmd
 ```
 
-**4. Показать демо-логины**
+**4. Проверка стека**
 
 ```cmd
-scripts\windows\show-credentials.cmd
+docker compose ps
+curl -s http://localhost:8000/health
 ```
+
+Учётные данные dev выводятся **локально** после seed (не хранятся в репозитории). Windows: `scripts\windows\show-credentials.cmd`
 
 | URL | Адрес |
 |-----|-------|
 | Frontend | http://localhost:3000 |
 | API | http://localhost:8000 |
 | API docs | http://localhost:8000/docs |
+| PostgreSQL (host) | `localhost:5433` |
 
 **Windows — staging (HTTPS, локально)**
 
@@ -161,6 +178,7 @@ docker compose exec backend python scripts/seed_demo_users.py --i-understand-thi
 | Frontend | http://localhost:3000 |
 | API | http://localhost:8000 |
 | API docs | http://localhost:8000/docs |
+| PostgreSQL (host) | `localhost:5433` |
 
 **macOS — staging (HTTPS, локально)**
 
@@ -353,7 +371,7 @@ git pull origin main
 
 ```bash
 docker ps --format '{{.Names}} {{.Ports}}' | grep 5432
-docker stop <имя_контейнера>
+docker stop some-postgres
 ./scripts/linux-dev-setup.sh
 ```
 
@@ -369,17 +387,42 @@ docker compose down --remove-orphans
 ./scripts/start.sh dev
 ```
 
+### Alembic `KeyError: '014_certificate_file_id'`
+
+Обновите `main` (цепочка миграций исправлена), затем пересоздайте dev-БД:
+
+```bash
+git pull origin main
+docker compose down -v
+./scripts/linux-dev-setup.sh
+```
+
+### Открытие в браузере
+
+- URL: **http://localhost:3000** (на той же машине, где работает Docker)
+- Проверка: `curl -s http://localhost:8000/health` → `{"status":"ok",...}`
+- Preview URL Cursor **не подключается** к локальному Docker
+- На Linux/Kali открывайте браузер **не от root**:
+
+```bash
+exit
+firefox http://localhost:3000 &
+# или от root:
+su - xushnud -c "firefox http://localhost:3000 &"
+```
+
 ---
 
-## Демо-учётные записи (только development)
+## Доступ в development
 
-| Роль | Логин | Пароль |
-|------|-------|--------|
-| Super Admin | `admin.tmb` | `Tmb#2026Admin!` |
-| Оператор хокимията | `operator.hokimiyat` | `Hokim#Op2026!` |
-| Админ центра | `admin.aspect` | `CenterAdmin#26!` |
-| Учитель | `teacher.dilnoza` | `Teach#Dil2026!` |
-| Ученик | `student.sardor` | `Student#2026!` |
+После `seed_demo_users.py` (или `update-main.cmd` / `linux-dev-setup.sh`) учётные данные выводятся **только в локальном терминале**:
+
+| Платформа | Команда |
+|-----------|---------|
+| Windows | `scripts\windows\show-credentials.cmd` |
+| Linux/macOS | Вывод `./scripts/start.sh dev` или `./scripts/linux-dev-setup.sh` |
+
+Логины и пароли **не публикуются в README** из соображений безопасности. Используйте только локально/staging.
 
 ---
 

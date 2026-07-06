@@ -19,7 +19,7 @@ sys.path.insert(0, ".")
 
 from app.core.config import settings
 from app.core.rls import apply_rls_context, set_rls_role
-from app.models.academics import Course, Exam, ExamQuestion, ExamResult, Grade, Lesson
+from app.models.academics import Course, Exam, ExamQuestion, ExamResult, Grade, Lesson, LessonMaterial
 from app.models.analytics_notifications import (
     Notification,
     NotificationLog,
@@ -167,6 +167,14 @@ async def collect_counts(session) -> dict[str, int]:
             .select_from(StoredFile)
             .where(or_(StoredFile.center_id.in_(demo_centers), StoredFile.uploaded_by.in_(demo_users))),
         ),
+        "demo_lesson_materials": await _count(
+            session,
+            select(func.count())
+            .select_from(LessonMaterial)
+            .where(
+                or_(LessonMaterial.center_id.in_(demo_centers), LessonMaterial.teacher_id.in_(demo_users))
+            ),
+        ),
         "demo_refresh_tokens": await _count(
             session, select(func.count()).select_from(RefreshToken).where(RefreshToken.user_id.in_(demo_users))
         ),
@@ -242,6 +250,11 @@ async def purge_demo_rows(session) -> None:
     await session.execute(
         delete(StoredFile).where(
             or_(StoredFile.center_id.in_(demo_centers), StoredFile.uploaded_by.in_(demo_users))
+        )
+    )
+    await session.execute(
+        delete(LessonMaterial).where(
+            or_(LessonMaterial.center_id.in_(demo_centers), LessonMaterial.teacher_id.in_(demo_users))
         )
     )
 

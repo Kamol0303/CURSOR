@@ -8,7 +8,6 @@ from fastapi import HTTPException
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.config import settings
 from app.models.education import Subject
 from app.models.identity import User
 from app.schemas.exams import ExamCreate, ExamGenerateRequest, ExamResponse
@@ -34,7 +33,7 @@ async def generate_exam(
 
     locale = body.locale if body.locale in {"uz", "ru", "en"} else (user.locale_preference or "uz")
     subject_name = getattr(subject, f"name_{locale}", subject.name_uz)
-    questions = await llm_service.generate_exam_questions(
+    questions, ai_provider = await llm_service.generate_exam_questions(
         subject_name=subject_name,
         topic=body.topic,
         question_count=body.question_count,
@@ -67,7 +66,7 @@ async def generate_exam(
             "topic": body.topic,
             "question_count": len(questions),
             "difficulty": body.difficulty,
-            "ai_provider": llm_service.llm_provider_label(),
+            "ai_provider": ai_provider,
         },
     )
     return exam

@@ -129,7 +129,7 @@ async def generate_lesson_material(
 
     locale = body.locale if body.locale in {"uz", "ru", "en"} else (user.locale_preference or "uz")
     subject_name = getattr(subject, f"name_{locale}", subject.name_uz)
-    content = await llm_service.generate_lesson_content(
+    content, ai_provider = await llm_service.generate_lesson_content(
         subject_name=subject_name,
         topic=body.topic.strip(),
         content_type=body.content_type,
@@ -148,7 +148,7 @@ async def generate_lesson_material(
         title=title,
         content_json=content,
         status="draft",
-        ai_provider=llm_service.llm_provider_label(),
+        ai_provider=ai_provider,
     )
     db.add(material)
     await db.flush()

@@ -209,6 +209,8 @@ infra/            Nginx, deployment configs
 - CA-signed TLS certificates (not `generate-dev-certs.sh`)
 - Data localization on Uzbekistan infrastructure
 - Step-by-step (UZ): `docs/go-live-steps-uz.md` · Windows prep: `scripts/windows/go-live-prep.cmd`
+- **100% checklist:** `docs/production-100-checklist-uz.md`
+- **LLM setup:** BazaarLink (primary) + Gemini (fallback) — `scripts/windows/setup-llm-env.cmd`
 
 ## License
 

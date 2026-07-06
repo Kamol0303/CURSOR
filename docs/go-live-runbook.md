@@ -80,6 +80,8 @@ This will: build → dry-run purge → confirm purge → pre-deploy gate → ver
 
 Production frontend uses `frontend/Dockerfile.prod` (Next.js `output: "standalone"`). Uploads persist in Docker volume `upload_data` (`FILE_UPLOAD_DIR=/data/uploads`).
 
+**LLM (AI):** BazaarLink primary (`LLM_API_KEY`), Gemini fallback (`GEMINI_API_KEY`) — see `docs/production-100-checklist-uz.md`.
+
 ## 4. Manual Steps (alternative)
 
 ### Purge demo data

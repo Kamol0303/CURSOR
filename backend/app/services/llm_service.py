@@ -1,64 +1,115 @@
-"""LLM helpers — BazaarLink gateway (OpenAI-compatible) with mock fallback."""
+"""LLM helpers — BazaarLink primary, Gemini fallback, mock when unconfigured."""
 
 from __future__ import annotations
 
 import json
 import re
+from dataclasses import dataclass
+from typing import Any
 
 import httpx
 from fastapi import HTTPException
 
 from app.core.config import settings
+from app.core.logging_config import get_logger
 from app.schemas.exams import ExamQuestionCreate
+
+logger = get_logger(__name__)
+
+_RETRYABLE_STATUS = frozenset({402, 429, 500, 502, 503, 504})
+
+
+@dataclass(frozen=True)
+class LlmProvider:
+    name: str
+    api_key: str
+    base_url: str
+    model: str
+
+
+def _normalize_bazaarlink_model(model: str) -> str:
+    if "/" not in model and not model.startswith("auto:"):
+        return f"openai/{model}"
+    return model
+
+
+def list_llm_providers() -> list[LlmProvider]:
+    """Ordered provider chain: BazaarLink → Gemini → direct OpenAI."""
+    providers: list[LlmProvider] = []
+
+    bazaar_key = (settings.LLM_API_KEY or "").strip()
+    if bazaar_key:
+        providers.append(
+            LlmProvider(
+                name="bazaarlink",
+                api_key=bazaar_key,
+                base_url=settings.LLM_BASE_URL.rstrip("/"),
+                model=_normalize_bazaarlink_model(settings.LLM_MODEL),
+            )
+        )
+
+    gemini_key = (settings.GEMINI_API_KEY or "").strip()
+    if gemini_key:
+        providers.append(
+            LlmProvider(
+                name="gemini",
+                api_key=gemini_key,
+                base_url=settings.GEMINI_BASE_URL.rstrip("/"),
+                model=settings.GEMINI_MODEL,
+            )
+        )
+
+    openai_key = (settings.OPENAI_API_KEY or "").strip()
+    if openai_key and not bazaar_key:
+        providers.append(
+            LlmProvider(
+                name="openai",
+                api_key=openai_key,
+                base_url="https://api.openai.com/v1",
+                model=settings.OPENAI_MODEL,
+            )
+        )
+
+    return providers
 
 
 def resolve_llm_settings() -> tuple[str, str, str]:
-    """Return (api_key, base_url, model) for chat completions."""
-    api_key = (settings.LLM_API_KEY or settings.OPENAI_API_KEY or "").strip()
-    if not api_key:
+    """Primary provider settings (backward compatible)."""
+    providers = list_llm_providers()
+    if not providers:
         return "", "", ""
-
-    if settings.LLM_API_KEY:
-        base_url = settings.LLM_BASE_URL.rstrip("/")
-        model = settings.LLM_MODEL
-        if "/" not in model and not model.startswith("auto:"):
-            model = f"openai/{model}"
-    else:
-        base_url = "https://api.openai.com/v1"
-        model = settings.OPENAI_MODEL
-
-    return api_key, base_url, model
+    first = providers[0]
+    return first.api_key, first.base_url, first.model
 
 
 def llm_provider_label() -> str:
-    api_key, base_url, _ = resolve_llm_settings()
-    if not api_key or not settings.AI_ENABLED:
+    if not settings.AI_ENABLED:
         return "mock"
-    if "bazaarlink" in base_url.lower():
-        return "bazaarlink"
-    return "openai"
+    providers = list_llm_providers()
+    if not providers:
+        return "mock"
+    if len(providers) > 1:
+        return f"{providers[0].name}+fallback"
+    return providers[0].name
 
 
-async def chat_json_completion(
+async def _call_openai_compatible(
+    provider: LlmProvider,
     *,
     system_prompt: str,
     user_prompt: str,
-    temperature: float = 0.4,
-    timeout: float = 90.0,
+    temperature: float,
+    timeout: float,
 ) -> str:
-    api_key, base_url, model = resolve_llm_settings()
-    if not api_key or not settings.AI_ENABLED:
-        raise HTTPException(status_code=503, detail={"code": "AI_NOT_CONFIGURED"})
-
     async with httpx.AsyncClient(timeout=timeout) as client:
         response = await client.post(
-            f"{base_url}/chat/completions",
+            f"{provider.base_url}/chat/completions",
             headers={
-                "Authorization": f"Bearer {api_key}",
+                "Authorization": f"Bearer {provider.api_key}",
                 "Content-Type": "application/json",
             },
             json={
-                "model": model,
+                "model": provider.model,
                 "messages": [
                     {"role": "system", "content": system_prompt},
                     {"role": "user", "content": user_prompt},
@@ -67,9 +118,64 @@ async def chat_json_completion(
                 "temperature": temperature,
             },
         )
+    if response.status_code in _RETRYABLE_STATUS:
+        raise httpx.HTTPStatusError(
+            f"{provider.name} rate/limit error",
+            request=response.request,
+            response=response,
+        )
     if response.status_code != 200:
-        raise HTTPException(status_code=502, detail={"code": "AI_PROVIDER_ERROR"})
-    return response.json()["choices"][0]["message"]["content"]
+        body = response.text[:300]
+        logger.warning("LLM provider %s failed: %s %s", provider.name, response.status_code, body)
+        raise HTTPException(status_code=502, detail={"code": "AI_PROVIDER_ERROR", "provider": provider.name})
+    data = response.json()
+    return data["choices"][0]["message"]["content"]
+
+
+async def chat_json_completion(
+    *,
+    system_prompt: str,
+    user_prompt: str,
+    temperature: float = 0.4,
+    timeout: float = 90.0,
+) -> tuple[str, str]:
+    """Try each configured provider; return (json_text, provider_name)."""
+    if not settings.AI_ENABLED:
+        raise HTTPException(status_code=503, detail={"code": "AI_NOT_CONFIGURED"})
+
+    providers = list_llm_providers()
+    if not providers:
+        raise HTTPException(status_code=503, detail={"code": "AI_NOT_CONFIGURED"})
+
+    last_error: Exception | None = None
+    for provider in providers:
+        try:
+            content = await _call_openai_compatible(
+                provider,
+                system_prompt=system_prompt,
+                user_prompt=user_prompt,
+                temperature=temperature,
+                timeout=timeout,
+            )
+            logger.info("LLM success via %s model=%s", provider.name, provider.model)
+            return content, provider.name
+        except httpx.HTTPStatusError as exc:
+            last_error = exc
+            logger.warning("LLM provider %s retryable failure: %s", provider.name, exc)
+            continue
+        except HTTPException as exc:
+            if exc.status_code == 502:
+                last_error = exc
+                logger.warning("LLM provider %s failed, trying next", provider.name)
+                continue
+            raise
+
+    if last_error:
+        raise HTTPException(
+            status_code=502,
+            detail={"code": "AI_ALL_PROVIDERS_FAILED", "message": str(last_error)},
+        )
+    raise HTTPException(status_code=502, detail={"code": "AI_PROVIDER_ERROR"})
 
 
 def _build_exam_prompt(
@@ -279,12 +385,11 @@ async def generate_exam_questions(
     question_count: int,
     difficulty: str,
     locale: str,
-) -> list[ExamQuestionCreate]:
+) -> tuple[list[ExamQuestionCreate], str]:
     if question_count < 1 or question_count > settings.AI_EXAM_MAX_QUESTIONS:
         raise HTTPException(status_code=422, detail={"code": "QUESTION_COUNT_OUT_OF_RANGE"})
 
-    api_key, _, _ = resolve_llm_settings()
-    if api_key and settings.AI_ENABLED and settings.AI_EXAM_ENABLED:
+    if list_llm_providers() and settings.AI_ENABLED and settings.AI_EXAM_ENABLED:
         prompt = _build_exam_prompt(
             subject_name=subject_name,
             topic=topic,
@@ -292,13 +397,16 @@ async def generate_exam_questions(
             difficulty=difficulty,
             locale=locale,
         )
-        content = await chat_json_completion(
-            system_prompt="You are an educational assessment author. Output JSON only.",
-            user_prompt=prompt,
-        )
-        return _parse_questions_payload(content)
+        try:
+            content, provider = await chat_json_completion(
+                system_prompt="You are an educational assessment author. Output JSON only.",
+                user_prompt=prompt,
+            )
+            return _parse_questions_payload(content), provider
+        except HTTPException:
+            logger.warning("All LLM providers failed for exam generation, using mock")
 
-    return generate_questions_mock(topic=topic, question_count=question_count, difficulty=difficulty)
+    return generate_questions_mock(topic=topic, question_count=question_count, difficulty=difficulty), "mock"
 
 
 async def generate_lesson_content(
@@ -307,12 +415,11 @@ async def generate_lesson_content(
     topic: str,
     content_type: str,
     locale: str,
-) -> dict:
+) -> tuple[dict[str, Any], str]:
     if content_type not in {"presentation", "game"}:
         raise HTTPException(status_code=422, detail={"code": "INVALID_CONTENT_TYPE"})
 
-    api_key, _, _ = resolve_llm_settings()
-    if api_key and settings.AI_ENABLED:
+    if list_llm_providers() and settings.AI_ENABLED:
         prompt = _build_lesson_prompt(
             subject_name=subject_name,
             topic=topic,
@@ -321,11 +428,17 @@ async def generate_lesson_content(
             max_slides=settings.AI_LESSON_MAX_SLIDES,
             max_rounds=settings.AI_LESSON_MAX_ROUNDS,
         )
-        content = await chat_json_completion(
-            system_prompt="You are an expert teacher assistant. Output JSON only.",
-            user_prompt=prompt,
-            temperature=0.5,
-        )
-        return _parse_lesson_payload(content, content_type=content_type)
+        try:
+            content, provider = await chat_json_completion(
+                system_prompt="You are an expert teacher assistant. Output JSON only.",
+                user_prompt=prompt,
+                temperature=0.5,
+            )
+            return _parse_lesson_payload(content, content_type=content_type), provider
+        except HTTPException:
+            logger.warning("All LLM providers failed for lesson generation, using mock")
 
-    return generate_lesson_mock(topic=topic, content_type=content_type, subject_name=subject_name)
+    return (
+        generate_lesson_mock(topic=topic, content_type=content_type, subject_name=subject_name),
+        "mock",
+    )

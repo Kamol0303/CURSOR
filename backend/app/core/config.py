@@ -38,6 +38,10 @@ class Settings(BaseSettings):
     LLM_BASE_URL: str = "https://bazaarlink.ai/api/v1"
     LLM_MODEL: str = "openai/gpt-4o-mini"
     AI_ENABLED: bool = True
+    # Gemini fallback when BazaarLink limit/quota exceeded
+    GEMINI_API_KEY: str = ""
+    GEMINI_BASE_URL: str = "https://generativelanguage.googleapis.com/v1beta/openai"
+    GEMINI_MODEL: str = "gemini-2.0-flash"
     # Legacy aliases — LLM_API_KEY takes precedence when set
     OPENAI_API_KEY: str = ""
     OPENAI_MODEL: str = "gpt-4o-mini"

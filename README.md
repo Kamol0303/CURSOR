@@ -95,6 +95,7 @@ scripts\windows\show-credentials.cmd
 | Frontend | http://localhost:3000 |
 | API | http://localhost:8000 |
 | API docs | http://localhost:8000/docs |
+| PostgreSQL (host) | `localhost:5433` (avoids port 5432 conflicts) |
 
 **Windows — staging (HTTPS, local)**
 
@@ -161,6 +162,7 @@ docker compose exec backend python scripts/seed_demo_users.py --i-understand-thi
 | Frontend | http://localhost:3000 |
 | API | http://localhost:8000 |
 | API docs | http://localhost:8000/docs |
+| PostgreSQL (host) | `localhost:5433` (avoids port 5432 conflicts) |
 
 **macOS — staging (HTTPS, local)**
 
@@ -342,22 +344,27 @@ docker compose -f docker-compose.prod.yml --env-file .env.production logs backen
 
 ### `port 5432 is already allocated`
 
-Another PostgreSQL instance is using port 5432. Fix:
+Another Docker container or system PostgreSQL is using port 5432. **Dev mode now uses host port 5433** for PostgreSQL (internal `postgres:5432` unchanged).
 
 ```bash
-# Stop TMB stacks first
-docker compose -f docker-compose.prod.yml --env-file .env.production down 2>/dev/null || true
-docker compose down --remove-orphans
-
-# Stop system PostgreSQL (if installed)
-sudo systemctl stop postgresql
-
-# See what uses the port
-ss -tlnp | grep 5432
-
-# Then start dev again
+git pull origin main
 ./scripts/linux-dev-setup.sh
 ```
+
+If it still fails, stop the conflicting container manually:
+
+```bash
+docker compose -f docker-compose.prod.yml --env-file .env.production down 2>/dev/null || true
+docker compose down --remove-orphans
+sudo systemctl stop postgresql
+docker ps --format '{{.Names}} {{.Ports}}' | grep 5432
+# stop the foreign container shown above:
+docker stop <container_name>
+
+./scripts/linux-dev-setup.sh
+```
+
+Host DB access (optional): `postgresql://tamor:tamor_dev@localhost:5433/tamor`
 
 ### `orphan containers (cursor-nginx-1)`
 

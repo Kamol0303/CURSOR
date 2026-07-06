@@ -342,15 +342,22 @@ docker compose -f docker-compose.prod.yml --env-file .env.production logs backen
 
 ### `port 5432 is already allocated`
 
-Порт 5432 занят другим PostgreSQL. Решение:
+Порт 5432 занят другим Docker-контейнером или системным PostgreSQL. **Dev-режим теперь использует хост-порт 5433**.
 
 ```bash
-docker compose -f docker-compose.prod.yml --env-file .env.production down 2>/dev/null || true
-docker compose down --remove-orphans
-sudo systemctl stop postgresql
-ss -tlnp | grep 5432
+git pull origin main
 ./scripts/linux-dev-setup.sh
 ```
+
+Если ошибка повторяется:
+
+```bash
+docker ps --format '{{.Names}} {{.Ports}}' | grep 5432
+docker stop <имя_контейнера>
+./scripts/linux-dev-setup.sh
+```
+
+Доступ к БД с хоста: `postgresql://tamor:tamor_dev@localhost:5433/tamor`
 
 ### `orphan containers (cursor-nginx-1)`
 

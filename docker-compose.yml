@@ -6,7 +6,7 @@ services:
       POSTGRES_PASSWORD: tamor_dev
       POSTGRES_DB: tamor
     ports:
-      - "5432:5432"
+      - "5433:5432"   # host 5433 — avoids conflict with other Docker/system PostgreSQL on 5432
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./infra/postgres/init-analytics-role.sql:/docker-entrypoint-initdb.d/02-analytics-role.sql

@@ -342,15 +342,22 @@ docker compose -f docker-compose.prod.yml --env-file .env.production logs backen
 
 ### `port 5432 is already allocated`
 
-5432 port boshqa PostgreSQL tomonidan band. Yechim:
+5432 port boshqa Docker konteyner yoki tizim PostgreSQL tomonidan band. **Dev rejim endi host port 5433** dan foydalanadi.
 
 ```bash
-docker compose -f docker-compose.prod.yml --env-file .env.production down 2>/dev/null || true
-docker compose down --remove-orphans
-sudo systemctl stop postgresql
-ss -tlnp | grep 5432
+git pull origin main
 ./scripts/linux-dev-setup.sh
 ```
+
+Agar yana xato bersa:
+
+```bash
+docker ps --format '{{.Names}} {{.Ports}}' | grep 5432
+docker stop <konteyner_nomi>
+./scripts/linux-dev-setup.sh
+```
+
+Hostdan DB: `postgresql://tamor:tamor_dev@localhost:5433/tamor`
 
 ### `orphan containers (cursor-nginx-1)`
 

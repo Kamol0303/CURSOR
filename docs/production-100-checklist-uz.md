@@ -8,7 +8,7 @@
 |-----------|-------|------|
 | Auth + MFA + RBAC | ✅ | Barcha rollar, RLS, portal routing |
 | Hokimiyat operator paneli | ✅ | Monitoring-only |
-| AI imtihon generatori | ✅ | BazaarLink → Gemini → mock |
+| AI imtihon generatori | ✅ | BazaarLink → Gemini → Mistral → mock |
 | AI dars materiallari | ✅ | `/teacher/lesson-start` |
 | Audit jurnali | ✅ | API + `/dashboard/audit` |
 | Production Docker | ✅ | `Dockerfile.prod`, `docker-compose.prod.yml` |
@@ -51,10 +51,14 @@ GEMINI_API_KEY=SIZNING_GEMINI_KALITINGIZ
 GEMINI_BASE_URL=https://generativelanguage.googleapis.com/v1beta/openai
 GEMINI_MODEL=gemini-2.0-flash
 
+MISTRAL_API_KEY=SIZNING_MISTRAL_KALITINGIZ
+MISTRAL_BASE_URL=https://api.mistral.ai/v1
+MISTRAL_MODEL=mistral-small-latest
+
 AI_ENABLED=true
 ```
 
-**Ishlash tartibi:** BazaarLink limit tugasa → avtomatik Gemini → ikkalasi ishlamasa → mock (dev).
+**Ishlash tartibi:** BazaarLink → Gemini → Mistral → mock (dev).
 
 **Xavfsizlik:** API kalitlarni hech qachon gitga commit qilmang. Chatda yuborilgan kalitlarni provider dashboarddan yangilang.
 

@@ -42,6 +42,10 @@ class Settings(BaseSettings):
     GEMINI_API_KEY: str = ""
     GEMINI_BASE_URL: str = "https://generativelanguage.googleapis.com/v1beta/openai"
     GEMINI_MODEL: str = "gemini-2.0-flash"
+    # Mistral fallback (third in chain)
+    MISTRAL_API_KEY: str = ""
+    MISTRAL_BASE_URL: str = "https://api.mistral.ai/v1"
+    MISTRAL_MODEL: str = "mistral-small-latest"
     # Legacy aliases — LLM_API_KEY takes precedence when set
     OPENAI_API_KEY: str = ""
     OPENAI_MODEL: str = "gpt-4o-mini"

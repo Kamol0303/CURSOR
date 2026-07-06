@@ -54,6 +54,9 @@ services:
       GEMINI_API_KEY: ${GEMINI_API_KEY:-}
       GEMINI_BASE_URL: ${GEMINI_BASE_URL:-https://generativelanguage.googleapis.com/v1beta/openai}
       GEMINI_MODEL: ${GEMINI_MODEL:-gemini-2.0-flash}
+      MISTRAL_API_KEY: ${MISTRAL_API_KEY:-}
+      MISTRAL_BASE_URL: ${MISTRAL_BASE_URL:-https://api.mistral.ai/v1}
+      MISTRAL_MODEL: ${MISTRAL_MODEL:-mistral-small-latest}
       SMS_WEBHOOK_SECRET: dev-sms-webhook-secret
     volumes:
       - jwt_secrets:/secrets

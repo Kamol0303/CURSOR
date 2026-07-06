@@ -1,4 +1,4 @@
-"""LLM helpers — BazaarLink primary, Gemini fallback, mock when unconfigured."""
+"""LLM helpers — BazaarLink → Gemini → Mistral fallback chain, mock when unconfigured."""
 
 from __future__ import annotations
 
@@ -34,7 +34,7 @@ def _normalize_bazaarlink_model(model: str) -> str:
 
 
 def list_llm_providers() -> list[LlmProvider]:
-    """Ordered provider chain: BazaarLink → Gemini → direct OpenAI."""
+    """Ordered provider chain: BazaarLink → Gemini → Mistral → direct OpenAI."""
     providers: list[LlmProvider] = []
 
     bazaar_key = (settings.LLM_API_KEY or "").strip()
@@ -56,6 +56,17 @@ def list_llm_providers() -> list[LlmProvider]:
                 api_key=gemini_key,
                 base_url=settings.GEMINI_BASE_URL.rstrip("/"),
                 model=settings.GEMINI_MODEL,
+            )
+        )
+
+    mistral_key = (settings.MISTRAL_API_KEY or "").strip()
+    if mistral_key:
+        providers.append(
+            LlmProvider(
+                name="mistral",
+                api_key=mistral_key,
+                base_url=settings.MISTRAL_BASE_URL.rstrip("/"),
+                model=settings.MISTRAL_MODEL,
             )
         )
 

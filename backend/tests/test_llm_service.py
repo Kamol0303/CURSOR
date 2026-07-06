@@ -8,6 +8,18 @@ from app.core.config import settings
 from app.services import llm_service
 
 
+def test_list_llm_providers_full_chain(monkeypatch):
+    monkeypatch.setattr(settings, "LLM_API_KEY", "sk-bl-test")
+    monkeypatch.setattr(settings, "GEMINI_API_KEY", "gemini-test-key")
+    monkeypatch.setattr(settings, "MISTRAL_API_KEY", "mistral-test-key")
+    monkeypatch.setattr(settings, "OPENAI_API_KEY", "")
+
+    providers = llm_service.list_llm_providers()
+    assert len(providers) == 3
+    assert [p.name for p in providers] == ["bazaarlink", "gemini", "mistral"]
+    assert providers[2].model == settings.MISTRAL_MODEL
+
+
 def test_list_llm_providers_bazaarlink_then_gemini(monkeypatch):
     monkeypatch.setattr(settings, "LLM_API_KEY", "sk-bl-test")
     monkeypatch.setattr(settings, "GEMINI_API_KEY", "gemini-test-key")

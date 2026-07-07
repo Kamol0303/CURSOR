@@ -529,7 +529,7 @@
 
 /* Sections */
 .aeline-section {
-  padding: 4rem 0;
+  padding: clamp(2.5rem, 6vw, 4rem) 0;
 }
 
 .aeline-section__head {
@@ -640,6 +640,15 @@
   overflow: hidden;
 }
 
+.aeline-about-card__logo-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(1rem, 4vw, 2rem);
+  background: #fff;
+  min-height: clamp(11rem, 38vw, 16rem);
+}
+
 .aeline-about-card__img {
   width: 100%;
   height: 12rem;
@@ -647,10 +656,32 @@
 }
 
 .aeline-about-card__img--logo {
+  width: auto;
+  height: auto;
+  max-width: min(100%, 14rem);
+  max-height: clamp(9rem, 32vw, 14rem);
+  aspect-ratio: 1;
   object-fit: contain;
-  padding: 1.25rem 1.5rem;
-  background: #fff;
-  height: 14rem;
+  margin-inline: auto;
+  display: block;
+}
+
+@media (min-width: 768px) {
+  .aeline-about-card__img--logo {
+    max-width: min(100%, 16rem);
+    max-height: 14rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .aeline-about-card__logo-wrap {
+    min-height: 18rem;
+  }
+
+  .aeline-about-card__img--logo {
+    max-width: 15rem;
+    max-height: 15rem;
+  }
 }
 
 .aeline-about-card--featured .aeline-about-card__body {
@@ -879,73 +910,27 @@
   filter: none;
 }
 
-/* Testimonials */
-.aeline-testimonials-scroll {
-  display: flex;
-  gap: 1rem;
-  overflow-x: auto;
-  padding-bottom: 0.5rem;
-  scroll-snap-type: x mandatory;
-}
-
-.aeline-testimonial-card {
-  flex: 0 0 min(22rem, 85vw);
-  scroll-snap-align: start;
-  position: relative;
-  border-radius: 1rem;
-  overflow: hidden;
-  min-height: 18rem;
-}
-
-.aeline-testimonial-card__img {
-  width: 100%;
-  height: 100%;
-  min-height: 18rem;
-  object-fit: cover;
-}
-
-.aeline-testimonial-card__overlay {
-  position: absolute;
-  inset: auto 0 0;
-  padding: 1.25rem;
-  background: linear-gradient(transparent, rgba(0, 0, 0, 0.85));
-  color: #fff;
-}
-
-.aeline-testimonial-card__overlay p {
-  font-size: 0.9375rem;
-  line-height: 1.5;
-}
-
-.aeline-testimonial-card__overlay span {
-  display: block;
-  margin-top: 0.75rem;
-  font-size: 0.8125rem;
-  opacity: 0.8;
-  text-align: right;
-}
-
-/* CTA */
 /* Creator */
 .aeline-creator {
   display: flex;
   justify-content: center;
-  padding: 2.5rem 1.25rem;
-  background: var(--aeline-black);
+  padding: clamp(2rem, 5vw, 2.5rem) clamp(1rem, 4vw, 1.25rem);
 }
 
 .aeline-creator__card {
   display: flex;
   align-items: center;
-  gap: 14px;
-  padding: 12px 20px 12px 12px;
+  gap: clamp(10px, 2.5vw, 14px);
+  width: min(100%, 22rem);
+  padding: 12px clamp(14px, 3vw, 20px) 12px 12px;
   border-radius: 100px;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.02));
+  background: linear-gradient(180deg, rgba(12, 12, 14, 0.96), rgba(8, 8, 10, 0.92));
   backdrop-filter: blur(12px);
   border: 1px solid transparent;
   background-clip: padding-box;
   position: relative;
   transition: transform 0.25s ease, box-shadow 0.25s ease;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
 }
 
 .aeline-creator__card::before {
@@ -968,14 +953,18 @@
 }
 
 .aeline-creator__avatar {
-  width: 40px;
-  height: 40px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
   flex-shrink: 0;
   overflow: hidden;
-  border: 2px solid transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 14px;
+  color: #fff;
   background: linear-gradient(135deg, #7c5cff, #22d3ee);
-  background-clip: padding-box;
   position: relative;
   z-index: 1;
 }
@@ -987,21 +976,34 @@
   border-radius: 50%;
 }
 
+@media (min-width: 640px) {
+  .aeline-creator__card {
+    width: auto;
+    max-width: none;
+  }
+
+  .aeline-creator__avatar {
+    width: 40px;
+    height: 40px;
+  }
+}
+
 .aeline-creator__text {
   display: flex;
   flex-direction: column;
   line-height: 1.25;
   position: relative;
   z-index: 1;
+  min-width: 0;
 }
 
 .aeline-creator__label {
-  font-size: 11px;
+  font-size: clamp(10px, 2.5vw, 11px);
   color: rgba(255, 255, 255, 0.5);
 }
 
 .aeline-creator__name {
-  font-size: 14px;
+  font-size: clamp(13px, 3vw, 14px);
   font-weight: 600;
   background: linear-gradient(90deg, #7c5cff, #22d3ee);
   -webkit-background-clip: text;
@@ -1016,6 +1018,7 @@
   width: 28px;
   height: 28px;
   border-radius: 50%;
+  flex-shrink: 0;
   color: rgba(255, 255, 255, 0.7);
   background: rgba(255, 255, 255, 0.05);
   transition: background 0.2s, color 0.2s, transform 0.2s;

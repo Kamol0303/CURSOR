@@ -16,7 +16,7 @@ export function AuthCreator() {
           <span className="aeline-creator__label">{t("label")}</span>
           <span className="aeline-creator__name">{t("name")}</span>
         </div>
-        <a href={t("linkHref")} className="aeline-creator__link" aria-label={t("linkAria")} target="_blank" rel="noopener noreferrer">
+        <a href="#" className="aeline-creator__link" aria-label={t("linkAria")}>
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
             <path d="M7 17L17 7M17 7H7M17 7V17" />
           </svg>

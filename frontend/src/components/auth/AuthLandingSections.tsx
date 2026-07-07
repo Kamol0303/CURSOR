@@ -14,12 +14,6 @@ const SERVICE_IMAGES = [
   "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=800&q=80",
 ];
 
-const TESTIMONIAL_IMAGES = [
-  "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=600&q=80",
-  "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=600&q=80",
-  "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=600&q=80",
-];
-
 export function AuthLandingSections() {
   const t = useTranslations("auth.landing");
 
@@ -53,13 +47,17 @@ export function AuthLandingSections() {
           </div>
           <div className="aeline-about-grid">
             <div className="aeline-about-card aeline-about-card--featured">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src="/images/ortta-logo.png"
-                alt="O'zbekiston Respublikasi nodavlat ta'lim muassasalari assotsiatsiyasi"
-                className="aeline-about-card__img aeline-about-card__img--logo"
-                loading="lazy"
-              />
+              <div className="aeline-about-card__logo-wrap">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src="/images/ortta-logo.png"
+                  alt={t("about.logoAlt")}
+                  className="aeline-about-card__img aeline-about-card__img--logo"
+                  loading="lazy"
+                  width={512}
+                  height={512}
+                />
+              </div>
               <div className="aeline-about-card__body">
                 <div className="aeline-about-card__stat">
                   <span className="aeline-about-card__stat-num">12+</span>
@@ -170,31 +168,6 @@ export function AuthLandingSections() {
               </AuthArrowButton>
             </article>
           ))}
-        </div>
-      </section>
-
-      <section className="aeline-section">
-        <div className="aeline-container">
-          <div className="aeline-section__head">
-            <div className="aeline-tag">
-              <span className="aeline-tag__dot" />
-              {t("testimonials.tag")}
-            </div>
-            <h2 className="aeline-section__title">{t("testimonials.title")}</h2>
-            <p className="aeline-section__desc">{t("testimonials.desc")}</p>
-          </div>
-          <div className="aeline-testimonials-scroll">
-            {(["one", "two", "three"] as const).map((key, i) => (
-              <article key={key} className="aeline-testimonial-card">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={TESTIMONIAL_IMAGES[i]} alt="" className="aeline-testimonial-card__img" loading="lazy" />
-                <div className="aeline-testimonial-card__overlay">
-                  <p>&ldquo;{t(`testimonials.items.${key}.text`)}&rdquo;</p>
-                  <span>{t(`testimonials.items.${key}.author`)}</span>
-                </div>
-              </article>
-            ))}
-          </div>
         </div>
       </section>
 

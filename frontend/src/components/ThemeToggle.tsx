@@ -23,30 +23,58 @@ export function ThemeToggle() {
     applyTheme(next);
   };
 
+  const isDark = theme === "dark";
+  const isLit = isDark;
+
   if (!mounted) {
     return (
       <button
         type="button"
-        className="p-2 rounded-lg border border-naqsh-primary/20 text-naqsh-primary opacity-60"
+        className="candle-toggle opacity-60"
         aria-label={t("themeToggle")}
         disabled
       >
-        ◐
+        <span className="candle-toggle__scene" aria-hidden>
+          <span className="candle-toggle__wave" />
+          <span className="candle-toggle__candle">
+            <span className="candle-toggle__wick" />
+            <span className="candle-toggle__body">
+              <span className="candle-toggle__eyes">
+                <span className="candle-toggle__eye candle-toggle__eye--left" />
+                <span className="candle-toggle__eye candle-toggle__eye--right" />
+              </span>
+            </span>
+            <span className="candle-toggle__flame" />
+          </span>
+          <span className="candle-toggle__floor" />
+        </span>
       </button>
     );
   }
-
-  const isDark = theme === "dark";
 
   return (
     <button
       type="button"
       onClick={toggleTheme}
-      className="p-2 rounded-lg border border-naqsh-primary/20 text-naqsh-primary hover:bg-naqsh-primary/10 dark:border-white/20 dark:text-naqsh-accent dark:hover:bg-white/10 transition-colors"
+      className={`candle-toggle ${isLit ? "candle-toggle--lit" : ""}`}
       aria-label={isDark ? t("themeLight") : t("themeDark")}
       title={isDark ? t("themeLight") : t("themeDark")}
+      aria-pressed={isDark}
     >
-      {isDark ? "☀️" : "🌙"}
+      <span className="candle-toggle__scene" aria-hidden>
+        <span className="candle-toggle__wave" />
+        <span className="candle-toggle__candle">
+          <span className="candle-toggle__wick" />
+          <span className="candle-toggle__body">
+            <span className="candle-toggle__eyes">
+              <span className="candle-toggle__eye candle-toggle__eye--left" />
+              <span className="candle-toggle__eye candle-toggle__eye--right" />
+            </span>
+          </span>
+          <span className="candle-toggle__flame" />
+        </span>
+        <span className="candle-toggle__floor" />
+      </span>
     </button>
   );
 }

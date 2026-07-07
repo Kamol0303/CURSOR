@@ -2,11 +2,10 @@
 
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
+import { AuthButton } from "@/components/AuthButton";
 import { AuthChrome } from "@/components/AuthChrome";
 import { GlassInput } from "@/components/GlassInput";
-import { GridGlowEffect } from "@/components/GridGlowEffect";
 import { MfaSetupForm } from "@/components/MfaSetupForm";
-import { TmbLogo } from "@/components/TmbLogo";
 
 import { getApiBaseUrl } from "@/lib/api";
 import { getRoleFromToken, homePathForRole, setAuthCookie } from "@/lib/auth-cookie";
@@ -14,9 +13,6 @@ import { getRoleFromToken, homePathForRole, setAuthCookie } from "@/lib/auth-coo
 type Step = "login" | "mfa" | "mfa_setup";
 
 const REMEMBER_KEY = "tmb_remember_username";
-
-const glassBtn =
-  "w-full bg-white text-gray-900 font-semibold py-3 rounded-md border-2 border-transparent hover:text-white hover:border-white hover:bg-white/15 transition-all duration-300 disabled:opacity-50 text-base";
 
 export function LoginForm() {
   const t = useTranslations("auth");
@@ -150,17 +146,8 @@ export function LoginForm() {
     >
       {step === "login" ? (
         <form onSubmit={handleLogin} className="text-left flex flex-col">
-          <div className="flex justify-center mb-5 lg:hidden">
-            <div className="relative w-16 h-16 rounded-2xl overflow-hidden border border-white/20">
-              <GridGlowEffect className="inset-0" columns={6} rows={6} compact color="#c8932a" />
-              <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
-                <TmbLogo className="w-9 h-9 text-naqsh-accent auth-logo-float" />
-              </div>
-            </div>
-          </div>
-
-          <h2 className="text-2xl font-semibold text-white text-center mb-1">{t("login")}</h2>
-          <p className="text-xs text-white/60 text-center mb-6">{t("loginHint")}</p>
+          <h2 className="auth-agentflow-card__title">{t("login")}</h2>
+          <p className="auth-agentflow-card__hint">{t("loginHint")}</p>
 
           <GlassInput
             label={t("username")}
@@ -168,6 +155,7 @@ export function LoginForm() {
             onChange={setUsername}
             autoComplete="username"
             id="username"
+            variant="light"
           />
           <GlassInput
             label={t("password")}
@@ -177,53 +165,47 @@ export function LoginForm() {
             autoComplete="current-password"
             id="password"
             className="mt-4"
+            variant="light"
           />
 
-          <div className="flex items-center justify-between mt-6 mb-7 text-sm text-white/85">
+          <div className="flex items-center justify-between mt-6 mb-6 text-sm text-slate-600">
             <label htmlFor="remember" className="flex items-center gap-2 cursor-pointer select-none">
               <input
                 id="remember"
                 type="checkbox"
                 checked={remember}
                 onChange={(e) => setRemember(e.target.checked)}
-                className="accent-naqsh-accent w-4 h-4 rounded"
+                className="accent-blue-600 w-4 h-4 rounded"
               />
               <span>{t("rememberMe")}</span>
             </label>
             <button
               type="button"
               onClick={() => setShowForgotHint((v) => !v)}
-              className="text-white/80 hover:text-white hover:underline transition-colors"
+              className="text-slate-600 hover:text-blue-600 hover:underline transition-colors"
             >
               {t("forgotPassword")}
             </button>
           </div>
 
           {showForgotHint && (
-            <p className="text-xs text-white/65 bg-white/5 border border-white/10 rounded-lg px-3 py-2 mb-4 -mt-3">
-              {t("forgotPasswordHint")}
-            </p>
+            <p className="auth-agentflow-alert auth-agentflow-alert--info -mt-2 mb-4">{t("forgotPasswordHint")}</p>
           )}
 
           {error && (
-            <p
-              className="text-sm text-red-200 bg-red-500/15 border border-red-400/30 rounded-lg px-3 py-2 mb-4"
-              role="alert"
-            >
+            <p className="auth-agentflow-alert auth-agentflow-alert--error" role="alert">
               {error}
             </p>
           )}
 
-          <button type="submit" disabled={loading} className={glassBtn}>
+          <AuthButton type="submit" disabled={loading}>
             {loading ? "…" : t("login")}
-          </button>
-
-          <p className="text-center mt-6 text-sm text-white/60">{t("subtitle")}</p>
+          </AuthButton>
         </form>
       ) : step === "mfa_setup" && setupToken ? (
         <div className="text-left">
           <MfaSetupForm
-            variant="glass"
+            variant="light"
             setupToken={setupToken}
             onComplete={(accessToken) => {
               if (accessToken) {
@@ -235,14 +217,15 @@ export function LoginForm() {
             onError={(code) => handleError(code)}
           />
           {error && (
-            <p className="text-sm text-red-200 mt-3" role="alert">
+            <p className="auth-agentflow-alert auth-agentflow-alert--error mt-3" role="alert">
               {error}
             </p>
           )}
         </div>
       ) : (
         <form onSubmit={handleMfa} className="text-left flex flex-col">
-          <h2 className="text-xl font-semibold text-white text-center mb-6">{t("mfaTitle")}</h2>
+          <h2 className="auth-agentflow-card__title">{t("mfaTitle")}</h2>
+          <p className="auth-agentflow-card__hint">{t("mfaCode")}</p>
           <GlassInput
             label={t("mfaCode")}
             value={mfaCode}
@@ -250,16 +233,19 @@ export function LoginForm() {
             inputMode="numeric"
             autoComplete="one-time-code"
             id="mfa"
+            variant="light"
             className="[&_input]:tracking-[0.3em] [&_input]:text-center [&_input]:text-lg"
           />
           {error && (
-            <p className="text-sm text-red-200 mt-4" role="alert">
+            <p className="auth-agentflow-alert auth-agentflow-alert--error mt-4" role="alert">
               {error}
             </p>
           )}
-          <button type="submit" disabled={loading} className={`${glassBtn} mt-7`}>
-            {t("verify")}
-          </button>
+          <div className="mt-7">
+            <AuthButton type="submit" disabled={loading}>
+              {t("verify")}
+            </AuthButton>
+          </div>
         </form>
       )}
     </AuthChrome>

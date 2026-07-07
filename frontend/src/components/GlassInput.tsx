@@ -12,6 +12,7 @@ type GlassInputProps = {
   maxLength?: number;
   className?: string;
   id?: string;
+  variant?: "dark" | "light";
 };
 
 export function GlassInput({
@@ -24,9 +25,29 @@ export function GlassInput({
   maxLength,
   className = "",
   id: externalId,
+  variant = "light",
 }: GlassInputProps) {
   const generatedId = useId();
   const id = externalId ?? generatedId;
+
+  if (variant === "light") {
+    return (
+      <div className={`auth-af-input ${className}`}>
+        <input
+          id={id}
+          type={type}
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          autoComplete={autoComplete}
+          inputMode={inputMode}
+          maxLength={maxLength}
+          placeholder=" "
+          required
+        />
+        <label htmlFor={id}>{label}</label>
+      </div>
+    );
+  }
 
   return (
     <div className={`relative border-b-2 border-white/30 py-1 ${className}`}>

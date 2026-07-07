@@ -36,6 +36,11 @@
       "staff": "Xodimlar kirishi",
       "region": "Toyloq tumani · Samarqand",
       "copyright": "© TMB — Ta'lim Monitoring Bazasi"
+    },
+    "heroStats": {
+      "modules": "Modullar",
+      "security": "Xavfsizlik",
+      "monitoring": "Monitoring"
     }
   },
   "security": {

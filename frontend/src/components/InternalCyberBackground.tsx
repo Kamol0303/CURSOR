@@ -6,7 +6,7 @@ import { MouseTrail } from "@/components/effects/MouseTrail";
 
 /**
  * Matrix rain, interactive grid, and mouse trail for authenticated internal pages.
- * Not used on login/auth screens — those keep AuthChrome as-is.
+ * Not used on login/auth screens — those use the Agentflow-style AuthChrome shell.
  */
 export function InternalCyberBackground() {
   return (

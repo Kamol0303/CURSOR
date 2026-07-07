@@ -36,6 +36,11 @@
       "staff": "Staff login",
       "region": "Toyloq district · Samarkand",
       "copyright": "© TMB — Education Monitoring Database"
+    },
+    "heroStats": {
+      "modules": "Modules",
+      "security": "Security",
+      "monitoring": "Monitoring"
     }
   },
   "security": {

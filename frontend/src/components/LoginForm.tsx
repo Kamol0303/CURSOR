@@ -7,7 +7,7 @@ import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { MfaSetupForm } from "@/components/MfaSetupForm";
 import { TmbLogo } from "@/components/TmbLogo";
-import { Alert, Button, FormField, Input, Label } from "@/components/ui";
+import { Alert, BezelCard, Button, FormField, Input, Label } from "@/components/ui";
 import { getApiBaseUrl } from "@/lib/api";
 import { getRoleFromToken, homePathForRole, setAuthCookie } from "@/lib/auth-cookie";
 
@@ -132,7 +132,8 @@ export function LoginForm() {
 
       <main className="flex-1 flex items-center justify-center p-4 sm:p-6">
         <div className="w-full max-w-4xl animate-slide-up">
-          <div className="grid lg:grid-cols-[1fr_1.1fr] rounded-2xl overflow-hidden shadow-xl border border-border bg-card/95 backdrop-blur-xl">
+          <BezelCard padding="p-2" className="overflow-hidden">
+            <div className="grid lg:grid-cols-[1fr_1.1fr] overflow-hidden rounded-[calc(1rem-0.25rem)]">
             <div className="hidden lg:flex flex-col justify-between bg-gradient-to-br from-[#1b4d3e] via-[#1e3a2f] to-[#122a22] text-white p-10 relative overflow-hidden">
               <div className="absolute inset-0 opacity-[0.07] girih-bg pointer-events-none" aria-hidden />
               <div className="relative">
@@ -230,7 +231,8 @@ export function LoginForm() {
                 </Link>
               </p>
             </div>
-          </div>
+            </div>
+          </BezelCard>
         </div>
       </main>
     </div>

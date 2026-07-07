@@ -5,6 +5,7 @@ __pycache__/
 .env.staging
 .env.production
 .env.local
+.env.save
 .venv/
 node_modules/
 .next/

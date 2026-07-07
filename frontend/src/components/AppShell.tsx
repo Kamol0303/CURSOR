@@ -167,9 +167,11 @@ export function AppShell({
   const sidebar = (
   <aside
     className={cn(
-      "flex flex-col shrink-0 bg-gradient-to-b from-[#1b4d3e] to-[#122a22] text-white",
-      "w-64 min-h-screen shadow-xl",
-      "fixed inset-y-0 left-0 z-40 lg:relative lg:translate-x-0 transition-transform duration-slow ease-out",
+      "flex flex-col shrink-0 text-white",
+      "bg-gradient-to-b from-[#1b4d3e] via-[#163328] to-[#0f221c]",
+      "ring-1 ring-white/10 shadow-xl",
+      "w-64 min-h-screen",
+      "fixed inset-y-0 left-0 z-40 lg:relative lg:translate-x-0 transition-transform duration-slow ease-premium",
       mobileOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0",
     )}
   >
@@ -199,9 +201,9 @@ export function AppShell({
             href={item.href}
             onClick={() => setMobileOpen(false)}
             className={cn(
-              "flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-small transition-all duration-fast",
+              "flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-small transition-all duration-slow ease-premium",
               active
-                ? "bg-white/15 font-medium text-white shadow-sm border-l-2 border-naqsh-accent pl-[10px]"
+                ? "bg-white/15 font-medium text-white shadow-sm border-l-2 border-naqsh-accent pl-[10px] shadow-inset-highlight"
                 : "text-white/75 hover:bg-white/10 hover:text-white border-l-2 border-transparent pl-[10px]",
             )}
             aria-current={active ? "page" : undefined}

@@ -43,7 +43,7 @@ export function Button({
   return (
     <button
       className={cn(
-        "inline-flex items-center justify-center font-medium transition-all duration-fast ease-out",
+        "inline-flex items-center justify-center font-medium transition-all duration-slow ease-premium",
         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-naqsh-primary/30 focus-visible:ring-offset-2 focus-visible:ring-offset-background",
         "disabled:opacity-50 disabled:pointer-events-none disabled:active:scale-100",
         variants[variant],

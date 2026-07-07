@@ -86,8 +86,15 @@ export function DataTable({
   className?: string;
 }) {
   return (
-    <div className={cn("bg-card rounded-xl border border-border shadow-sm overflow-hidden", className)}>
-      {children}
+    <div
+      className={cn(
+        "rounded-2xl bg-muted/60 ring-1 ring-border/80 p-1 shadow-sm",
+        className,
+      )}
+    >
+      <div className="bg-card rounded-[calc(1rem-0.125rem)] border border-border/60 shadow-sm shadow-inset-highlight overflow-hidden">
+        {children}
+      </div>
     </div>
   );
 }

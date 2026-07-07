@@ -2,6 +2,8 @@
 
 import { useTranslations } from "next-intl";
 
+const CREATOR_IMAGE = "/images/kamolbek-creator.png?v=original";
+
 export function AuthCreator() {
   const t = useTranslations("auth.landing.creator");
 
@@ -34,12 +36,12 @@ export function AuthCreator() {
         <div className="aeline-creator__visual">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src="/images/kamolbek-creator.png"
+            src={CREATOR_IMAGE}
             alt={t("imageAlt")}
             className="aeline-creator__image"
             loading="lazy"
-            width={1108}
-            height={904}
+            width={1024}
+            height={1024}
           />
         </div>
       </div>

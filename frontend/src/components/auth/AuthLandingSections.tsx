@@ -54,9 +54,9 @@ export function AuthLandingSections() {
             <div className="aeline-about-card aeline-about-card--featured">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src="https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=900&q=80"
-                alt=""
-                className="aeline-about-card__img"
+                src="/images/ortta-logo.png"
+                alt="O'zbekiston Respublikasi nodavlat ta'lim muassasalari assotsiatsiyasi"
+                className="aeline-about-card__img aeline-about-card__img--logo"
                 loading="lazy"
               />
               <div className="aeline-about-card__body">

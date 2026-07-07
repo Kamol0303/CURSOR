@@ -646,6 +646,13 @@
   object-fit: cover;
 }
 
+.aeline-about-card__img--logo {
+  object-fit: contain;
+  padding: 1.25rem 1.5rem;
+  background: #fff;
+  height: 14rem;
+}
+
 .aeline-about-card--featured .aeline-about-card__body {
   padding: 1.25rem;
 }

@@ -35,17 +35,24 @@ function StaffDashboard() {
   }, []);
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h2 className="text-2xl font-bold text-gray-900">{t("welcome")}</h2>
-        {userName && <p className="text-gray-500 mt-1">{userName}</p>}
+    <div className="space-y-5">
+      <div className="rounded-lg border border-gray-200/80 dark:border-gray-800 bg-white dark:bg-gray-900 px-4 sm:px-5 py-4 shadow-sm">
+        <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-gray-100">{t("welcome")}</h2>
+        {userName && (
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+            <span className="inline-flex items-center gap-1.5">
+              <span className="h-2 w-2 rounded-full bg-emerald-500" aria-hidden />
+              {userName}
+            </span>
+          </p>
+        )}
       </div>
       {loading ? (
-        <p className="text-gray-400">{t("loading")}</p>
+        <p className="text-gray-400 dark:text-gray-500 text-sm px-1">{t("loading")}</p>
       ) : (
         <>
           <KpiCards kpis={dash?.kpis ?? []} />
-          <div className="grid gap-4 lg:grid-cols-3">
+          <div className="grid gap-3 lg:grid-cols-3">
             <StatsChart title={t("charts.daily")} data={dash?.daily_stats ?? []} />
             <StatsChart title={t("charts.weekly")} data={dash?.weekly_stats ?? []} />
             <StatsChart title={t("charts.monthly")} data={dash?.monthly_stats ?? []} />

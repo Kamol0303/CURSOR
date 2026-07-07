@@ -5,6 +5,8 @@
     "username": "Username",
     "password": "Password",
     "login": "Sign in",
+    "loginHint": "Authorized staff access only",
+    "parentPortal": "Parent portal →",
     "mfaTitle": "Two-factor authentication",
     "mfaCode": "TOTP code",
     "verify": "Verify",

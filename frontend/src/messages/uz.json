@@ -5,6 +5,8 @@
     "username": "Foydalanuvchi nomi",
     "password": "Parol",
     "login": "Kirish",
+    "loginHint": "Faqat ruxsat etilgan xodimlar uchun",
+    "parentPortal": "Ota-ona portali →",
     "mfaTitle": "Ikki bosqichli autentifikatsiya",
     "mfaCode": "TOTP kodi",
     "verify": "Tasdiqlash",

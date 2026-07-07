@@ -553,3 +553,112 @@
     transform: scaleY(0.1);
   }
 }
+
+/* ─── Internal cyber background (dashboards only) ─────────────── */
+.internal-cyber-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.cyber-matrix-rain {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.cyber-grid-static {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(27, 77, 62, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(27, 77, 62, 0.04) 1px, transparent 1px);
+  background-size: 30px 30px;
+  pointer-events: none;
+}
+
+.dark .cyber-grid-static {
+  background-image:
+    linear-gradient(rgba(200, 147, 42, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(200, 147, 42, 0.06) 1px, transparent 1px);
+}
+
+.cyber-interactive-grid {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.cyber-grid-square {
+  position: absolute;
+  border: 1px solid rgba(27, 77, 62, 0.04);
+  transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
+  pointer-events: none;
+}
+
+.dark .cyber-grid-square {
+  border-color: rgba(200, 147, 42, 0.05);
+}
+
+.cyber-grid-square--active {
+  background-color: color-mix(in srgb, var(--cyber-accent, #c8932a) 18%, transparent);
+  border-color: color-mix(in srgb, var(--cyber-accent, #c8932a) 55%, transparent);
+  box-shadow: 0 0 15px color-mix(in srgb, var(--cyber-accent, #c8932a) 35%, transparent);
+  transform: scale(1.08);
+  z-index: 1;
+  animation: cyber-square-pulse 0.5s ease;
+}
+
+.cyber-grid-square--ripple {
+  background-color: color-mix(in srgb, var(--cyber-accent, #c8932a) 8%, transparent);
+}
+
+@keyframes cyber-square-pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.15);
+  }
+  100% {
+    transform: scale(1.08);
+  }
+}
+
+.cyber-mouse-trail-layer {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.cyber-mouse-trail {
+  position: fixed;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    color-mix(in srgb, var(--trail-color, #c8932a) 75%, transparent) 0%,
+    transparent 70%
+  );
+  pointer-events: none;
+  animation: cyber-trail-fade 1s forwards;
+}
+
+@keyframes cyber-trail-fade {
+  to {
+    opacity: 0;
+    transform: scale(2);
+  }
+}
+
+.internal-page-shell {
+  position: relative;
+  z-index: 1;
+  min-height: 100dvh;
+}

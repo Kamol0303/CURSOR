@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { cn } from "@/lib/cn";
+import { InternalCyberBackground } from "@/components/InternalCyberBackground";
 import { TmbLogo } from "@/components/TmbLogo";
 
 export type NavItem = {
@@ -231,7 +232,8 @@ export function AppShell({
   );
 
   return (
-    <div className="min-h-[100dvh] bg-background flex overflow-hidden">
+    <div className="min-h-[100dvh] bg-background flex overflow-hidden relative">
+      <InternalCyberBackground />
       {!hideSidebar && (
         <>
           {mobileOpen && (
@@ -245,7 +247,7 @@ export function AppShell({
         </>
       )}
 
-      <div className="flex-1 flex flex-col min-w-0 min-h-0">
+      <div className="relative z-10 flex-1 flex flex-col min-w-0 min-h-0">
         <header
           className={cn(
             "sticky top-0 z-20 shrink-0 bg-surface/90 dark:bg-card/90 backdrop-blur-xl",

@@ -11,6 +11,7 @@ import {
   EmptyState,
   PageSkeleton,
 } from "@/components/ui";
+import { InternalCyberBackground } from "@/components/InternalCyberBackground";
 import { apiFetch, getApiBaseUrl } from "@/lib/api";
 import { clearAuthCookie } from "@/lib/auth-cookie";
 
@@ -64,8 +65,9 @@ export default function StudentDashboardPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <header className="bg-naqsh-primary text-white px-4 py-5 flex justify-between items-center shadow-sm">
+    <div className="internal-page-shell min-h-screen bg-background/95">
+      <InternalCyberBackground />
+      <header className="relative z-10 bg-naqsh-primary text-white px-4 py-5 flex justify-between items-center shadow-sm">
         <div>
           <h1 className="font-bold text-lg">{t("title")}</h1>
           <p className="text-caption text-white/70 mt-0.5">{profile?.center_name}</p>
@@ -75,7 +77,7 @@ export default function StudentDashboardPage() {
         </Button>
       </header>
 
-      <main className="p-4 max-w-lg mx-auto space-y-5">
+      <main className="relative z-10 p-4 max-w-lg mx-auto space-y-5">
         {loading ? (
           <PageSkeleton />
         ) : (

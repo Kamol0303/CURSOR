@@ -13,6 +13,7 @@ import {
   CardTitle,
   Spinner,
 } from "@/components/ui";
+import { InternalCyberBackground } from "@/components/InternalCyberBackground";
 import { apiFetch } from "@/lib/api";
 
 type Question = {
@@ -67,26 +68,35 @@ export default function StudentTakeExamPage() {
     }
   };
 
+  const shellClass = "internal-page-shell min-h-screen bg-background/95";
+
   if (loading) {
     return (
-      <div className="min-h-screen bg-background p-4">
-        <Spinner label={t("loading")} className="py-16" />
+      <div className={`${shellClass} p-4`}>
+        <InternalCyberBackground />
+        <div className="relative z-10">
+          <Spinner label={t("loading")} className="py-16" />
+        </div>
       </div>
     );
   }
 
   if (!exam) {
     return (
-      <div className="min-h-screen bg-background p-4 max-w-lg mx-auto">
-        <Alert variant="danger">{t("examNotFound")}</Alert>
+      <div className={`${shellClass} p-4 max-w-lg mx-auto`}>
+        <InternalCyberBackground />
+        <div className="relative z-10">
+          <Alert variant="danger">{t("examNotFound")}</Alert>
+        </div>
       </div>
     );
   }
 
   if (result) {
     return (
-      <div className="min-h-screen bg-background p-4 max-w-lg mx-auto flex items-center">
-        <Card className="w-full">
+      <div className={`${shellClass} p-4 max-w-lg mx-auto flex items-center`}>
+        <InternalCyberBackground />
+        <Card className="w-full relative z-10">
           <CardBody className="text-center space-y-4">
             <CardTitle>{t("examSubmitted")}</CardTitle>
             <p className="text-3xl font-semibold text-foreground">
@@ -105,8 +115,9 @@ export default function StudentTakeExamPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <header className="bg-naqsh-primary text-white px-4 py-5 shadow-sm">
+    <div className={shellClass}>
+      <InternalCyberBackground />
+      <header className="relative z-10 bg-naqsh-primary text-white px-4 py-5 shadow-sm">
         <Link href="/student/dashboard" className="text-small text-white/80 hover:text-white transition-colors">
           ← {t("back")}
         </Link>
@@ -115,7 +126,7 @@ export default function StudentTakeExamPage() {
           {t("passScore")}: {exam.pass_score}% · {exam.duration_minutes} min
         </p>
       </header>
-      <form onSubmit={submit} className="p-4 max-w-lg mx-auto space-y-4">
+      <form onSubmit={submit} className="relative z-10 p-4 max-w-lg mx-auto space-y-4">
         {exam.questions.map((q, idx) => (
           <Card key={q.id}>
             <CardBody>

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { AuthChrome } from "@/components/AuthChrome";
 import { GlassInput } from "@/components/GlassInput";
+import { GridGlowEffect } from "@/components/GridGlowEffect";
 import { MfaSetupForm } from "@/components/MfaSetupForm";
 import { TmbLogo } from "@/components/TmbLogo";
 
@@ -141,15 +142,23 @@ export function LoginForm() {
   };
 
   return (
-    <AuthChrome alternateHref="/parent/login" alternateLabel={t("parentPortal")}>
-      <div className="flex justify-center mb-5">
-        <div className="p-3 rounded-xl bg-naqsh-accent/20 border border-naqsh-accent/30">
-          <TmbLogo className="w-10 h-10 text-naqsh-accent" />
-        </div>
-      </div>
-
+    <AuthChrome
+      alternateHref="/parent/login"
+      alternateLabel={t("parentPortal")}
+      heroTitle={t("title")}
+      heroSubtitle={t("subtitle")}
+    >
       {step === "login" ? (
         <form onSubmit={handleLogin} className="text-left flex flex-col">
+          <div className="flex justify-center mb-5 lg:hidden">
+            <div className="relative w-16 h-16 rounded-2xl overflow-hidden border border-white/20">
+              <GridGlowEffect className="inset-0" columns={6} rows={6} compact color="#c8932a" />
+              <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
+                <TmbLogo className="w-9 h-9 text-naqsh-accent auth-logo-float" />
+              </div>
+            </div>
+          </div>
+
           <h2 className="text-2xl font-semibold text-white text-center mb-1">{t("login")}</h2>
           <p className="text-xs text-white/60 text-center mb-6">{t("loginHint")}</p>
 

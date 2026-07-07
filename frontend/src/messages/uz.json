@@ -6,6 +6,9 @@
     "password": "Parol",
     "login": "Kirish",
     "loginHint": "Faqat ruxsat etilgan xodimlar uchun",
+    "rememberMe": "Meni eslab qol",
+    "forgotPassword": "Parolni unutdingizmi?",
+    "forgotPasswordHint": "Markaz direktori yoki tizim administratoriga murojaat qiling. Parolni faqat admin tiklay oladi.",
     "parentPortal": "Ota-ona portali →",
     "mfaTitle": "Ikki bosqichli autentifikatsiya",
     "mfaCode": "TOTP kodi",
@@ -25,6 +28,14 @@
       "ACCOUNT_LOCKED": "Hisob vaqtincha bloklangan. Parolni tiklang: ./scripts/reset-demo-login.sh",
       "PASSWORD_CHANGE_REQUIRED": "Avval parolni yangilashingiz kerak",
       "NETWORK_ERROR": "Serverga ulanib bo'lmadi. Backend ishlayaptimi? (localhost:8000)"
+    },
+    "footer": {
+      "verify": "Sertifikat tekshirish",
+      "platform": "Ta'lim monitoringi",
+      "parent": "Ota-ona portali",
+      "staff": "Xodimlar kirishi",
+      "region": "Toyloq tumani · Samarqand",
+      "copyright": "© TMB — Ta'lim Monitoring Bazasi"
     }
   },
   "security": {

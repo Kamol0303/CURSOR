@@ -12,6 +12,7 @@ import {
   PageSkeleton,
 } from "@/components/ui";
 import { InternalCyberBackground } from "@/components/InternalCyberBackground";
+import { DigitalClock } from "@/components/DigitalClock";
 import { apiFetch, getApiBaseUrl } from "@/lib/api";
 import { clearAuthCookie } from "@/lib/auth-cookie";
 
@@ -78,6 +79,7 @@ export default function StudentDashboardPage() {
       </header>
 
       <main className="relative z-10 p-4 max-w-lg mx-auto space-y-5">
+        <DigitalClock />
         {loading ? (
           <PageSkeleton />
         ) : (

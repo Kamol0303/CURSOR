@@ -4,7 +4,6 @@ import { useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { AppShell } from "@/components/AppShell";
-import { DigitalClock } from "@/components/DigitalClock";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { NotificationBell } from "@/components/NotificationBell";
 import { ThemeToggle } from "@/components/ThemeToggle";
@@ -61,12 +60,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
       pageSubtitle={isOnboarding ? undefined : t("platform")}
       headerActions={
         <>
-          {!isOnboarding && (
-            <>
-              <DigitalClock variant="compact" />
-              <NotificationBell />
-            </>
-          )}
+          {!isOnboarding && <NotificationBell />}
           <ThemeToggle />
           <LanguageSwitcher />
         </>

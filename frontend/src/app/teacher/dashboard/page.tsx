@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
-import { DigitalClock } from "@/components/DigitalClock";
 import {
   Badge,
   Card,
@@ -51,13 +50,11 @@ export default function TeacherDashboardPage() {
 
   return (
     <PageSection className="max-w-4xl">
-      <div className="grid gap-4 lg:grid-cols-[1fr_minmax(260px,340px)] mb-6">
-        <PageHeader
-          title={t("welcome")}
-          description={profile ? `${profile.full_name} · ${profile.center_name}` : undefined}
-        />
-        <DigitalClock />
-      </div>
+      <PageHeader
+        className="mb-6"
+        title={t("welcome")}
+        description={profile ? `${profile.full_name} · ${profile.center_name}` : undefined}
+      />
 
       <div className="grid gap-4 sm:grid-cols-2 mb-6">
         <Card>

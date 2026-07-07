@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { CenterCertificatesChart } from "@/components/CenterCertificatesChart";
-import { DigitalClock } from "@/components/DigitalClock";
 import { OperatorKpiCards } from "@/components/OperatorKpiCards";
 import { TrendLineChart } from "@/components/TrendLineChart";
 import { Alert, Card, CardBody, PageHeader, PageSection, PageSkeleton } from "@/components/ui";
@@ -49,13 +48,11 @@ export function OperatorDashboard() {
 
   return (
     <PageSection>
-      <div className="grid gap-4 lg:grid-cols-[1fr_minmax(260px,340px)] mb-6">
-        <PageHeader
-          title={t("welcome")}
-          description={userName ? `${userName} · ${t("subtitle")}` : t("subtitle")}
-        />
-        <DigitalClock />
-      </div>
+      <PageHeader
+        className="mb-6"
+        title={t("welcome")}
+        description={userName ? `${userName} · ${t("subtitle")}` : t("subtitle")}
+      />
 
       {data ? (
         <>

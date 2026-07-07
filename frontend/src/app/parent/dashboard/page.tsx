@@ -12,6 +12,7 @@ import {
   PageSkeleton,
 } from "@/components/ui";
 import { InternalCyberBackground } from "@/components/InternalCyberBackground";
+import { DigitalClock } from "@/components/DigitalClock";
 import { apiFetch, downloadFile, getApiBaseUrl } from "@/lib/api";
 
 type Child = {
@@ -79,6 +80,7 @@ export default function ParentDashboardPage() {
       </header>
 
       <main className="relative z-10 p-4 max-w-lg mx-auto space-y-5">
+        <DigitalClock />
         {loading ? (
           <PageSkeleton />
         ) : children.length === 0 ? (

@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
-import { DigitalClock } from "@/components/DigitalClock";
 import { KpiCards } from "@/components/KpiCards";
 import { OperatorDashboard } from "@/components/OperatorDashboard";
 import { StatsChart } from "@/components/StatsChart";
@@ -40,7 +39,7 @@ function StaffDashboard() {
 
   return (
     <PageSection>
-      <div className="grid gap-4 lg:grid-cols-[1fr_minmax(280px,380px)] mb-6">
+      <div className="mb-6">
         <Card>
           <CardBody className="flex flex-col justify-center h-full">
             <h2 className="text-h2 text-foreground">{t("welcome")}</h2>
@@ -53,7 +52,6 @@ function StaffDashboard() {
             )}
           </CardBody>
         </Card>
-        <DigitalClock />
       </div>
 
       <KpiCards kpis={dash?.kpis ?? []} />

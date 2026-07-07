@@ -3,7 +3,6 @@
 import { usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { AppShell } from "@/components/AppShell";
-import { DigitalClock } from "@/components/DigitalClock";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { ChangePasswordForm } from "@/components/ChangePasswordForm";
@@ -57,7 +56,6 @@ export function TeacherLayout({ children }: { children: React.ReactNode }) {
       pageTitle={activeItem ? t(`nav.${activeItem.key}`) : t("subtitle")}
       headerActions={
         <>
-          <DigitalClock variant="compact" />
           <ThemeToggle />
           <LanguageSwitcher />
         </>

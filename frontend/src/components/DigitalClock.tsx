@@ -24,7 +24,7 @@ function readHour12Preference(): boolean {
 }
 
 type DigitalClockProps = {
-  variant?: "full" | "compact";
+  variant?: "full" | "compact" | "sidebar";
   className?: string;
 };
 
@@ -101,65 +101,87 @@ export function DigitalClock({ variant = "full", className = "" }: DigitalClockP
     );
   }
 
+  const isSidebar = variant === "sidebar";
+
   return (
     <section
-      className={`rounded-2xl border border-naqsh-primary/15 dark:border-naqsh-accent/20 bg-gradient-to-br from-[#1b4d3e] to-[#163328] text-white shadow-lg shadow-naqsh-primary/20 p-5 sm:p-6 flex flex-col gap-5 ${className}`}
+      className={`rounded-2xl border border-naqsh-primary/15 dark:border-naqsh-accent/20 bg-gradient-to-br from-[#1b4d3e] to-[#163328] text-white shadow-lg shadow-naqsh-primary/20 flex flex-col gap-3 ${
+        isSidebar ? "p-3" : "p-5 sm:p-6 gap-5"
+      } ${className}`}
       aria-live="polite"
     >
-      <div className="flex flex-wrap justify-between items-center gap-3">
-        <div className="flex items-center gap-3 min-w-0">
-          <div className="shrink-0 p-2.5 rounded-xl bg-naqsh-accent/90 text-white">
-            <TmbLogo className="w-7 h-7" />
+      <div className={`flex flex-wrap justify-between items-center gap-2 ${isSidebar ? "" : "gap-3"}`}>
+        <div className="flex items-center gap-2 min-w-0">
+          <div className={`shrink-0 rounded-xl bg-naqsh-accent/90 text-white ${isSidebar ? "p-1.5" : "p-2.5"}`}>
+            <TmbLogo className={isSidebar ? "w-5 h-5" : "w-7 h-7"} />
           </div>
           <div className="min-w-0">
-            <div className="font-semibold text-base truncate">{t("title")}</div>
-            <div className="text-xs text-white/60">{t("subtitle")}</div>
+            <div className={`font-semibold truncate ${isSidebar ? "text-xs" : "text-base"}`}>
+              {t("title")}
+            </div>
+            <div className={`text-white/60 ${isSidebar ? "text-[10px] leading-tight" : "text-xs"}`}>
+              {t("subtitle")}
+            </div>
           </div>
         </div>
         <div
-          className="flex items-center gap-1 bg-white/5 rounded-full p-1"
+          className="flex items-center gap-0.5 bg-white/5 rounded-full p-0.5"
           role="group"
           aria-label={t("formatToggle")}
         >
           <button
             type="button"
             onClick={select12}
-            className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-colors ${
-              hour12 ? "bg-white/15 text-naqsh-accent" : "text-white/70 hover:text-white"
-            }`}
+            className={`rounded-full font-semibold transition-colors ${
+              isSidebar ? "px-2 py-1 text-[10px]" : "px-3 py-1.5 text-xs"
+            } ${hour12 ? "bg-white/15 text-naqsh-accent" : "text-white/70 hover:text-white"}`}
           >
             {t("hour12")}
           </button>
           <button
             type="button"
             onClick={select24}
-            className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-colors ${
-              !hour12 ? "bg-white/15 text-naqsh-accent" : "text-white/70 hover:text-white"
-            }`}
+            className={`rounded-full font-semibold transition-colors ${
+              isSidebar ? "px-2 py-1 text-[10px]" : "px-3 py-1.5 text-xs"
+            } ${!hour12 ? "bg-white/15 text-naqsh-accent" : "text-white/70 hover:text-white"}`}
           >
             {t("hour24")}
           </button>
         </div>
       </div>
 
-      <div className="flex flex-wrap justify-between items-end gap-4">
-        <div className="flex items-baseline gap-2 min-w-0">
-          <div className="font-mono text-4xl sm:text-5xl lg:text-6xl font-semibold tracking-[0.12em] tabular-nums text-white">
+      <div className={`flex flex-col gap-2 ${isSidebar ? "" : "sm:flex-row sm:flex-wrap sm:justify-between sm:items-end gap-4"}`}>
+        <div className="flex items-baseline gap-1.5 min-w-0">
+          <div
+            className={`font-mono font-semibold tabular-nums text-white ${
+              isSidebar
+                ? "text-2xl tracking-[0.1em]"
+                : "text-4xl sm:text-5xl lg:text-6xl tracking-[0.12em]"
+            }`}
+          >
             {timeText}
           </div>
           {hour12 && (
-            <span className="text-base sm:text-lg font-medium text-naqsh-accent uppercase">
+            <span
+              className={`font-medium text-naqsh-accent uppercase ${
+                isSidebar ? "text-xs" : "text-base sm:text-lg"
+              }`}
+            >
               {ampmText}
             </span>
           )}
         </div>
-        <div className="text-right text-sm text-white/70">
-          <div>{dateText}</div>
-          <div className="font-medium text-white/90">{dayText}</div>
+        <div className={`text-white/70 ${isSidebar ? "text-[11px]" : "text-right text-sm"}`}>
+          <div className="truncate">{dateText}</div>
+          <div className="font-medium text-white/90 capitalize">{dayText}</div>
         </div>
       </div>
 
-      <div className="flex justify-between text-[11px] text-white/50 border-t border-white/10 pt-3">
+      <div
+        className={`flex justify-between text-white/50 border-t border-white/10 pt-2 ${
+          isSidebar ? "text-[9px]" : "text-[11px] pt-3"
+        }`}
+      >
         <span>{t("autoUpdate")}</span>
         <span>{t("localTime")}</span>
       </div>

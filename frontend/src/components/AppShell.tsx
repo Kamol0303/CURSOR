@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { cn } from "@/lib/cn";
+import { DigitalClock } from "@/components/DigitalClock";
 import { InternalCyberBackground } from "@/components/InternalCyberBackground";
 import { TmbLogo } from "@/components/TmbLogo";
 
@@ -193,7 +194,11 @@ export function AppShell({
       )}
     </div>
 
-    <nav className="flex-1 p-3 space-y-0.5 overflow-y-auto scrollbar-thin" aria-label="Main navigation">
+    <nav className="flex-1 flex flex-col min-h-0 overflow-hidden" aria-label="Main navigation">
+      <div className="shrink-0 p-3 pb-2">
+        <DigitalClock variant="sidebar" />
+      </div>
+      <div className="flex-1 overflow-y-auto p-3 pt-1 space-y-0.5 scrollbar-thin">
       {navItems.map((item) => {
         const active = isNavActive(pathname, item.href, item.exact);
         return (
@@ -214,6 +219,7 @@ export function AppShell({
           </Link>
         );
       })}
+      </div>
     </nav>
 
     <div className="p-3 border-t border-white/10">

@@ -145,9 +145,9 @@ export function LoginForm() {
       heroSubtitle={t("subtitle")}
     >
       {step === "login" ? (
-        <form onSubmit={handleLogin} className="text-left flex flex-col">
-          <h2 className="aeline-login-card__title">{t("login")}</h2>
-          <p className="aeline-login-card__hint">{t("loginHint")}</p>
+        <form onSubmit={handleLogin} className="aeline-split-login__form">
+          <h2 className="aeline-split-login__title">{t("login")}</h2>
+          <p className="aeline-split-login__hint">{t("loginHint")}</p>
 
           <GlassInput
             label={t("username")}
@@ -155,7 +155,7 @@ export function LoginForm() {
             onChange={setUsername}
             autoComplete="username"
             id="username"
-            variant="light"
+            variant="split"
           />
           <GlassInput
             label={t("password")}
@@ -165,47 +165,42 @@ export function LoginForm() {
             autoComplete="current-password"
             id="password"
             className="mt-4"
-            variant="light"
+            variant="split"
           />
 
-          <div className="flex items-center justify-between mt-6 mb-6 text-sm text-slate-600">
-            <label htmlFor="remember" className="flex items-center gap-2 cursor-pointer select-none">
+          <div className="aeline-split-login__meta">
+            <label htmlFor="remember" className="aeline-split-login__remember">
               <input
                 id="remember"
                 type="checkbox"
                 checked={remember}
                 onChange={(e) => setRemember(e.target.checked)}
-                className="accent-blue-600 w-4 h-4 rounded"
               />
               <span>{t("rememberMe")}</span>
             </label>
-            <button
-              type="button"
-              onClick={() => setShowForgotHint((v) => !v)}
-              className="text-slate-600 hover:text-blue-600 hover:underline transition-colors"
-            >
+            <button type="button" onClick={() => setShowForgotHint((v) => !v)} className="aeline-split-login__forgot">
               {t("forgotPassword")}
             </button>
           </div>
 
           {showForgotHint && (
-            <p className="aeline-alert aeline-alert--info -mt-2 mb-4">{t("forgotPasswordHint")}</p>
+            <p className="aeline-alert aeline-alert--info aeline-split-login__alert">{t("forgotPasswordHint")}</p>
           )}
 
           {error && (
-            <p className="aeline-alert aeline-alert--error" role="alert">
+            <p className="aeline-alert aeline-alert--error aeline-split-login__alert" role="alert">
               {error}
             </p>
           )}
 
-          <AuthButton type="submit" disabled={loading}>
+          <AuthButton type="submit" disabled={loading} variant="split">
             {loading ? "…" : t("login")}
           </AuthButton>
         </form>
       ) : step === "mfa_setup" && setupToken ? (
-        <div className="text-left">
+        <div className="aeline-split-login__form">
           <MfaSetupForm
-            variant="light"
+            variant="split"
             setupToken={setupToken}
             onComplete={(accessToken) => {
               if (accessToken) {
@@ -223,9 +218,9 @@ export function LoginForm() {
           )}
         </div>
       ) : (
-        <form onSubmit={handleMfa} className="text-left flex flex-col">
-          <h2 className="aeline-login-card__title">{t("mfaTitle")}</h2>
-          <p className="aeline-login-card__hint">{t("mfaCode")}</p>
+        <form onSubmit={handleMfa} className="aeline-split-login__form">
+          <h2 className="aeline-split-login__title">{t("mfaTitle")}</h2>
+          <p className="aeline-split-login__hint">{t("mfaCode")}</p>
           <GlassInput
             label={t("mfaCode")}
             value={mfaCode}
@@ -233,16 +228,16 @@ export function LoginForm() {
             inputMode="numeric"
             autoComplete="one-time-code"
             id="mfa"
-            variant="light"
+            variant="split"
             className="[&_input]:tracking-[0.3em] [&_input]:text-center [&_input]:text-lg"
           />
           {error && (
-            <p className="aeline-alert aeline-alert--error mt-4" role="alert">
+            <p className="aeline-alert aeline-alert--error aeline-split-login__alert" role="alert">
               {error}
             </p>
           )}
-          <div className="mt-7">
-            <AuthButton type="submit" disabled={loading}>
+          <div className="aeline-split-login__actions">
+            <AuthButton type="submit" disabled={loading} variant="split">
               {t("verify")}
             </AuthButton>
           </div>

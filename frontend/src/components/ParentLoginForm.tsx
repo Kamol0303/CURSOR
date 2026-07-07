@@ -53,12 +53,12 @@ export function ParentLoginForm() {
       heroTitle={t("title")}
       heroSubtitle={t("subtitle")}
     >
-      <div className="text-left">
-        <h2 className="aeline-login-card__title">{t("title")}</h2>
-        <p className="aeline-login-card__hint">{t("subtitle")}</p>
+      <div className="aeline-split-login__form">
+        <h2 className="aeline-split-login__title">{t("title")}</h2>
+        <p className="aeline-split-login__hint">{t("subtitle")}</p>
 
         {step === "phone" ? (
-          <div className="flex flex-col">
+          <div>
             <GlassInput
               label={t("phone")}
               type="tel"
@@ -66,21 +66,21 @@ export function ParentLoginForm() {
               onChange={setPhone}
               autoComplete="tel"
               id="parent-phone"
-              variant="light"
+              variant="split"
             />
             {error && (
-              <p className="aeline-alert aeline-alert--error mt-4" role="alert">
+              <p className="aeline-alert aeline-alert--error aeline-split-login__alert" role="alert">
                 {error}
               </p>
             )}
-            <div className="mt-7">
-              <AuthButton type="button" onClick={requestOtp} disabled={loading || phone.length < 13}>
+            <div className="aeline-split-login__actions">
+              <AuthButton type="button" onClick={requestOtp} disabled={loading || phone.length < 13} variant="split">
                 {loading ? t("sending") : t("sendOtp")}
               </AuthButton>
             </div>
           </div>
         ) : (
-          <div className="flex flex-col">
+          <div>
             <GlassInput
               label={t("otp")}
               value={otp}
@@ -88,24 +88,20 @@ export function ParentLoginForm() {
               inputMode="numeric"
               maxLength={6}
               id="parent-otp"
-              variant="light"
+              variant="split"
               className="[&_input]:tracking-[0.35em] [&_input]:text-center"
             />
             {error && (
-              <p className="aeline-alert aeline-alert--error mt-4" role="alert">
+              <p className="aeline-alert aeline-alert--error aeline-split-login__alert" role="alert">
                 {error}
               </p>
             )}
-            <div className="mt-7">
-              <AuthButton type="button" onClick={verifyOtp} disabled={loading || otp.length < 4}>
+            <div className="aeline-split-login__actions">
+              <AuthButton type="button" onClick={verifyOtp} disabled={loading || otp.length < 4} variant="split">
                 {loading ? t("verifying") : t("verify")}
               </AuthButton>
             </div>
-            <button
-              type="button"
-              onClick={() => setStep("phone")}
-              className="mt-4 text-sm text-slate-500 hover:text-blue-600 hover:underline text-center"
-            >
+            <button type="button" onClick={() => setStep("phone")} className="aeline-split-login__forgot aeline-split-login__forgot--center">
               {t("changePhone")}
             </button>
           </div>

@@ -3,7 +3,7 @@
 import Link from "next/link";
 
 type AuthButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
-  variant?: "dark" | "secondary" | "lime";
+  variant?: "dark" | "secondary" | "lime" | "split";
   fullWidth?: boolean;
 };
 
@@ -15,6 +15,18 @@ export function AuthButton({
   type = "button",
   ...props
 }: AuthButtonProps) {
+  if (variant === "split") {
+    return (
+      <button
+        type={type}
+        className={`aeline-split-login__submit ${fullWidth ? "aeline-split-login__submit--block" : ""} ${className}`}
+        {...props}
+      >
+        {children}
+      </button>
+    );
+  }
+
   return (
     <button
       type={type}

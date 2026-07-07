@@ -196,7 +196,7 @@
 @media (min-width: 1100px) {
   .aeline-hero__content {
     display: grid;
-    grid-template-columns: 1fr minmax(22rem, 26rem);
+    grid-template-columns: 1fr minmax(28rem, 36rem);
     grid-template-rows: auto 1fr;
     gap: 0 2rem;
     align-items: start;
@@ -306,7 +306,269 @@
   to { transform: rotateY(360deg) rotateX(8deg); }
 }
 
-/* Login card */
+/* Split login card */
+.aeline-split-login {
+  width: 100%;
+  max-width: 42rem;
+  border-radius: 2.5rem;
+  overflow: hidden;
+  background: #fff;
+  box-shadow: -1px -2px 42px -19px rgba(0, 0, 0, 0.35);
+}
+
+.aeline-split-login__body {
+  display: flex;
+  align-items: stretch;
+  min-height: clamp(22rem, 52vw, 28rem);
+}
+
+.aeline-split-login__main {
+  flex: 1 1 62%;
+  padding: clamp(1.5rem, 4vw, 2.75rem) clamp(1.25rem, 3vw, 2rem);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.aeline-split-login__curve {
+  flex-shrink: 0;
+  width: 2.5rem;
+  height: auto;
+  align-self: stretch;
+  display: none;
+}
+
+.aeline-split-login__side {
+  flex: 0 0 34%;
+  background: #f9bc35;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem 1rem;
+  text-align: center;
+}
+
+.aeline-split-login__side-content {
+  max-width: 14rem;
+}
+
+.aeline-split-login__side h2 {
+  font-family: var(--aeline-font-display);
+  font-size: clamp(1rem, 2.5vw, 1.2rem);
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.aeline-split-login__side p {
+  margin-top: 0.75rem;
+  font-size: clamp(0.7rem, 1.8vw, 0.8rem);
+  letter-spacing: 0.08em;
+  line-height: 1.5;
+  color: rgba(0, 0, 0, 0.72);
+}
+
+.aeline-split-login__side-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 1.75rem;
+  min-width: 10rem;
+  padding: 0.45rem 1rem;
+  border-radius: 0.2rem;
+  background: rgba(248, 249, 250, 0.31);
+  color: #000;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.aeline-split-login__side-btn:hover {
+  background: rgba(255, 255, 255, 0.55);
+  transform: translateY(-1px);
+}
+
+.aeline-split-login__title {
+  font-family: var(--aeline-font-display);
+  font-size: clamp(1.15rem, 2.8vw, 1.35rem);
+  font-weight: 700;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.aeline-split-login__hint {
+  margin-top: 0.5rem;
+  margin-bottom: 1.25rem;
+  font-size: clamp(0.75rem, 2vw, 0.85rem);
+  text-align: center;
+  letter-spacing: 0.08em;
+  color: var(--aeline-muted);
+  line-height: 1.5;
+}
+
+.aeline-split-login__form {
+  width: 100%;
+}
+
+.aeline-split-login__group {
+  margin-bottom: 0.75rem;
+}
+
+.aeline-split-login__group label {
+  display: block;
+  margin-bottom: 0.25rem;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--aeline-text);
+}
+
+.aeline-split-login__control {
+  width: 100%;
+  border: 1px solid #d1d5db;
+  border-radius: 0;
+  padding: 0.55rem 0.65rem;
+  font-size: 0.9rem;
+  color: var(--aeline-text);
+  background: #fff;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.aeline-split-login__control:focus {
+  border-color: #f9bc35;
+  box-shadow: 0 0 0 2px rgba(249, 188, 53, 0.25);
+}
+
+.aeline-split-login__meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin: 1.25rem 0 1rem;
+  font-size: 0.8rem;
+  color: #64748b;
+}
+
+.aeline-split-login__remember {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  cursor: pointer;
+  user-select: none;
+}
+
+.aeline-split-login__remember input {
+  width: 1rem;
+  height: 1rem;
+  accent-color: #f1da36;
+}
+
+.aeline-split-login__forgot {
+  border: none;
+  background: none;
+  padding: 0;
+  font-size: inherit;
+  color: inherit;
+  cursor: pointer;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.aeline-split-login__forgot:hover {
+  color: #d97706;
+  text-decoration: underline;
+}
+
+.aeline-split-login__forgot--center {
+  display: block;
+  width: 100%;
+  margin-top: 0.75rem;
+  text-align: center;
+}
+
+.aeline-split-login__alert {
+  margin-bottom: 0.75rem;
+}
+
+.aeline-split-login__actions {
+  margin-top: 0.5rem;
+}
+
+.aeline-split-login__submit {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.5rem;
+  padding: 0.45rem 1rem;
+  border: none;
+  border-radius: 0.2rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #111;
+  cursor: pointer;
+  background: linear-gradient(to right, #f1da36 0%, #fca86c 99%);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.aeline-split-login__submit:hover:not(:disabled) {
+  transform: translateY(-1px);
+  opacity: 0.95;
+}
+
+.aeline-split-login__submit:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.aeline-split-login__submit--block {
+  width: 100%;
+  margin-top: 0.5rem;
+}
+
+@media (min-width: 640px) {
+  .aeline-split-login__curve {
+    display: block;
+  }
+
+  .aeline-split-login__side {
+    border-radius: 0 2.5rem 2.5rem 0;
+    padding: 2rem 1.25rem;
+  }
+}
+
+@media (max-width: 639px) {
+  .aeline-split-login {
+    border-radius: 1.5rem;
+  }
+
+  .aeline-split-login__body {
+    flex-direction: column;
+    min-height: auto;
+  }
+
+  .aeline-split-login__main {
+    flex: none;
+    padding: 1.5rem 1.25rem 1rem;
+  }
+
+  .aeline-split-login__side {
+    flex: none;
+    border-radius: 0 0 1.5rem 1.5rem;
+    padding: 1.5rem 1rem 1.75rem;
+  }
+
+  .aeline-split-login__meta {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+/* Legacy login card (internal pages) */
 .aeline-login-card {
   width: 100%;
   max-width: 24rem;

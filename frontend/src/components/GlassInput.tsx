@@ -12,7 +12,7 @@ type GlassInputProps = {
   maxLength?: number;
   className?: string;
   id?: string;
-  variant?: "dark" | "light";
+  variant?: "dark" | "light" | "split";
 };
 
 export function GlassInput({
@@ -29,6 +29,25 @@ export function GlassInput({
 }: GlassInputProps) {
   const generatedId = useId();
   const id = externalId ?? generatedId;
+
+  if (variant === "split") {
+    return (
+      <div className={`aeline-split-login__group ${className}`}>
+        <label htmlFor={id}>{label}</label>
+        <input
+          id={id}
+          type={type}
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          autoComplete={autoComplete}
+          inputMode={inputMode}
+          maxLength={maxLength}
+          className="aeline-split-login__control"
+          required
+        />
+      </div>
+    );
+  }
 
   if (variant === "light") {
     return (

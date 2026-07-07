@@ -17,7 +17,7 @@ type SetupData = {
 type Props = {
   setupToken?: string;
   accessToken?: string;
-  variant?: "default" | "glass" | "light";
+  variant?: "default" | "glass" | "light" | "split";
   onComplete: (accessToken?: string) => void;
   onError: (code: string) => void;
 };
@@ -29,7 +29,7 @@ export function MfaSetupForm({ setupToken, accessToken, variant = "default", onC
   const [loading, setLoading] = useState(false);
   const [initLoading, setInitLoading] = useState(true);
 
-  const isLight = variant === "light" || variant === "glass";
+  const isLight = variant === "light" || variant === "glass" || variant === "split";
 
   useEffect(() => {
     const init = async () => {
@@ -103,11 +103,23 @@ export function MfaSetupForm({ setupToken, accessToken, variant = "default", onC
   }
 
   return (
-    <form onSubmit={handleConfirm} className="space-y-4">
-      <h2 className={`font-semibold text-center ${isLight ? "aeline-login-card__title !mb-0" : "text-naqsh-primary"}`}>
+    <form onSubmit={handleConfirm} className={variant === "split" ? "aeline-split-login__form" : "space-y-4"}>
+      <h2
+        className={
+          variant === "split"
+            ? "aeline-split-login__title"
+            : `font-semibold text-center ${isLight ? "aeline-login-card__title !mb-0" : "text-naqsh-primary"}`
+        }
+      >
         {t("mfaSetupTitle")}
       </h2>
-      <p className={`text-sm text-center ${isLight ? "text-slate-500" : "text-gray-600 dark:text-gray-400"}`}>
+      <p
+        className={
+          variant === "split"
+            ? "aeline-split-login__hint"
+            : `text-sm text-center ${isLight ? "text-slate-500" : "text-gray-600 dark:text-gray-400"}`
+        }
+      >
         {t("mfaSetupInstructions")}
       </p>
       <div
@@ -123,7 +135,18 @@ export function MfaSetupForm({ setupToken, accessToken, variant = "default", onC
         <p className="mt-2 break-all font-mono">{setup.provisioning_uri}</p>
       </details>
       <div>
-        {isLight ? (
+        {variant === "split" ? (
+          <GlassInput
+            label={t("mfaCode")}
+            value={code}
+            onChange={setCode}
+            inputMode="numeric"
+            autoComplete="one-time-code"
+            id="mfa-setup-code"
+            variant="split"
+            className="[&_input]:tracking-widest [&_input]:text-center"
+          />
+        ) : isLight ? (
           <GlassInput
             label={t("mfaCode")}
             value={code}
@@ -152,7 +175,11 @@ export function MfaSetupForm({ setupToken, accessToken, variant = "default", onC
           </>
         )}
       </div>
-      {isLight ? (
+      {variant === "split" ? (
+        <AuthButton type="submit" disabled={loading} variant="split">
+          {t("mfaSetupConfirm")}
+        </AuthButton>
+      ) : isLight ? (
         <AuthButton type="submit" disabled={loading}>
           {t("mfaSetupConfirm")}
         </AuthButton>

@@ -1,10 +1,10 @@
 "use client";
 
-import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { AuthHero3D } from "@/components/auth/AuthHero3D";
 import { AuthHeroActions, AuthHeroRating, AuthNavbar } from "@/components/auth/AuthNavbar";
 import { AuthLandingSections } from "@/components/auth/AuthLandingSections";
+import { AuthSplitLoginCard } from "@/components/auth/AuthSplitLoginCard";
 
 export function AuthChrome({
   children,
@@ -12,14 +12,19 @@ export function AuthChrome({
   alternateLabel,
   heroTitle,
   heroSubtitle,
+  welcomeTitle,
+  welcomeSubtitle,
 }: {
   children: React.ReactNode;
   alternateHref?: string;
   alternateLabel?: string;
   heroTitle?: string;
   heroSubtitle?: string;
+  welcomeTitle?: string;
+  welcomeSubtitle?: string;
 }) {
-  const t = useTranslations("auth.landing");
+  const t = useTranslations("auth");
+  const landing = useTranslations("auth.landing");
 
   return (
     <div className="auth-aeline">
@@ -29,10 +34,10 @@ export function AuthChrome({
         <div className="aeline-hero__content">
           <div className="aeline-container aeline-hero__text">
             <h1 className="aeline-hero__title">
-              {heroTitle || t("hero.title")}
-              <span className="aeline-hero__title-muted"> {t("hero.titleAccent")}</span>
+              {heroTitle || landing("hero.title")}
+              <span className="aeline-hero__title-muted"> {landing("hero.titleAccent")}</span>
             </h1>
-            <p className="aeline-hero__subtitle">{heroSubtitle || t("hero.subtitle")}</p>
+            <p className="aeline-hero__subtitle">{heroSubtitle || landing("hero.subtitle")}</p>
             <AuthHeroActions />
           </div>
 
@@ -49,14 +54,14 @@ export function AuthChrome({
           </div>
 
           <div className="aeline-container aeline-hero__login-col">
-            <div id="login" className="aeline-login-card">
+            <AuthSplitLoginCard
+              welcomeTitle={welcomeTitle || t("splitWelcomeTitle")}
+              welcomeSubtitle={welcomeSubtitle || t("splitWelcomeSubtitle")}
+              sideHref={alternateHref}
+              sideLabel={alternateLabel}
+            >
               {children}
-              {alternateHref && alternateLabel && (
-                <p className="aeline-login-card__alt">
-                  <Link href={alternateHref}>{alternateLabel}</Link>
-                </p>
-              )}
-            </div>
+            </AuthSplitLoginCard>
           </div>
         </div>
       </section>

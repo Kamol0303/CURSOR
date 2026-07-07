@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useCallback } from "react";
+import { useEffect, useCallback, useState } from "react";
+import { createPortal } from "react-dom";
 import { cn } from "@/lib/cn";
 import { Button } from "./Button";
 
@@ -34,6 +35,8 @@ export function Modal({
   className,
   footer,
 }: ModalProps) {
+  const [mounted, setMounted] = useState(false);
+
   const handleEscape = useCallback(
     (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
@@ -42,71 +45,83 @@ export function Modal({
   );
 
   useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
     if (!open) return;
+    const prev = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     document.addEventListener("keydown", handleEscape);
     return () => {
-      document.body.style.overflow = "";
+      document.body.style.overflow = prev;
       document.removeEventListener("keydown", handleEscape);
     };
   }, [open, handleEscape]);
 
-  if (!open) return null;
+  if (!open || !mounted) return null;
 
-  return (
+  return createPortal(
     <div
-      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4 sm:p-6"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby={title ? "modal-title" : undefined}
+      className="fixed inset-0 z-[200] overflow-y-auto overscroll-contain"
+      role="presentation"
     >
+      {/* Backdrop */}
       <div
-        className="absolute inset-0 bg-black/50 backdrop-blur-[2px] animate-fade-in"
+        className="fixed inset-0 bg-black/50 backdrop-blur-[2px] animate-fade-in"
         onClick={onClose}
         aria-hidden
       />
-      <div
-        className={cn(
-          "relative w-full bg-card rounded-2xl shadow-xl border border-border",
-          "max-h-[90vh] flex flex-col animate-scale-in",
-          sizes[size],
-          className,
-        )}
-      >
-        {(title || showClose) && (
-          <div className="flex items-start justify-between gap-4 px-6 pt-5 pb-4 border-b border-border shrink-0">
-            <div className="min-w-0">
-              {title && (
-                <h2 id="modal-title" className="text-h3 text-naqsh-primary dark:text-naqsh-accent">
-                  {title}
-                </h2>
-              )}
-              {description && (
-                <p className="text-small text-muted-foreground mt-1">{description}</p>
+
+      {/* Centered panel — scrollable when taller than viewport */}
+      <div className="flex min-h-[100dvh] items-center justify-center p-4 sm:p-6">
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby={title ? "modal-title" : undefined}
+          className={cn(
+            "relative w-full bg-card rounded-2xl shadow-xl border border-border",
+            "max-h-[calc(100dvh-2rem)] flex flex-col animate-fade-in",
+            sizes[size],
+            className,
+          )}
+        >
+          {(title || showClose) && (
+            <div className="flex items-start justify-between gap-4 px-6 pt-5 pb-4 border-b border-border shrink-0">
+              <div className="min-w-0 pr-2">
+                {title && (
+                  <h2 id="modal-title" className="text-h3 text-naqsh-primary dark:text-naqsh-accent">
+                    {title}
+                  </h2>
+                )}
+                {description && (
+                  <p className="text-small text-muted-foreground mt-1">{description}</p>
+                )}
+              </div>
+              {showClose && (
+                <button
+                  type="button"
+                  onClick={onClose}
+                  className="shrink-0 p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors duration-fast"
+                  aria-label="Close"
+                >
+                  <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
               )}
             </div>
-            {showClose && (
-              <button
-                type="button"
-                onClick={onClose}
-                className="shrink-0 p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors duration-fast"
-                aria-label="Close"
-              >
-                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            )}
-          </div>
-        )}
-        <div className="overflow-y-auto flex-1 px-6 py-5 scrollbar-thin">{children}</div>
-        {footer && (
-          <div className="px-6 py-4 border-t border-border shrink-0 flex justify-end gap-2">
-            {footer}
-          </div>
-        )}
+          )}
+          <div className="overflow-y-auto flex-1 min-h-0 px-6 py-5 scrollbar-thin">{children}</div>
+          {footer && (
+            <div className="px-6 py-4 border-t border-border shrink-0 flex justify-end gap-2">
+              {footer}
+            </div>
+          )}
+        </div>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }
 

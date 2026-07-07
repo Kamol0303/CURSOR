@@ -33,5 +33,5 @@ export function PageSection({
   children: React.ReactNode;
   className?: string;
 }) {
-  return <section className={cn("space-y-6 animate-slide-up", className)}>{children}</section>;
+  return <section className={cn("space-y-6", className)}>{children}</section>;
 }

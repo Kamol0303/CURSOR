@@ -170,8 +170,8 @@ export function AppShell({
       "flex flex-col shrink-0 text-white",
       "bg-gradient-to-b from-[#1b4d3e] via-[#163328] to-[#0f221c]",
       "ring-1 ring-white/10 shadow-xl",
-      "w-64 min-h-screen",
-      "fixed inset-y-0 left-0 z-40 lg:relative lg:translate-x-0 transition-transform duration-slow ease-premium",
+      "w-64 h-[100dvh] overflow-hidden",
+      "fixed inset-y-0 left-0 z-40 lg:sticky lg:top-0 lg:translate-x-0 transition-transform duration-slow ease-premium",
       mobileOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0",
     )}
   >
@@ -231,7 +231,7 @@ export function AppShell({
   );
 
   return (
-    <div className="min-h-screen bg-background flex">
+    <div className="min-h-[100dvh] bg-background flex overflow-hidden">
       {!hideSidebar && (
         <>
           {mobileOpen && (
@@ -245,10 +245,10 @@ export function AppShell({
         </>
       )}
 
-      <div className="flex-1 flex flex-col min-w-0">
+      <div className="flex-1 flex flex-col min-w-0 min-h-0">
         <header
           className={cn(
-            "sticky top-0 z-20 bg-surface/80 dark:bg-card/80 backdrop-blur-xl",
+            "sticky top-0 z-20 shrink-0 bg-surface/90 dark:bg-card/90 backdrop-blur-xl",
             "border-b border-border px-4 sm:px-6 py-3",
             "flex justify-between items-center gap-4",
           )}
@@ -284,7 +284,9 @@ export function AppShell({
           )}
         </header>
 
-        <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-auto">{children}</main>
+        <main className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden p-4 sm:p-6 lg:p-8">
+          {children}
+        </main>
       </div>
     </div>
   );

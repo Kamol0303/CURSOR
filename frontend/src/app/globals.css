@@ -292,6 +292,43 @@
   animation: auth-logo-pulse 4s ease-in-out infinite;
 }
 
+/* Auth header brand — Chakra Petch */
+.auth-brand {
+  font-family: var(--font-chakra), "Chakra Petch", sans-serif;
+}
+
+.auth-brand__title {
+  font-size: clamp(1.35rem, 4vw, 1.75rem);
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  line-height: 1.1;
+  color: #fff;
+  text-shadow:
+    0 0 20px rgba(200, 147, 42, 0.55),
+    0 0 40px rgba(200, 147, 42, 0.25),
+    0 2px 4px rgba(0, 0, 0, 0.35);
+}
+
+.auth-brand__region {
+  font-size: clamp(0.8rem, 2.5vw, 0.95rem);
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  line-height: 1.35;
+  color: rgba(255, 255, 255, 0.82);
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.4);
+}
+
+@media (min-width: 640px) {
+  .auth-brand__title {
+    font-size: 1.875rem;
+    letter-spacing: 0.16em;
+  }
+
+  .auth-brand__region {
+    font-size: 1rem;
+  }
+}
+
 /* ── Interactive grid glow (CodePen-style) ── */
 .grid-glow {
   display: grid;

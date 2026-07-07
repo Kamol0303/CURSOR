@@ -29,12 +29,12 @@ export function AuthChrome({
 
       <GridGlowEffect className="fixed inset-0 opacity-50 pointer-events-auto" color="#c8932a" />
 
-      <header className="relative z-20 flex justify-between items-center gap-3 px-4 sm:px-6 py-4 auth-animate-in">
-        <div className="flex items-center gap-2.5">
-          <TmbLogo className="w-9 h-9 text-naqsh-accent auth-logo-float" />
-          <div className="hidden sm:block">
-            <div className="font-semibold text-sm tracking-wide">TMB</div>
-            <div className="text-[11px] text-white/60">{t("footer.region")}</div>
+      <header className="relative z-20 flex justify-between items-center gap-3 px-4 sm:px-6 py-4 sm:py-5 auth-animate-in">
+        <div className="flex items-center gap-3 sm:gap-3.5 min-w-0">
+          <TmbLogo className="w-11 h-11 sm:w-12 sm:h-12 shrink-0 text-naqsh-accent auth-logo-float" />
+          <div className="auth-brand min-w-0">
+            <div className="auth-brand__title">TMB</div>
+            <div className="auth-brand__region truncate">{t("footer.region")}</div>
           </div>
         </div>
         <div className="flex items-center gap-2 pointer-events-auto">

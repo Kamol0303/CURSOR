@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import {
   Alert,
   Badge,
@@ -35,8 +35,21 @@ type Material = {
   subject_name_uz?: string;
 };
 
+function subjectLabel(subject: Subject, locale: string): string {
+  if (locale === "ru" && subject.name_ru) return subject.name_ru;
+  if (locale === "en" && subject.name_en) return subject.name_en;
+  return subject.name_uz;
+}
+
+function mapError(t: ReturnType<typeof useTranslations<"lessonStart">>, code?: string): string {
+  if (!code) return t("errors.UNKNOWN");
+  const key = `errors.${code}` as const;
+  return t.has(key) ? t(key) : t("errors.UNKNOWN");
+}
+
 export default function TeacherLessonStartPage() {
   const t = useTranslations("lessonStart");
+  const locale = useLocale();
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const [groups, setGroups] = useState<Group[]>([]);
   const [subjectId, setSubjectId] = useState("");
@@ -46,6 +59,7 @@ export default function TeacherLessonStartPage() {
   const [material, setMaterial] = useState<Material | null>(null);
   const [history, setHistory] = useState<Material[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [generating, setGenerating] = useState(false);
   const [starting, setStarting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -56,7 +70,9 @@ export default function TeacherLessonStartPage() {
       apiFetch<Group[]>("/teacher/groups"),
       apiFetch<Material[]>("/teacher/lesson-materials?per_page=10"),
     ]).then(([subjRes, groupRes, histRes]) => {
-      if (subjRes.success && subjRes.data) {
+      if (!subjRes.success) {
+        setLoadError(mapError(t, subjRes.error?.code));
+      } else if (subjRes.data) {
         setSubjects(subjRes.data);
         setSubjectId(subjRes.data[0]?.id || "");
       }
@@ -64,7 +80,7 @@ export default function TeacherLessonStartPage() {
       if (histRes.success && histRes.data) setHistory(histRes.data);
       setLoading(false);
     });
-  }, []);
+  }, [t]);
 
   const filteredGroups = groups.filter((g) => !subjectId || g.subject_id === subjectId);
 
@@ -80,11 +96,12 @@ export default function TeacherLessonStartPage() {
         topic: topic.trim(),
         content_type: contentType,
         group_id: groupId || undefined,
+        locale,
       }),
     });
     setGenerating(false);
     if (!res.success || !res.data) {
-      setError(t("generateError"));
+      setError(mapError(t, res.error?.code));
       return;
     }
     setMaterial(res.data);
@@ -94,11 +111,17 @@ export default function TeacherLessonStartPage() {
   const startLesson = async () => {
     if (!material) return;
     setStarting(true);
+    setError(null);
     const res = await apiFetch<Material>(`/teacher/lesson-materials/${material.id}/start`, {
       method: "POST",
     });
     setStarting(false);
-    if (res.success && res.data) setMaterial(res.data);
+    if (!res.success || !res.data) {
+      setError(mapError(t, res.error?.code));
+      return;
+    }
+    setMaterial(res.data);
+    setHistory((prev) => prev.map((h) => (h.id === res.data!.id ? res.data! : h)));
   };
 
   if (loading) {
@@ -113,6 +136,12 @@ export default function TeacherLessonStartPage() {
     <PageSection className="max-w-4xl">
       <PageHeader title={t("title")} description={t("subtitle")} />
 
+      {loadError && <Alert variant="danger">{loadError}</Alert>}
+
+      {subjects.length === 0 && !loadError && (
+        <Alert variant="warning">{t("noSubjects")}</Alert>
+      )}
+
       <Card>
         <CardBody>
           <form onSubmit={generate} className="space-y-5">
@@ -126,17 +155,25 @@ export default function TeacherLessonStartPage() {
                     setGroupId("");
                   }}
                   required
+                  disabled={subjects.length === 0}
                 >
+                  {subjects.length === 0 && (
+                    <option value="">{t("noSubjectsShort")}</option>
+                  )}
                   {subjects.map((s) => (
                     <option key={s.id} value={s.id}>
-                      {s.name_uz}
+                      {subjectLabel(s, locale)}
                     </option>
                   ))}
                 </Select>
               </FormField>
               <FormField>
                 <Label>{t("groupOptional")}</Label>
-                <Select value={groupId} onChange={(e) => setGroupId(e.target.value)}>
+                <Select
+                  value={groupId}
+                  onChange={(e) => setGroupId(e.target.value)}
+                  disabled={subjects.length === 0}
+                >
                   <option value="">{t("noGroup")}</option>
                   {filteredGroups.map((g) => (
                     <option key={g.id} value={g.id}>
@@ -181,6 +218,8 @@ export default function TeacherLessonStartPage() {
                 placeholder={t("topicPlaceholder")}
                 required
                 minLength={2}
+                maxLength={500}
+                disabled={subjects.length === 0}
               />
             </FormField>
 
@@ -206,12 +245,7 @@ export default function TeacherLessonStartPage() {
                 </p>
               </div>
               {material.status !== "started" ? (
-                <Button
-                  type="button"
-                  variant="accent"
-                  onClick={startLesson}
-                  loading={starting}
-                >
+                <Button type="button" variant="accent" onClick={startLesson} loading={starting}>
                   {starting ? t("starting") : t("startLesson")}
                 </Button>
               ) : (

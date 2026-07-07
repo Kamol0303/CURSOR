@@ -149,6 +149,65 @@ export async function downloadFile(fileId: string, fileName = "download") {
   return true;
 }
 
+function parseApiErrorCode(body: unknown, status: number): string {
+  if (body && typeof body === "object") {
+    const record = body as Record<string, unknown>;
+    const detail = record.detail;
+    if (detail && typeof detail === "object" && "code" in detail) {
+      return String((detail as { code: string }).code);
+    }
+    const error = record.error;
+    if (error && typeof error === "object" && "code" in error) {
+      return String((error as { code: string }).code);
+    }
+  }
+  if (status === 403) return "FORBIDDEN";
+  return "HTTP_ERROR";
+}
+
+export async function downloadRatingsReport(
+  format: "pdf" | "excel",
+  locale?: string,
+): Promise<{ ok: true } | { ok: false; code: string }> {
+  const token = getToken();
+  const params = new URLSearchParams({ format: format === "excel" ? "excel" : "pdf" });
+  if (locale) params.set("locale", locale);
+
+  let res: Response;
+  try {
+    res = await fetch(`${getApiBaseUrl()}/api/v1/reports/ratings?${params}`, {
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+      credentials: "include",
+    });
+  } catch {
+    return { ok: false, code: "NETWORK_ERROR" };
+  }
+
+  if (!res.ok) {
+    try {
+      const body = await res.json();
+      return { ok: false, code: parseApiErrorCode(body, res.status) };
+    } catch {
+      return { ok: false, code: parseApiErrorCode(null, res.status) };
+    }
+  }
+
+  const contentType = res.headers.get("content-type") || "";
+  if (!contentType.includes("pdf") && !contentType.includes("spreadsheet") && !contentType.includes("excel")) {
+    return { ok: false, code: "INVALID_RESPONSE" };
+  }
+
+  const blob = await res.blob();
+  const disposition = res.headers.get("content-disposition");
+  const match = disposition?.match(/filename="?([^";]+)"?/i);
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = match?.[1] || `tmb-ratings.${format === "excel" ? "xlsx" : "pdf"}`;
+  a.click();
+  URL.revokeObjectURL(a.href);
+  return { ok: true };
+}
+
 export async function uploadFile(
   file: File,
   params: { center_id: string; owner_type: string; owner_id: string },

@@ -3,9 +3,10 @@
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { CenterCertificatesChart } from "@/components/CenterCertificatesChart";
+import { DigitalClock } from "@/components/DigitalClock";
 import { OperatorKpiCards } from "@/components/OperatorKpiCards";
 import { TrendLineChart } from "@/components/TrendLineChart";
-import { Alert, PageHeader, PageSection, PageSkeleton } from "@/components/ui";
+import { Alert, Card, CardBody, PageHeader, PageSection, PageSkeleton } from "@/components/ui";
 import { getMe, getOperatorSummary } from "@/lib/api";
 
 type OperatorData = {
@@ -48,10 +49,13 @@ export function OperatorDashboard() {
 
   return (
     <PageSection>
-      <PageHeader
-        title={t("welcome")}
-        description={userName ? `${userName} · ${t("subtitle")}` : t("subtitle")}
-      />
+      <div className="grid gap-4 lg:grid-cols-[1fr_minmax(260px,340px)] mb-6">
+        <PageHeader
+          title={t("welcome")}
+          description={userName ? `${userName} · ${t("subtitle")}` : t("subtitle")}
+        />
+        <DigitalClock />
+      </div>
 
       {data ? (
         <>

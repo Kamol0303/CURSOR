@@ -6,6 +6,9 @@
     "password": "Password",
     "login": "Sign in",
     "loginHint": "Authorized staff access only",
+    "rememberMe": "Remember me",
+    "forgotPassword": "Forgot password?",
+    "forgotPasswordHint": "Contact your center director or system administrator. Only an admin can reset passwords.",
     "parentPortal": "Parent portal →",
     "mfaTitle": "Two-factor authentication",
     "mfaCode": "TOTP code",
@@ -25,6 +28,14 @@
       "ACCOUNT_LOCKED": "Account temporarily locked. Reset: ./scripts/reset-demo-login.sh",
       "PASSWORD_CHANGE_REQUIRED": "You must change your password first",
       "NETWORK_ERROR": "Cannot reach server. Is backend running? (localhost:8000)"
+    },
+    "footer": {
+      "verify": "Verify certificate",
+      "platform": "Education monitoring",
+      "parent": "Parent portal",
+      "staff": "Staff login",
+      "region": "Toyloq district · Samarkand",
+      "copyright": "© TMB — Education Monitoring Database"
     }
   },
   "security": {
@@ -542,7 +553,18 @@
     "cancel": "Cancel",
     "save": "Save",
     "saving": "Saving...",
-    "download": "Download"
+    "download": "Download",
+    "downloadError": "Failed to download file",
+    "exportPdf": "Ratings PDF",
+    "exportExcel": "Ratings Excel",
+    "exporting": "Downloading...",
+    "exportErrors": {
+      "FORBIDDEN": "You do not have permission to download this report",
+      "NETWORK_ERROR": "Network error. Please try again",
+      "INVALID_RESPONSE": "Server returned an invalid response",
+      "HTTP_ERROR": "Failed to download report",
+      "UNKNOWN": "Failed to download report"
+    }
   },
   "verify": {
     "title": "Certificate verification",
@@ -631,6 +653,8 @@
     "generate": "Generate with AI",
     "generating": "Generating...",
     "generateError": "Generation failed. Check API key configuration.",
+    "noSubjects": "No subjects are assigned to you. Ask your center manager to assign subjects or groups.",
+    "noSubjectsShort": "No subjects",
     "startLesson": "Start lesson",
     "starting": "Starting...",
     "started": "Lesson started",
@@ -638,7 +662,28 @@
     "round": "Round",
     "hint": "Hint",
     "answer": "Answer",
-    "recent": "Recent materials"
+    "recent": "Recent materials",
+    "errors": {
+      "SUBJECT_NOT_ASSIGNED": "This subject is not assigned to you",
+      "SUBJECT_NOT_FOUND": "Subject not found",
+      "GROUP_NOT_FOUND": "Group not found",
+      "GROUP_SUBJECT_MISMATCH": "Group and subject do not match",
+      "LESSON_ALREADY_STARTED": "Lesson has already been started",
+      "FORBIDDEN": "Access denied",
+      "NETWORK_ERROR": "Network error",
+      "UNKNOWN": "An error occurred"
+    }
+  },
+  "clock": {
+    "title": "Digital clock",
+    "subtitle": "12/24 hour · Local time",
+    "hour12": "12 hr",
+    "hour24": "24 hr",
+    "formatToggle": "Time format",
+    "am": "AM",
+    "pm": "PM",
+    "autoUpdate": "Updates every second",
+    "localTime": "Local time"
   },
   "audit": {
     "title": "Change log",

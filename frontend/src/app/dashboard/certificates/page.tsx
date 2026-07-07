@@ -1,10 +1,11 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { AddCertificateModal } from "@/components/AddCertificateModal";
 import { PermissionGate } from "@/components/PermissionGate";
 import {
+  Alert,
   Button,
   Card,
   CardBody,
@@ -13,7 +14,7 @@ import {
   PageSection,
   CardSkeleton,
 } from "@/components/ui";
-import { apiFetch, downloadFile, getApiBaseUrl, getMe, listCenters } from "@/lib/api";
+import { apiFetch, downloadFile, downloadRatingsReport, getMe, listCenters } from "@/lib/api";
 
 type Cert = {
   id: string;
@@ -29,10 +30,14 @@ type Cert = {
 
 export default function CertificatesPage() {
   const t = useTranslations("certificates");
+  const locale = useLocale();
   const [certs, setCerts] = useState<Cert[]>([]);
   const [loading, setLoading] = useState(true);
   const [centerId, setCenterId] = useState<string | null>(null);
   const [showAdd, setShowAdd] = useState(false);
+  const [exporting, setExporting] = useState<"pdf" | "excel" | null>(null);
+  const [exportError, setExportError] = useState<string | null>(null);
+  const [downloadError, setDownloadError] = useState<string | null>(null);
 
   const load = useCallback(() => {
     setLoading(true);
@@ -57,17 +62,21 @@ export default function CertificatesPage() {
     });
   }, [load]);
 
-  const downloadReport = (format: "pdf" | "excel") => {
-    const token = localStorage.getItem("tmb_access_token");
-    const url = `${getApiBaseUrl()}/api/v1/reports/ratings?format=${format === "excel" ? "excel" : "pdf"}`;
-    fetch(url, { headers: { Authorization: `Bearer ${token}` } })
-      .then((r) => r.blob())
-      .then((blob) => {
-        const a = document.createElement("a");
-        a.href = URL.createObjectURL(blob);
-        a.download = `tmb-ratings.${format === "excel" ? "xlsx" : "pdf"}`;
-        a.click();
-      });
+  const handleExport = async (format: "pdf" | "excel") => {
+    setExporting(format);
+    setExportError(null);
+    const result = await downloadRatingsReport(format, locale);
+    setExporting(null);
+    if (!result.ok) {
+      const key = `exportErrors.${result.code}` as const;
+      setExportError(t.has(key) ? t(key) : t("exportErrors.UNKNOWN"));
+    }
+  };
+
+  const handleCertDownload = async (fileId: string, fileName: string) => {
+    setDownloadError(null);
+    const ok = await downloadFile(fileId, fileName);
+    if (!ok) setDownloadError(t("downloadError"));
   };
 
   return (
@@ -81,13 +90,20 @@ export default function CertificatesPage() {
                 {t("add")}
               </Button>
             </PermissionGate>
-            <Button onClick={() => downloadReport("pdf")}>PDF</Button>
-            <Button variant="outline" onClick={() => downloadReport("excel")}>
-              Excel
-            </Button>
+            <PermissionGate permission="reports.generate">
+              <Button onClick={() => handleExport("pdf")} loading={exporting === "pdf"} disabled={exporting !== null}>
+                {exporting === "pdf" ? t("exporting") : t("exportPdf")}
+              </Button>
+              <Button variant="outline" onClick={() => handleExport("excel")} loading={exporting === "excel"} disabled={exporting !== null}>
+                {exporting === "excel" ? t("exporting") : t("exportExcel")}
+              </Button>
+            </PermissionGate>
           </>
         }
       />
+
+      {exportError && <Alert variant="danger">{exportError}</Alert>}
+      {downloadError && <Alert variant="danger">{downloadError}</Alert>}
 
       {loading ? (
         <div className="grid gap-4 md:grid-cols-2">
@@ -114,7 +130,7 @@ export default function CertificatesPage() {
                         variant="ghost"
                         size="sm"
                         className="mt-2"
-                        onClick={() => downloadFile(c.file_id!, `certificate-${c.certificate_number}`)}
+                        onClick={() => handleCertDownload(c.file_id!, `certificate-${c.certificate_number}`)}
                       >
                         {t("download")}
                       </Button>

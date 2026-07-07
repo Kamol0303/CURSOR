@@ -6,6 +6,9 @@
     "password": "Parol",
     "login": "Kirish",
     "loginHint": "Faqat ruxsat etilgan xodimlar uchun",
+    "rememberMe": "Meni eslab qol",
+    "forgotPassword": "Parolni unutdingizmi?",
+    "forgotPasswordHint": "Markaz direktori yoki tizim administratoriga murojaat qiling. Parolni faqat admin tiklay oladi.",
     "parentPortal": "Ota-ona portali →",
     "mfaTitle": "Ikki bosqichli autentifikatsiya",
     "mfaCode": "TOTP kodi",
@@ -25,6 +28,14 @@
       "ACCOUNT_LOCKED": "Hisob vaqtincha bloklangan. Parolni tiklang: ./scripts/reset-demo-login.sh",
       "PASSWORD_CHANGE_REQUIRED": "Avval parolni yangilashingiz kerak",
       "NETWORK_ERROR": "Serverga ulanib bo'lmadi. Backend ishlayaptimi? (localhost:8000)"
+    },
+    "footer": {
+      "verify": "Sertifikat tekshirish",
+      "platform": "Ta'lim monitoringi",
+      "parent": "Ota-ona portali",
+      "staff": "Xodimlar kirishi",
+      "region": "Toyloq tumani · Samarqand",
+      "copyright": "© TMB — Ta'lim Monitoring Bazasi"
     }
   },
   "security": {
@@ -542,7 +553,18 @@
     "cancel": "Bekor qilish",
     "save": "Saqlash",
     "saving": "Saqlanmoqda...",
-    "download": "Yuklab olish"
+    "download": "Yuklab olish",
+    "downloadError": "Faylni yuklab bo'lmadi",
+    "exportPdf": "Reyting PDF",
+    "exportExcel": "Reyting Excel",
+    "exporting": "Yuklanmoqda...",
+    "exportErrors": {
+      "FORBIDDEN": "Hisobot yuklab olish uchun ruxsat yo'q",
+      "NETWORK_ERROR": "Tarmoq xatosi. Qayta urinib ko'ring",
+      "INVALID_RESPONSE": "Server noto'g'ri javob qaytardi",
+      "HTTP_ERROR": "Hisobot yuklab bo'lmadi",
+      "UNKNOWN": "Hisobot yuklab bo'lmadi"
+    }
   },
   "verify": {
     "title": "Sertifikatni tekshirish",
@@ -631,6 +653,8 @@
     "generate": "AI bilan yaratish",
     "generating": "Yaratilmoqda...",
     "generateError": "Yaratishda xato. API kalitini tekshiring.",
+    "noSubjects": "Sizga biriktirilgan fanlar topilmadi. Markaz menejeridan fan yoki guruh biriktirishni so'rang.",
+    "noSubjectsShort": "Fanlar yo'q",
     "startLesson": "Darsni boshlash",
     "starting": "Boshlanmoqda...",
     "started": "Dars boshlangan",
@@ -638,7 +662,28 @@
     "round": "Raund",
     "hint": "Maslahat",
     "answer": "Javob",
-    "recent": "So'nggi materiallar"
+    "recent": "So'nggi materiallar",
+    "errors": {
+      "SUBJECT_NOT_ASSIGNED": "Bu fan sizga biriktirilmagan",
+      "SUBJECT_NOT_FOUND": "Fan topilmadi",
+      "GROUP_NOT_FOUND": "Guruh topilmadi",
+      "GROUP_SUBJECT_MISMATCH": "Guruh va fan mos kelmaydi",
+      "LESSON_ALREADY_STARTED": "Dars allaqachon boshlangan",
+      "FORBIDDEN": "Ruxsat yo'q",
+      "NETWORK_ERROR": "Tarmoq xatosi",
+      "UNKNOWN": "Xatolik yuz berdi"
+    }
+  },
+  "clock": {
+    "title": "Raqamli soat",
+    "subtitle": "12/24 soat · Mahalliy vaqt",
+    "hour12": "12 soat",
+    "hour24": "24 soat",
+    "formatToggle": "Vaqt formati",
+    "am": "TO",
+    "pm": "TK",
+    "autoUpdate": "Har soniyada yangilanadi",
+    "localTime": "Mahalliy vaqt"
   },
   "audit": {
     "title": "O'zgarishlar jurnali",

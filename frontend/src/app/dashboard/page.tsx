@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
+import { DigitalClock } from "@/components/DigitalClock";
 import { KpiCards } from "@/components/KpiCards";
 import { OperatorDashboard } from "@/components/OperatorDashboard";
 import { StatsChart } from "@/components/StatsChart";
@@ -39,21 +40,24 @@ function StaffDashboard() {
 
   return (
     <PageSection>
-      <Card>
-        <CardBody className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-          <div>
+      <div className="grid gap-4 lg:grid-cols-[1fr_minmax(280px,380px)] mb-6">
+        <Card>
+          <CardBody className="flex flex-col justify-center h-full">
             <h2 className="text-h2 text-foreground">{t("welcome")}</h2>
             {userName && (
               <p className="text-small text-muted-foreground mt-1 flex items-center gap-2">
-                <Badge variant="success" dot>{userName}</Badge>
+                <Badge variant="success" dot>
+                  {userName}
+                </Badge>
               </p>
             )}
-          </div>
-        </CardBody>
-      </Card>
+          </CardBody>
+        </Card>
+        <DigitalClock />
+      </div>
 
       <KpiCards kpis={dash?.kpis ?? []} />
-      <div className="grid gap-4 lg:grid-cols-3">
+      <div className="grid gap-4 lg:grid-cols-3 mt-6">
         <StatsChart title={t("charts.daily")} data={dash?.daily_stats ?? []} />
         <StatsChart title={t("charts.weekly")} data={dash?.weekly_stats ?? []} />
         <StatsChart title={t("charts.monthly")} data={dash?.monthly_stats ?? []} />

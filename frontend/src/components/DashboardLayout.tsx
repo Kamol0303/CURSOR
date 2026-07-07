@@ -4,9 +4,10 @@ import { useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { AppShell } from "@/components/AppShell";
+import { DigitalClock } from "@/components/DigitalClock";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
-import { ThemeToggle } from "@/components/ThemeToggle";
 import { NotificationBell } from "@/components/NotificationBell";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { useAuth } from "@/contexts/AuthContext";
 import { getApiBaseUrl } from "@/lib/api";
 import { clearAuthCookie } from "@/lib/auth-cookie";
@@ -60,7 +61,12 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
       pageSubtitle={isOnboarding ? undefined : t("platform")}
       headerActions={
         <>
-          {!isOnboarding && <NotificationBell />}
+          {!isOnboarding && (
+            <>
+              <DigitalClock variant="compact" />
+              <NotificationBell />
+            </>
+          )}
           <ThemeToggle />
           <LanguageSwitcher />
         </>

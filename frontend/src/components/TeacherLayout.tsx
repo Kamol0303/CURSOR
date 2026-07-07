@@ -3,10 +3,11 @@
 import { usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { AppShell } from "@/components/AppShell";
+import { DigitalClock } from "@/components/DigitalClock";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { ChangePasswordForm } from "@/components/ChangePasswordForm";
-import { Card, CardBody, CardTitle, CardDescription } from "@/components/ui";
+import { Card, CardBody, CardDescription, CardTitle } from "@/components/ui";
 import { useAuth } from "@/contexts/AuthContext";
 import { getApiBaseUrl } from "@/lib/api";
 import { clearAuthCookie } from "@/lib/auth-cookie";
@@ -56,6 +57,7 @@ export function TeacherLayout({ children }: { children: React.ReactNode }) {
       pageTitle={activeItem ? t(`nav.${activeItem.key}`) : t("subtitle")}
       headerActions={
         <>
+          <DigitalClock variant="compact" />
           <ThemeToggle />
           <LanguageSwitcher />
         </>

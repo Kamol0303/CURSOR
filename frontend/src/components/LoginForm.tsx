@@ -1,28 +1,43 @@
 "use client";
 
-import { useState } from "react";
-import Link from "next/link";
+import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
-import { LanguageSwitcher } from "@/components/LanguageSwitcher";
-import { ThemeToggle } from "@/components/ThemeToggle";
+import { AuthChrome } from "@/components/AuthChrome";
+import { GlassInput } from "@/components/GlassInput";
+import { GridGlowEffect } from "@/components/GridGlowEffect";
 import { MfaSetupForm } from "@/components/MfaSetupForm";
 import { TmbLogo } from "@/components/TmbLogo";
-import { Alert, BezelCard, Button, FormField, Input, Label } from "@/components/ui";
+
 import { getApiBaseUrl } from "@/lib/api";
 import { getRoleFromToken, homePathForRole, setAuthCookie } from "@/lib/auth-cookie";
 
 type Step = "login" | "mfa" | "mfa_setup";
 
+const REMEMBER_KEY = "tmb_remember_username";
+
+const glassBtn =
+  "w-full bg-white text-gray-900 font-semibold py-3 rounded-md border-2 border-transparent hover:text-white hover:border-white hover:bg-white/15 transition-all duration-300 disabled:opacity-50 text-base";
+
 export function LoginForm() {
   const t = useTranslations("auth");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [remember, setRemember] = useState(false);
   const [step, setStep] = useState<Step>("login");
   const [mfaToken, setMfaToken] = useState<string | null>(null);
   const [setupToken, setSetupToken] = useState<string | null>(null);
   const [mfaCode, setMfaCode] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [showForgotHint, setShowForgotHint] = useState(false);
+
+  useEffect(() => {
+    const saved = localStorage.getItem(REMEMBER_KEY);
+    if (saved) {
+      setUsername(saved);
+      setRemember(true);
+    }
+  }, []);
 
   const handleError = (code: string) => {
     const key = `errors.${code}` as "errors.INVALID_CREDENTIALS";
@@ -30,6 +45,14 @@ export function LoginForm() {
       setError(t(key));
     } catch {
       setError(code);
+    }
+  };
+
+  const persistRemember = (name: string) => {
+    if (remember) {
+      localStorage.setItem(REMEMBER_KEY, name);
+    } else {
+      localStorage.removeItem(REMEMBER_KEY);
     }
   };
 
@@ -67,6 +90,7 @@ export function LoginForm() {
         handleError(code);
         return;
       }
+      persistRemember(username.trim());
       if (data.data?.requires_mfa_setup) {
         setSetupToken(data.data.setup_token ?? null);
         setStep("mfa_setup");
@@ -118,123 +142,126 @@ export function LoginForm() {
   };
 
   return (
-    <div className="min-h-screen girih-bg flex flex-col">
-      <header className="flex justify-between items-center gap-3 px-4 sm:px-6 py-4">
-        <div className="flex items-center gap-2 text-naqsh-primary dark:text-naqsh-accent">
-          <TmbLogo className="w-8 h-8" />
-          <span className="font-semibold text-small tracking-wide hidden sm:inline">TMB</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <ThemeToggle />
-          <LanguageSwitcher />
-        </div>
-      </header>
-
-      <main className="flex-1 flex items-center justify-center p-4 sm:p-6">
-        <div className="w-full max-w-4xl animate-slide-up">
-          <BezelCard padding="p-2" className="overflow-hidden">
-            <div className="grid lg:grid-cols-[1fr_1.1fr] overflow-hidden rounded-[calc(1rem-0.25rem)]">
-            <div className="hidden lg:flex flex-col justify-between bg-gradient-to-br from-[#1b4d3e] via-[#1e3a2f] to-[#122a22] text-white p-10 relative overflow-hidden">
-              <div className="absolute inset-0 opacity-[0.07] girih-bg pointer-events-none" aria-hidden />
-              <div className="relative">
-                <TmbLogo className="w-14 h-14 text-naqsh-accent mb-6" />
-                <h1 className="text-h2 text-white mb-3">{t("title")}</h1>
-                <p className="text-small text-white/75 leading-relaxed max-w-xs">{t("subtitle")}</p>
+    <AuthChrome
+      alternateHref="/parent/login"
+      alternateLabel={t("parentPortal")}
+      heroTitle={t("title")}
+      heroSubtitle={t("subtitle")}
+    >
+      {step === "login" ? (
+        <form onSubmit={handleLogin} className="text-left flex flex-col">
+          <div className="flex justify-center mb-5 lg:hidden">
+            <div className="relative w-16 h-16 rounded-2xl overflow-hidden border border-white/20">
+              <GridGlowEffect className="inset-0" columns={6} rows={6} compact color="#c8932a" />
+              <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
+                <TmbLogo className="w-9 h-9 text-naqsh-accent auth-logo-float" />
               </div>
-              <p className="relative text-caption text-white/50 border-t border-white/10 pt-4">
-                Toyloq tumani · Samarqand viloyati
-              </p>
             </div>
+          </div>
 
-            <div className="p-6 sm:p-8 lg:p-10 flex flex-col justify-center border-t-4 border-naqsh-accent lg:border-t-0 lg:border-l-4">
-              <div className="lg:hidden flex items-center gap-3 mb-6">
-                <TmbLogo className="w-10 h-10 text-naqsh-primary dark:text-naqsh-accent" />
-                <div>
-                  <h1 className="text-h3 text-naqsh-primary dark:text-naqsh-accent">{t("title")}</h1>
-                  <p className="text-caption text-muted-foreground">{t("subtitle")}</p>
-                </div>
-              </div>
+          <h2 className="text-2xl font-semibold text-white text-center mb-1">{t("login")}</h2>
+          <p className="text-xs text-white/60 text-center mb-6">{t("loginHint")}</p>
 
-              {step === "login" ? (
-                <form onSubmit={handleLogin} className="space-y-5">
-                  <div>
-                    <h2 className="text-h3 text-foreground">{t("login")}</h2>
-                    <p className="text-caption text-muted-foreground mt-1">{t("loginHint")}</p>
-                  </div>
-                  <div className="space-y-4">
-                    <FormField>
-                      <Label htmlFor="username">{t("username")}</Label>
-                      <Input
-                        id="username"
-                        type="text"
-                        autoComplete="username"
-                        value={username}
-                        onChange={(e) => setUsername(e.target.value)}
-                        required
-                      />
-                    </FormField>
-                    <FormField>
-                      <Label htmlFor="password">{t("password")}</Label>
-                      <Input
-                        id="password"
-                        type="password"
-                        autoComplete="current-password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        required
-                      />
-                    </FormField>
-                  </div>
-                  {error && <Alert variant="danger">{error}</Alert>}
-                  <Button type="submit" loading={loading} className="w-full" size="lg">
-                    {t("login")}
-                  </Button>
-                </form>
-              ) : step === "mfa_setup" && setupToken ? (
-                <MfaSetupForm
-                  setupToken={setupToken}
-                  onComplete={(accessToken) => {
-                    if (accessToken) {
-                      localStorage.setItem("tmb_access_token", accessToken);
-                      setAuthCookie(accessToken);
-                      window.location.href = homePathForRole(getRoleFromToken(accessToken));
-                    }
-                  }}
-                  onError={(code) => handleError(code)}
-                />
-              ) : (
-                <form onSubmit={handleMfa} className="space-y-5">
-                  <h2 className="text-h3 text-naqsh-primary dark:text-naqsh-accent">{t("mfaTitle")}</h2>
-                  <FormField>
-                    <Label htmlFor="mfa">{t("mfaCode")}</Label>
-                    <Input
-                      id="mfa"
-                      type="text"
-                      inputMode="numeric"
-                      autoComplete="one-time-code"
-                      value={mfaCode}
-                      onChange={(e) => setMfaCode(e.target.value)}
-                      className="tracking-[0.3em] text-center text-lg"
-                      required
-                    />
-                  </FormField>
-                  {error && <Alert variant="danger">{error}</Alert>}
-                  <Button type="submit" variant="accent" loading={loading} className="w-full" size="lg">
-                    {t("verify")}
-                  </Button>
-                </form>
-              )}
+          <GlassInput
+            label={t("username")}
+            value={username}
+            onChange={setUsername}
+            autoComplete="username"
+            id="username"
+          />
+          <GlassInput
+            label={t("password")}
+            type="password"
+            value={password}
+            onChange={setPassword}
+            autoComplete="current-password"
+            id="password"
+            className="mt-4"
+          />
 
-              <p className="text-center mt-6 pt-4 border-t border-border text-small text-muted-foreground">
-                <Link href="/parent/login" className="text-naqsh-accent hover:underline font-medium transition-colors">
-                  {t("parentPortal")}
-                </Link>
-              </p>
-            </div>
-            </div>
-          </BezelCard>
+          <div className="flex items-center justify-between mt-6 mb-7 text-sm text-white/85">
+            <label htmlFor="remember" className="flex items-center gap-2 cursor-pointer select-none">
+              <input
+                id="remember"
+                type="checkbox"
+                checked={remember}
+                onChange={(e) => setRemember(e.target.checked)}
+                className="accent-naqsh-accent w-4 h-4 rounded"
+              />
+              <span>{t("rememberMe")}</span>
+            </label>
+            <button
+              type="button"
+              onClick={() => setShowForgotHint((v) => !v)}
+              className="text-white/80 hover:text-white hover:underline transition-colors"
+            >
+              {t("forgotPassword")}
+            </button>
+          </div>
+
+          {showForgotHint && (
+            <p className="text-xs text-white/65 bg-white/5 border border-white/10 rounded-lg px-3 py-2 mb-4 -mt-3">
+              {t("forgotPasswordHint")}
+            </p>
+          )}
+
+          {error && (
+            <p
+              className="text-sm text-red-200 bg-red-500/15 border border-red-400/30 rounded-lg px-3 py-2 mb-4"
+              role="alert"
+            >
+              {error}
+            </p>
+          )}
+
+          <button type="submit" disabled={loading} className={glassBtn}>
+            {loading ? "…" : t("login")}
+          </button>
+
+          <p className="text-center mt-6 text-sm text-white/60">{t("subtitle")}</p>
+        </form>
+      ) : step === "mfa_setup" && setupToken ? (
+        <div className="text-left">
+          <MfaSetupForm
+            variant="glass"
+            setupToken={setupToken}
+            onComplete={(accessToken) => {
+              if (accessToken) {
+                localStorage.setItem("tmb_access_token", accessToken);
+                setAuthCookie(accessToken);
+                window.location.href = homePathForRole(getRoleFromToken(accessToken));
+              }
+            }}
+            onError={(code) => handleError(code)}
+          />
+          {error && (
+            <p className="text-sm text-red-200 mt-3" role="alert">
+              {error}
+            </p>
+          )}
         </div>
-      </main>
-    </div>
+      ) : (
+        <form onSubmit={handleMfa} className="text-left flex flex-col">
+          <h2 className="text-xl font-semibold text-white text-center mb-6">{t("mfaTitle")}</h2>
+          <GlassInput
+            label={t("mfaCode")}
+            value={mfaCode}
+            onChange={setMfaCode}
+            inputMode="numeric"
+            autoComplete="one-time-code"
+            id="mfa"
+            className="[&_input]:tracking-[0.3em] [&_input]:text-center [&_input]:text-lg"
+          />
+          {error && (
+            <p className="text-sm text-red-200 mt-4" role="alert">
+              {error}
+            </p>
+          )}
+          <button type="submit" disabled={loading} className={`${glassBtn} mt-7`}>
+            {t("verify")}
+          </button>
+        </form>
+      )}
+    </AuthChrome>
   );
 }

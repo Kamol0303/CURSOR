@@ -127,8 +127,12 @@
       },
       "creator": {
         "ariaLabel": "Platforma yaratuvchisi",
+        "tag": "Yaratuvchi",
+        "title": "Platformani yaratgan mutaxassis",
+        "desc": "TMB platformasi zamonaviy texnologiyalar, xavfsiz kirish va ta'lim monitoringi uchun maxsus ishlab chiqilgan.",
         "label": "Platformani yaratdi",
         "name": "Kamolbek",
+        "imageAlt": "Kamolbek — TMB platformasi yaratuvchisi",
         "linkAria": "Bog'lanish",
         "linkHref": "https://t.me/"
       },

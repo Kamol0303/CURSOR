@@ -107,8 +107,12 @@
       },
       "creator": {
         "ariaLabel": "Platform creator",
+        "tag": "Creator",
+        "title": "The specialist behind the platform",
+        "desc": "TMB was built with modern technology, secure access, and education monitoring tailored for learning centers.",
         "label": "Created the platform",
         "name": "Kamolbek",
+        "imageAlt": "Kamolbek — creator of the TMB platform",
         "linkAria": "Get in touch",
         "linkHref": "https://t.me/"
       },

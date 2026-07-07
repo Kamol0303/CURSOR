@@ -1,41 +1,52 @@
 /** Dashboard route → required permission (mirrors backend NAV_PERMISSIONS). */
 
+export type NavSectionKey =
+  | "overview"
+  | "organization"
+  | "academic"
+  | "communication"
+  | "finance"
+  | "system"
+  | "teaching"
+  | "account";
+
 export type DashboardNavItem = {
   href: string;
   key: string;
   permission: string;
   exact?: boolean;
+  section?: NavSectionKey;
 };
 
 /** Hokimiyat — monitoring-only sidebar (district-wide read + analytics). */
 export const OPERATOR_NAV_ROUTES: readonly DashboardNavItem[] = [
-  { href: "/dashboard", key: "dashboard", permission: "dashboard.view", exact: true },
-  { href: "/dashboard/centers", key: "centers", permission: "centers.read" },
-  { href: "/dashboard/teachers", key: "teachers", permission: "teachers.read" },
-  { href: "/dashboard/students", key: "students", permission: "students.read" },
-  { href: "/dashboard/certificates", key: "certificates", permission: "certificates.read" },
-  { href: "/dashboard/analytics", key: "analytics", permission: "analytics.view" },
+  { href: "/dashboard", key: "dashboard", permission: "dashboard.view", exact: true, section: "overview" },
+  { href: "/dashboard/analytics", key: "analytics", permission: "analytics.view", section: "overview" },
+  { href: "/dashboard/centers", key: "centers", permission: "centers.read", section: "organization" },
+  { href: "/dashboard/teachers", key: "teachers", permission: "teachers.read", section: "organization" },
+  { href: "/dashboard/students", key: "students", permission: "students.read", section: "organization" },
+  { href: "/dashboard/certificates", key: "certificates", permission: "certificates.read", section: "academic" },
 ] as const;
 
 export const DASHBOARD_NAV_ROUTES: readonly DashboardNavItem[] = [
-  { href: "/dashboard", key: "dashboard", permission: "dashboard.view", exact: true },
-  { href: "/dashboard/centers", key: "centers", permission: "centers.read" },
-  { href: "/dashboard/students", key: "students", permission: "students.read" },
-  { href: "/dashboard/teachers", key: "teachers", permission: "teachers.read" },
-  { href: "/dashboard/groups", key: "groups", permission: "groups.read" },
-  { href: "/dashboard/subjects", key: "subjects", permission: "subjects.read" },
-  { href: "/dashboard/courses", key: "courses", permission: "courses.read" },
-  { href: "/dashboard/messages", key: "messages", permission: "messages.read" },
-  { href: "/dashboard/messages/monitor", key: "messagesMonitor", permission: "messages.monitor" },
-  { href: "/dashboard/attendance", key: "attendance", permission: "attendance.read" },
-  { href: "/dashboard/payments", key: "payments", permission: "payments.read" },
-  { href: "/dashboard/exams", key: "exams", permission: "exams.read" },
-  { href: "/dashboard/grades", key: "grades", permission: "grades.read" },
-  { href: "/dashboard/ratings", key: "ratings", permission: "ratings.view" },
-  { href: "/dashboard/certificates", key: "certificates", permission: "certificates.read" },
-  { href: "/dashboard/analytics", key: "analytics", permission: "analytics.view" },
-  { href: "/dashboard/audit", key: "audit", permission: "audit.read" },
-  { href: "/dashboard/security", key: "security", permission: "users.password_reset" },
+  { href: "/dashboard", key: "dashboard", permission: "dashboard.view", exact: true, section: "overview" },
+  { href: "/dashboard/analytics", key: "analytics", permission: "analytics.view", section: "overview" },
+  { href: "/dashboard/centers", key: "centers", permission: "centers.read", section: "organization" },
+  { href: "/dashboard/students", key: "students", permission: "students.read", section: "organization" },
+  { href: "/dashboard/teachers", key: "teachers", permission: "teachers.read", section: "organization" },
+  { href: "/dashboard/groups", key: "groups", permission: "groups.read", section: "organization" },
+  { href: "/dashboard/subjects", key: "subjects", permission: "subjects.read", section: "academic" },
+  { href: "/dashboard/courses", key: "courses", permission: "courses.read", section: "academic" },
+  { href: "/dashboard/exams", key: "exams", permission: "exams.read", section: "academic" },
+  { href: "/dashboard/grades", key: "grades", permission: "grades.read", section: "academic" },
+  { href: "/dashboard/ratings", key: "ratings", permission: "ratings.view", section: "academic" },
+  { href: "/dashboard/certificates", key: "certificates", permission: "certificates.read", section: "academic" },
+  { href: "/dashboard/messages", key: "messages", permission: "messages.read", section: "communication" },
+  { href: "/dashboard/messages/monitor", key: "messagesMonitor", permission: "messages.monitor", section: "communication" },
+  { href: "/dashboard/attendance", key: "attendance", permission: "attendance.read", section: "finance" },
+  { href: "/dashboard/payments", key: "payments", permission: "payments.read", section: "finance" },
+  { href: "/dashboard/audit", key: "audit", permission: "audit.read", section: "system" },
+  { href: "/dashboard/security", key: "security", permission: "users.password_reset", section: "system" },
 ] as const;
 
 const ONBOARDING_PATH = "/dashboard/onboarding";

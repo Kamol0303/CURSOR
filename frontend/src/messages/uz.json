@@ -123,6 +123,16 @@
     "payments": "To'lovlar",
     "exams": "Imtihonlar",
     "grades": "Baholar",
+    "sections": {
+      "overview": "Boshqaruv",
+      "organization": "Tashkilot",
+      "academic": "Ta'lim",
+      "communication": "Aloqa",
+      "finance": "Moliya",
+      "system": "Tizim",
+      "teaching": "Darslar",
+      "account": "Hisob"
+    },
     "roles": {
       "super_admin": "Super admin",
       "hokimiyat_operator": "Hokimiyat operatori",
@@ -637,6 +647,11 @@
       "grades": "Baholar",
       "schedule": "Jadval",
       "profile": "Profil"
+    },
+    "sections": {
+      "overview": "Boshqaruv",
+      "teaching": "Darslar",
+      "account": "Hisob"
     }
   },
   "lessonStart": {

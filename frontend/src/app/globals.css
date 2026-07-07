@@ -329,6 +329,200 @@
   }
 }
 
+/* ── Vertical sidebar navigation (Falcon-inspired) ── */
+.sidebar-vertical {
+  --sidebar-link-height: 2.25rem;
+}
+
+.sidebar-vertical__brand {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem 1rem 0.75rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.sidebar-vertical__toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 0.375rem;
+  color: rgba(255, 255, 255, 0.7);
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.sidebar-vertical__toggle:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+.sidebar-vertical__toggle--header {
+  color: var(--foreground);
+}
+
+.sidebar-vertical__toggle--header:hover {
+  background: var(--muted);
+  color: var(--foreground);
+}
+
+.sidebar-vertical__toggle-icon {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.3rem;
+  width: 1rem;
+  height: 1rem;
+}
+
+.sidebar-vertical__toggle-line {
+  display: block;
+  height: 2px;
+  width: 100%;
+  border-radius: 1px;
+  background: currentColor;
+  transition: transform 0.2s ease;
+}
+
+.sidebar-vertical__content {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 0.5rem 0.75rem 1rem;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+}
+
+.sidebar-vertical__content::-webkit-scrollbar {
+  width: 4px;
+}
+
+.sidebar-vertical__content::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+}
+
+.sidebar-vertical__section {
+  margin-top: 0.75rem;
+  margin-bottom: 0.25rem;
+}
+
+.sidebar-vertical__section:first-child {
+  margin-top: 0;
+}
+
+.sidebar-vertical__label-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.35rem;
+  padding: 0 0.5rem;
+}
+
+.sidebar-vertical__label {
+  flex-shrink: 0;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.sidebar-vertical__divider {
+  flex: 1;
+  height: 1px;
+  border: 0;
+  margin: 0;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.sidebar-vertical__nav {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.sidebar-vertical__item {
+  margin: 0;
+}
+
+.sidebar-vertical__link {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: var(--sidebar-link-height);
+  padding: 0.35rem 0.625rem;
+  border-radius: 0.375rem;
+  font-size: 0.8125rem;
+  line-height: 1.25;
+  color: rgba(255, 255, 255, 0.72);
+  text-decoration: none;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.sidebar-vertical__link:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+}
+
+.sidebar-vertical__link--active {
+  background: rgba(255, 255, 255, 0.14);
+  color: #fff;
+  font-weight: 600;
+  box-shadow: inset 3px 0 0 var(--naqsh-accent, #c9a227);
+}
+
+.sidebar-vertical__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.25rem;
+  flex-shrink: 0;
+  opacity: 0.85;
+}
+
+.sidebar-vertical__link--active .sidebar-vertical__icon {
+  opacity: 1;
+  color: var(--naqsh-accent, #c9a227);
+}
+
+.sidebar-vertical__text {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  padding-left: 0.125rem;
+}
+
+.sidebar-vertical__footer {
+  padding: 0.75rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.sidebar-vertical__logout {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  min-height: var(--sidebar-link-height);
+  padding: 0.35rem 0.625rem;
+  border-radius: 0.375rem;
+  font-size: 0.8125rem;
+  color: rgba(255, 255, 255, 0.65);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.sidebar-vertical__logout:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+}
+
 /* ── Interactive grid glow (CodePen-style) ── */
 .grid-glow {
   display: grid;

@@ -55,7 +55,16 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
         key: item.key,
         label: t(item.key),
         exact: item.exact,
+        section: item.section,
       }))}
+      sectionLabels={{
+        overview: t("sections.overview"),
+        organization: t("sections.organization"),
+        academic: t("sections.academic"),
+        communication: t("sections.communication"),
+        finance: t("sections.finance"),
+        system: t("sections.system"),
+      }}
       pageTitle={isOnboarding ? undefined : activePage ? t(activePage.key) : t("platform")}
       pageSubtitle={isOnboarding ? undefined : t("platform")}
       headerActions={

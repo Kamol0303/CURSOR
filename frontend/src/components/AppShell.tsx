@@ -14,7 +14,21 @@ export type NavItem = {
   key?: string;
   exact?: boolean;
   icon?: React.ReactNode;
+  section?: string;
 };
+
+function groupNavBySection(items: NavItem[]): { section?: string; items: NavItem[] }[] {
+  const groups: { section?: string; items: NavItem[] }[] = [];
+  for (const item of items) {
+    const last = groups[groups.length - 1];
+    if (last && last.section === item.section) {
+      last.items.push(item);
+    } else {
+      groups.push({ section: item.section, items: [item] });
+    }
+  }
+  return groups;
+}
 
 function isNavActive(pathname: string, href: string, exact?: boolean) {
   if (exact) return pathname === href;
@@ -139,6 +153,8 @@ type AppShellProps = {
   brandSubtitle?: string;
   roleBadge?: string;
   navItems: NavItem[];
+  sectionLabels?: Record<string, string>;
+  brandHref?: string;
   pageTitle?: string;
   pageSubtitle?: string;
   headerActions?: React.ReactNode;
@@ -154,6 +170,8 @@ export function AppShell({
   brandSubtitle,
   roleBadge,
   navItems,
+  sectionLabels,
+  brandHref,
   pageTitle,
   pageSubtitle,
   headerActions,
@@ -165,73 +183,101 @@ export function AppShell({
 }: AppShellProps) {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const navGroups = groupNavBySection(navItems);
+  const homeHref = brandHref ?? navItems[0]?.href ?? "/dashboard";
 
   const sidebar = (
   <aside
     className={cn(
-      "flex flex-col shrink-0 text-white",
+      "sidebar-vertical flex flex-col shrink-0 text-white",
       "bg-gradient-to-b from-[#1b4d3e] via-[#163328] to-[#0f221c]",
       "ring-1 ring-white/10 shadow-xl",
-      "w-64 h-[100dvh] overflow-hidden",
+      "w-[15.625rem] h-[100dvh] overflow-hidden",
       "fixed inset-y-0 left-0 z-40 lg:sticky lg:top-0 lg:translate-x-0 transition-transform duration-slow ease-premium",
       mobileOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0",
     )}
   >
-    <div className="p-5 border-b border-white/10">
-      <div className="flex items-center gap-3">
+    <div className="sidebar-vertical__brand">
+      <button
+        type="button"
+        className="sidebar-vertical__toggle lg:hidden"
+        onClick={() => setMobileOpen(false)}
+        aria-label="Close menu"
+      >
+        <span className="sidebar-vertical__toggle-icon" aria-hidden>
+          <span className="sidebar-vertical__toggle-line" />
+          <span className="sidebar-vertical__toggle-line" />
+          <span className="sidebar-vertical__toggle-line" />
+        </span>
+      </button>
+      <Link href={homeHref} className="flex items-center gap-2.5 min-w-0 flex-1 no-underline text-inherit" onClick={() => setMobileOpen(false)}>
         <TmbLogo className="w-9 h-9 text-naqsh-accent shrink-0" />
         <div className="min-w-0">
-          <div className="font-semibold text-base tracking-tight">{brandTitle}</div>
+          <div className="font-semibold text-sm tracking-tight truncate">{brandTitle}</div>
           {brandSubtitle && (
-            <div className="text-caption text-white/60 truncate">{brandSubtitle}</div>
+            <div className="text-[0.7rem] text-white/55 truncate">{brandSubtitle}</div>
           )}
         </div>
-      </div>
-      {roleBadge && (
-        <div className="mt-3 inline-flex text-caption font-medium uppercase tracking-wider text-naqsh-accent bg-white/10 rounded-md px-2 py-0.5">
-          {roleBadge}
-        </div>
-      )}
+      </Link>
     </div>
 
+    {roleBadge && (
+      <div className="px-4 pb-2">
+        <div className="inline-flex text-[0.65rem] font-semibold uppercase tracking-wider text-naqsh-accent bg-white/10 rounded-md px-2 py-0.5">
+          {roleBadge}
+        </div>
+      </div>
+    )}
+
     <nav className="flex-1 flex flex-col min-h-0 overflow-hidden" aria-label="Main navigation">
-      <div className="shrink-0 p-3 pb-2">
+      <div className="shrink-0 px-3 pt-2 pb-1">
         <DigitalClock variant="sidebar" />
       </div>
-      <div className="flex-1 overflow-y-auto p-3 pt-1 space-y-0.5 scrollbar-thin">
-      {navItems.map((item) => {
-        const active = isNavActive(pathname, item.href, item.exact);
-        return (
-          <Link
-            key={item.href}
-            href={item.href}
-            onClick={() => setMobileOpen(false)}
-            className={cn(
-              "flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-small transition-all duration-slow ease-premium",
-              active
-                ? "bg-white/15 font-medium text-white shadow-sm border-l-2 border-naqsh-accent pl-[10px] shadow-inset-highlight"
-                : "text-white/75 hover:bg-white/10 hover:text-white border-l-2 border-transparent pl-[10px]",
+      <div className="sidebar-vertical__content">
+        {navGroups.map((group, groupIndex) => (
+          <div key={group.section ?? `group-${groupIndex}`} className="sidebar-vertical__section">
+            {group.section && sectionLabels?.[group.section] && (
+              <div className="sidebar-vertical__label-row">
+                <span className="sidebar-vertical__label">{sectionLabels[group.section]}</span>
+                <hr className="sidebar-vertical__divider" />
+              </div>
             )}
-            aria-current={active ? "page" : undefined}
-          >
-            {item.icon ?? <NavIcon name={item.key || item.href.split("/").pop() || "dashboard"} />}
-            <span className="truncate">{item.label}</span>
-          </Link>
-        );
-      })}
+            <ul className="sidebar-vertical__nav">
+              {group.items.map((item) => {
+                const active = isNavActive(pathname, item.href, item.exact);
+                return (
+                  <li key={item.href} className="sidebar-vertical__item">
+                    <Link
+                      href={item.href}
+                      onClick={() => setMobileOpen(false)}
+                      className={cn(
+                        "sidebar-vertical__link",
+                        active && "sidebar-vertical__link--active",
+                      )}
+                      aria-current={active ? "page" : undefined}
+                    >
+                      <span className="sidebar-vertical__icon">
+                        {item.icon ?? <NavIcon name={item.key || item.href.split("/").pop() || "dashboard"} />}
+                      </span>
+                      <span className="sidebar-vertical__text">{item.label}</span>
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+        ))}
       </div>
     </nav>
 
-    <div className="p-3 border-t border-white/10">
-      <button
-        type="button"
-        onClick={onLogout}
-        className="w-full flex items-center gap-2.5 px-3 py-2.5 text-small rounded-lg text-white/70 hover:bg-white/10 hover:text-white transition-colors duration-fast"
-      >
-        <svg className="h-[18px] w-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-        </svg>
-        {logoutLabel}
+    <div className="sidebar-vertical__footer">
+      <button type="button" onClick={onLogout} className="sidebar-vertical__logout">
+        <span className="sidebar-vertical__icon">
+          <svg className="h-[18px] w-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+          </svg>
+        </span>
+        <span className="sidebar-vertical__text">{logoutLabel}</span>
       </button>
     </div>
   </aside>
@@ -266,12 +312,14 @@ export function AppShell({
               <button
                 type="button"
                 onClick={() => setMobileOpen(true)}
-                className="lg:hidden p-2 -ml-1 rounded-lg hover:bg-muted transition-colors"
+                className="lg:hidden sidebar-vertical__toggle sidebar-vertical__toggle--header -ml-1"
                 aria-label="Open menu"
               >
-                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                </svg>
+                <span className="sidebar-vertical__toggle-icon" aria-hidden>
+                  <span className="sidebar-vertical__toggle-line" />
+                  <span className="sidebar-vertical__toggle-line" />
+                  <span className="sidebar-vertical__toggle-line" />
+                </span>
               </button>
             )}
             {!minimalHeader && (pageTitle || pageSubtitle) && (

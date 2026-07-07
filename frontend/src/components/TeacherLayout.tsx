@@ -12,13 +12,13 @@ import { getApiBaseUrl } from "@/lib/api";
 import { clearAuthCookie } from "@/lib/auth-cookie";
 
 const NAV = [
-  { href: "/teacher/dashboard", key: "dashboard", exact: true },
-  { href: "/teacher/lesson-start", key: "lessonStart" },
-  { href: "/teacher/groups", key: "groups" },
-  { href: "/teacher/attendance", key: "attendance" },
-  { href: "/teacher/grades", key: "grades" },
-  { href: "/teacher/schedule", key: "schedule" },
-  { href: "/teacher/profile", key: "profile" },
+  { href: "/teacher/dashboard", key: "dashboard", exact: true, section: "overview" },
+  { href: "/teacher/lesson-start", key: "lessonStart", section: "teaching" },
+  { href: "/teacher/groups", key: "groups", section: "teaching" },
+  { href: "/teacher/attendance", key: "attendance", section: "teaching" },
+  { href: "/teacher/grades", key: "grades", section: "teaching" },
+  { href: "/teacher/schedule", key: "schedule", section: "teaching" },
+  { href: "/teacher/profile", key: "profile", section: "account" },
 ] as const;
 
 function isActive(pathname: string, href: string, exact?: boolean) {
@@ -52,7 +52,13 @@ export function TeacherLayout({ children }: { children: React.ReactNode }) {
         key: item.key,
         label: t(`nav.${item.key}`),
         exact: "exact" in item ? item.exact : undefined,
+        section: item.section,
       }))}
+      sectionLabels={{
+        overview: t("sections.overview"),
+        teaching: t("sections.teaching"),
+        account: t("sections.account"),
+      }}
       pageTitle={activeItem ? t(`nav.${activeItem.key}`) : t("subtitle")}
       headerActions={
         <>

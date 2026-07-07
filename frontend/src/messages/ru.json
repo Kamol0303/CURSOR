@@ -123,6 +123,16 @@
     "payments": "Платежи",
     "exams": "Экзамены",
     "grades": "Оценки",
+    "sections": {
+      "overview": "Обзор",
+      "organization": "Организация",
+      "academic": "Обучение",
+      "communication": "Связь",
+      "finance": "Финансы",
+      "system": "Система",
+      "teaching": "Занятия",
+      "account": "Аккаунт"
+    },
     "roles": {
       "super_admin": "Супер админ",
       "hokimiyat_operator": "Оператор",
@@ -637,6 +647,11 @@
       "grades": "Оценки",
       "schedule": "Расписание",
       "profile": "Профиль"
+    },
+    "sections": {
+      "overview": "Обзор",
+      "teaching": "Занятия",
+      "account": "Аккаунт"
     }
   },
   "lessonStart": {

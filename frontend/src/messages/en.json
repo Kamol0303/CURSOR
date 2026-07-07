@@ -123,6 +123,16 @@
     "payments": "Payments",
     "exams": "Exams",
     "grades": "Grades",
+    "sections": {
+      "overview": "Overview",
+      "organization": "Organization",
+      "academic": "Academic",
+      "communication": "Communication",
+      "finance": "Finance",
+      "system": "System",
+      "teaching": "Teaching",
+      "account": "Account"
+    },
     "roles": {
       "super_admin": "Super admin",
       "hokimiyat_operator": "Operator",
@@ -637,6 +647,11 @@
       "grades": "Grades",
       "schedule": "Schedule",
       "profile": "Profile"
+    },
+    "sections": {
+      "overview": "Overview",
+      "teaching": "Teaching",
+      "account": "Account"
     }
   },
   "lessonStart": {

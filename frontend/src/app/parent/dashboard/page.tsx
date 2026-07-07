@@ -3,6 +3,14 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
+import {
+  Button,
+  Card,
+  CardBody,
+  CardTitle,
+  EmptyState,
+  PageSkeleton,
+} from "@/components/ui";
 import { apiFetch, downloadFile, getApiBaseUrl } from "@/lib/api";
 
 type Child = {
@@ -57,80 +65,86 @@ export default function ParentDashboardPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="bg-naqsh-primary text-white px-4 py-4 flex justify-between items-center">
+    <div className="min-h-screen bg-background">
+      <header className="bg-naqsh-primary text-white px-4 py-5 flex justify-between items-center shadow-sm">
         <div>
           <h1 className="font-bold text-lg">{t("dashboardTitle")}</h1>
-          <p className="text-xs text-white/70">{t("subtitle")}</p>
+          <p className="text-caption text-white/70 mt-0.5">{t("subtitle")}</p>
         </div>
-        <button type="button" onClick={logout} className="text-sm underline">
+        <Button variant="ghost" size="sm" onClick={logout} className="text-white hover:bg-white/10">
           {t("logout")}
-        </button>
+        </Button>
       </header>
 
-      <main className="p-4 max-w-lg mx-auto space-y-4">
+      <main className="p-4 max-w-lg mx-auto space-y-5">
         {loading ? (
-          <p className="text-gray-500">{t("loading")}</p>
+          <PageSkeleton />
         ) : children.length === 0 ? (
-          <p className="text-gray-500">{t("noChildren")}</p>
+          <EmptyState title={t("noChildren")} />
         ) : (
           <>
-            <section className="bg-white rounded-xl border p-4">
-              <h2 className="font-semibold text-naqsh-primary mb-3">{t("myChildren")}</h2>
-              <div className="space-y-2">
-                {children.map((c) => (
-                  <button
-                    key={c.id}
-                    type="button"
-                    onClick={() => setSelected(c.id)}
-                    className={`w-full text-left p-3 rounded-lg border ${
-                      selected === c.id ? "border-naqsh-accent bg-amber-50" : "border-gray-200"
-                    }`}
-                  >
-                    <p className="font-medium">{c.full_name}</p>
-                    <p className="text-xs text-gray-500">
-                      {c.center_name} · {c.grade || "—"}
-                    </p>
-                  </button>
-                ))}
-              </div>
-            </section>
-
-            <section className="bg-white rounded-xl border p-4">
-              <h2 className="font-semibold text-naqsh-primary mb-3">{t("certificates")}</h2>
-              {certs.length === 0 ? (
-                <p className="text-sm text-gray-500">{t("noCertificates")}</p>
-              ) : (
-                <ul className="space-y-2">
-                  {certs.map((cert) => (
-                    <li key={cert.id} className="p-3 border rounded-lg text-sm">
-                      <p className="font-medium">{cert.course_name}</p>
-                      <p className="text-gray-500">{cert.certificate_number}</p>
-                      <p className="text-xs text-gray-400">{cert.issue_date}</p>
-                      <div className="flex gap-3 mt-1">
-                        <Link
-                          href={`/verify/${cert.certificate_number}`}
-                          className="text-naqsh-accent text-xs hover:underline"
-                        >
-                          {t("verify")}
-                        </Link>
-                        {cert.file_id && (
-                          <button
-                            type="button"
-                            onClick={() =>
-                              downloadFile(cert.file_id!, `certificate-${cert.certificate_number}`)
-                            }
-                            className="text-naqsh-accent text-xs hover:underline"
-                          >
-                            {t("download")}
-                          </button>
-                        )}
-                      </div>
-                    </li>
+            <Card>
+              <CardBody>
+                <CardTitle className="mb-4">{t("myChildren")}</CardTitle>
+                <div className="space-y-2">
+                  {children.map((c) => (
+                    <button
+                      key={c.id}
+                      type="button"
+                      onClick={() => setSelected(c.id)}
+                      className={`w-full text-left p-3 rounded-lg border transition-colors ${
+                        selected === c.id
+                          ? "border-naqsh-accent bg-naqsh-accent/10"
+                          : "border-border hover:bg-muted"
+                      }`}
+                    >
+                      <p className="font-medium text-foreground">{c.full_name}</p>
+                      <p className="text-caption text-muted-foreground mt-0.5">
+                        {c.center_name} · {c.grade || "—"}
+                      </p>
+                    </button>
                   ))}
-                </ul>
-              )}
-            </section>
+                </div>
+              </CardBody>
+            </Card>
+
+            <Card>
+              <CardBody>
+                <CardTitle className="mb-4">{t("certificates")}</CardTitle>
+                {certs.length === 0 ? (
+                  <EmptyState title={t("noCertificates")} className="py-8" />
+                ) : (
+                  <ul className="space-y-3">
+                    {certs.map((cert) => (
+                      <li key={cert.id} className="p-4 border border-border rounded-lg text-small">
+                        <p className="font-medium text-foreground">{cert.course_name}</p>
+                        <p className="text-muted-foreground mt-0.5">{cert.certificate_number}</p>
+                        <p className="text-caption text-muted-foreground mt-0.5">{cert.issue_date}</p>
+                        <div className="flex gap-3 mt-2">
+                          <Link
+                            href={`/verify/${cert.certificate_number}`}
+                            className="text-naqsh-accent text-caption hover:underline"
+                          >
+                            {t("verify")}
+                          </Link>
+                          {cert.file_id && (
+                            <button
+                              type="button"
+                              onClick={() =>
+                                downloadFile(cert.file_id!, `certificate-${cert.certificate_number}`)
+                              }
+                              className="text-naqsh-accent text-caption hover:underline"
+                            >
+                              {t("download")}
+                            </button>
+                          )}
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </CardBody>
+            </Card>
           </>
         )}
       </main>

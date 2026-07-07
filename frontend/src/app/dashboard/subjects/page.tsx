@@ -4,6 +4,21 @@ import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { PermissionGate } from "@/components/PermissionGate";
 import { SubjectFormModal } from "@/components/SubjectFormModal";
+import {
+  Button,
+  DataTable,
+  EmptyState,
+  PageHeader,
+  PageSection,
+  StatusBadge,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+  TableSkeleton,
+} from "@/components/ui";
 import { apiFetch } from "@/lib/api";
 import { usePermissions } from "@/hooks/usePermissions";
 
@@ -47,92 +62,96 @@ export default function SubjectsPage() {
     load();
   };
 
+  const showActions = can("subjects.update") || can("subjects.delete");
+
   return (
     <>
-      <div className="space-y-4">
-        <div className="flex justify-between items-center">
-          <h2 className="text-xl font-bold text-naqsh-primary">{t("title")}</h2>
-          <PermissionGate permission="subjects.create">
-            <button
-              type="button"
-              onClick={() => {
-                setEditSubject(null);
-                setShowForm(true);
-              }}
-              className="px-4 py-2 bg-naqsh-primary text-white rounded-lg text-sm font-medium"
-            >
-              {t("add")}
-            </button>
-          </PermissionGate>
-        </div>
+      <PageSection>
+        <PageHeader
+          title={t("title")}
+          actions={
+            <PermissionGate permission="subjects.create">
+              <Button
+                onClick={() => {
+                  setEditSubject(null);
+                  setShowForm(true);
+                }}
+              >
+                {t("add")}
+              </Button>
+            </PermissionGate>
+          }
+        />
+
         {loading ? (
-          <p className="text-gray-400">{t("loading")}</p>
+          <DataTable>
+            <TableSkeleton rows={6} cols={5} />
+          </DataTable>
+        ) : subjects.length === 0 ? (
+          <DataTable>
+            <EmptyState title={t("empty")} />
+          </DataTable>
         ) : (
-          <div className="bg-white rounded-xl shadow border overflow-hidden">
-            <table className="w-full text-sm">
-              <thead className="bg-gray-50 border-b">
-                <tr>
-                  <th className="text-left p-3 font-medium">{t("nameUz")}</th>
-                  <th className="text-left p-3 font-medium">{t("nameRu")}</th>
-                  <th className="text-left p-3 font-medium">{t("nameEn")}</th>
-                  <th className="text-left p-3 font-medium">{t("status")}</th>
-                  {(can("subjects.update") || can("subjects.delete")) && <th className="p-3" />}
-                </tr>
-              </thead>
-              <tbody>
+          <DataTable>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>{t("nameUz")}</TableHead>
+                  <TableHead>{t("nameRu")}</TableHead>
+                  <TableHead>{t("nameEn")}</TableHead>
+                  <TableHead>{t("status")}</TableHead>
+                  {showActions && <TableHead className="text-right">{t("edit")}</TableHead>}
+                </TableRow>
+              </TableHeader>
+              <TableBody>
                 {subjects.map((s) => (
-                  <tr key={s.id} className="border-b last:border-0 hover:bg-gray-50">
-                    <td className="p-3">{s.name_uz}</td>
-                    <td className="p-3">{s.name_ru}</td>
-                    <td className="p-3">{s.name_en}</td>
-                    <td className="p-3">
-                      <span
-                        className={`text-xs px-2 py-0.5 rounded-full ${
-                          s.is_active ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-500"
-                        }`}
-                      >
-                        {s.is_active ? t("active") : t("inactive")}
-                      </span>
-                    </td>
-                    {(can("subjects.update") || can("subjects.delete")) && (
-                      <td className="p-3 text-right space-x-2">
-                        {can("subjects.update") && (
-                          <button
-                            type="button"
-                            className="text-naqsh-accent text-sm hover:underline"
-                            onClick={() => {
-                              setEditSubject(s);
-                              setShowForm(true);
-                            }}
-                          >
-                            {t("edit")}
-                          </button>
-                        )}
-                        {can("subjects.delete") && (
-                          <button
-                            type="button"
-                            className="text-red-600 text-sm hover:underline"
-                            onClick={() => remove(s)}
-                          >
-                            {t("delete")}
-                          </button>
-                        )}
-                      </td>
+                  <TableRow key={s.id}>
+                    <TableCell className="font-medium">{s.name_uz}</TableCell>
+                    <TableCell>{s.name_ru}</TableCell>
+                    <TableCell>{s.name_en}</TableCell>
+                    <TableCell>
+                      <StatusBadge
+                        active={s.is_active}
+                        activeLabel={t("active")}
+                        inactiveLabel={t("inactive")}
+                      />
+                    </TableCell>
+                    {showActions && (
+                      <TableCell className="text-right">
+                        <div className="flex justify-end gap-2">
+                          {can("subjects.update") && (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => {
+                                setEditSubject(s);
+                                setShowForm(true);
+                              }}
+                            >
+                              {t("edit")}
+                            </Button>
+                          )}
+                          {can("subjects.delete") && (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="text-danger hover:text-danger"
+                              onClick={() => remove(s)}
+                            >
+                              {t("delete")}
+                            </Button>
+                          )}
+                        </div>
+                      </TableCell>
                     )}
-                  </tr>
+                  </TableRow>
                 ))}
-                {subjects.length === 0 && (
-                  <tr>
-                    <td colSpan={5} className="p-6 text-center text-gray-400">
-                      {t("empty")}
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
+              </TableBody>
+            </Table>
+          </DataTable>
         )}
-      </div>
+      </PageSection>
+
       {showForm && (
         <SubjectFormModal
           subject={editSubject}

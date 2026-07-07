@@ -5,6 +5,21 @@ import { useTranslations } from "next-intl";
 import { CenterFormModal } from "@/components/CenterFormModal";
 import { CenterOnboardModal } from "@/components/CenterOnboardModal";
 import { PermissionGate } from "@/components/PermissionGate";
+import {
+  Button,
+  DataTable,
+  EmptyState,
+  PageHeader,
+  PageSection,
+  StatusBadge,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+  TableSkeleton,
+} from "@/components/ui";
 import { apiFetch, listCenters } from "@/lib/api";
 import { usePermissions } from "@/hooks/usePermissions";
 import { useAuth } from "@/contexts/AuthContext";
@@ -64,115 +79,109 @@ export default function CentersPage() {
 
   return (
     <>
-      <div className="space-y-4">
-        <div className="flex justify-between items-center flex-wrap gap-2">
-          <div>
-            <h2 className="text-xl font-bold text-naqsh-primary">{t("title")}</h2>
-            <p className="text-sm text-gray-500">{t("subtitle")}</p>
-          </div>
-          <div className="flex gap-2">
-            {isSuperAdmin && (
+      <PageSection>
+        <PageHeader
+          title={t("title")}
+          description={t("subtitle")}
+          actions={
+            <>
+              {isSuperAdmin && (
+                <PermissionGate permission="centers.create">
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      setEditCenter(null);
+                      setShowForm(true);
+                    }}
+                  >
+                    {t("add")}
+                  </Button>
+                </PermissionGate>
+              )}
               <PermissionGate permission="centers.create">
-                <button
-                  type="button"
+                <Button
                   onClick={() => {
                     setEditCenter(null);
-                    setShowForm(true);
+                    setShowOnboard(true);
                   }}
-                  className="px-4 py-2 border border-naqsh-primary text-naqsh-primary rounded-lg text-sm font-medium"
                 >
-                  {t("add")}
-                </button>
+                  {t("onboardAdd")}
+                </Button>
               </PermissionGate>
-            )}
-            <PermissionGate permission="centers.create">
-              <button
-                type="button"
-                onClick={() => {
-                  setEditCenter(null);
-                  setShowOnboard(true);
-                }}
-                className="px-4 py-2 bg-naqsh-primary text-white rounded-lg text-sm font-medium"
-              >
-                {t("onboardAdd")}
-              </button>
-            </PermissionGate>
-          </div>
-        </div>
+            </>
+          }
+        />
+
         {loading ? (
-          <p className="text-gray-400">{t("loading")}</p>
+          <DataTable>
+            <TableSkeleton rows={6} cols={6} />
+          </DataTable>
+        ) : centers.length === 0 ? (
+          <DataTable>
+            <EmptyState title={t("empty")} />
+          </DataTable>
         ) : (
-          <div className="bg-white rounded-xl shadow border overflow-hidden overflow-x-auto">
-            <table className="w-full text-sm min-w-[720px]">
-              <thead className="bg-gray-50 border-b">
-                <tr>
-                  <th className="text-left p-3 font-medium">{t("name")}</th>
-                  <th className="text-left p-3 font-medium">{t("mahalla")}</th>
-                  <th className="text-left p-3 font-medium">{t("stir")}</th>
-                  <th className="text-left p-3 font-medium">{t("director")}</th>
-                  <th className="text-left p-3 font-medium">{t("licenseExpiry")}</th>
-                  <th className="text-left p-3 font-medium">{t("status")}</th>
-                  {showActions && <th className="p-3" />}
-                </tr>
-              </thead>
-              <tbody>
+          <DataTable>
+            <Table className="min-w-[720px]">
+              <TableHeader>
+                <TableRow>
+                  <TableHead>{t("name")}</TableHead>
+                  <TableHead>{t("mahalla")}</TableHead>
+                  <TableHead>{t("stir")}</TableHead>
+                  <TableHead>{t("director")}</TableHead>
+                  <TableHead>{t("licenseExpiry")}</TableHead>
+                  <TableHead>{t("status")}</TableHead>
+                  {showActions && <TableHead className="text-right">{t("edit")}</TableHead>}
+                </TableRow>
+              </TableHeader>
+              <TableBody>
                 {centers.map((c) => (
-                  <tr key={c.id} className="border-b last:border-0 hover:bg-gray-50">
-                    <td className="p-3">{c.name}</td>
-                    <td className="p-3">{c.mahalla_name_uz || "—"}</td>
-                    <td className="p-3">{c.stir || "—"}</td>
-                    <td className="p-3">{c.director_name || "—"}</td>
-                    <td className="p-3">
+                  <TableRow key={c.id}>
+                    <TableCell className="font-medium">{c.name}</TableCell>
+                    <TableCell>{c.mahalla_name_uz || "—"}</TableCell>
+                    <TableCell className="font-mono text-caption">{c.stir || "—"}</TableCell>
+                    <TableCell>{c.director_name || "—"}</TableCell>
+                    <TableCell>
                       {c.license_expiry ? new Date(c.license_expiry).toLocaleDateString() : "—"}
-                    </td>
-                    <td className="p-3">
-                      <span
-                        className={`px-2 py-0.5 rounded-full text-xs ${
-                          c.is_active ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-600"
-                        }`}
-                      >
-                        {c.is_active ? t("active") : t("inactive")}
-                      </span>
-                    </td>
+                    </TableCell>
+                    <TableCell>
+                      <StatusBadge
+                        active={c.is_active}
+                        activeLabel={t("active")}
+                        inactiveLabel={t("inactive")}
+                      />
+                    </TableCell>
                     {showActions && (
-                      <td className="p-3 text-right space-x-2">
-                        {can("centers.update") && (
-                          <button
-                            type="button"
-                            className="text-naqsh-accent text-sm hover:underline"
-                            onClick={() => {
-                              setEditCenter(c);
-                              setShowForm(true);
-                            }}
-                          >
-                            {t("edit")}
-                          </button>
-                        )}
-                        {can("centers.delete") && (
-                          <button
-                            type="button"
-                            className="text-red-600 text-sm hover:underline"
-                            onClick={() => deleteCenter(c)}
-                          >
-                            {t("delete")}
-                          </button>
-                        )}
-                      </td>
+                      <TableCell className="text-right">
+                        <div className="flex justify-end gap-2">
+                          {can("centers.update") && (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => {
+                                setEditCenter(c);
+                                setShowForm(true);
+                              }}
+                            >
+                              {t("edit")}
+                            </Button>
+                          )}
+                          {can("centers.delete") && (
+                            <Button variant="ghost" size="sm" className="text-danger hover:text-danger" onClick={() => deleteCenter(c)}>
+                              {t("delete")}
+                            </Button>
+                          )}
+                        </div>
+                      </TableCell>
                     )}
-                  </tr>
+                  </TableRow>
                 ))}
-                {centers.length === 0 && (
-                  <tr>
-                    <td colSpan={showActions ? 7 : 6} className="p-6 text-center text-gray-400">
-                      {t("empty")}
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
+              </TableBody>
+            </Table>
+          </DataTable>
         )}
-      </div>
+      </PageSection>
+
       {showOnboard && (
         <CenterOnboardModal onClose={() => setShowOnboard(false)} onSaved={load} />
       )}

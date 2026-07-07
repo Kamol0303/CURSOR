@@ -5,6 +5,20 @@ import { useTranslations } from "next-intl";
 import { EnrollStudentModal } from "@/components/EnrollStudentModal";
 import { AssignTeacherModal } from "@/components/AssignTeacherModal";
 import { PermissionGate } from "@/components/PermissionGate";
+import {
+  Button,
+  Card,
+  CardBody,
+  CardDescription,
+  CardTitle,
+  EmptyState,
+  FormActions,
+  Input,
+  PageHeader,
+  PageSection,
+  Select,
+  CardSkeleton,
+} from "@/components/ui";
 import { apiFetch, getMe, listCenters } from "@/lib/api";
 
 type Group = {
@@ -70,70 +84,80 @@ export default function GroupsPage() {
 
   return (
     <>
-      <div className="space-y-4">
-        <div className="flex justify-between items-center">
-          <h2 className="text-xl font-bold text-naqsh-primary">{t("title")}</h2>
-          <PermissionGate permission="groups.create">
-            <button
-              type="button"
-              onClick={() => setShowForm(true)}
-              className="px-4 py-2 bg-naqsh-primary text-white rounded-lg text-sm"
-            >
-              {t("add")}
-            </button>
-          </PermissionGate>
-        </div>
+      <PageSection>
+        <PageHeader
+          title={t("title")}
+          actions={
+            <PermissionGate permission="groups.create">
+              <Button onClick={() => setShowForm(true)}>{t("add")}</Button>
+            </PermissionGate>
+          }
+        />
+
         {showForm && (
-          <form onSubmit={createGroup} className="bg-white p-4 rounded-xl border space-y-3">
-            <input className="w-full border rounded-lg px-3 py-2" placeholder={t("name")} value={name} onChange={(e) => setName(e.target.value)} required />
-            <select className="w-full border rounded-lg px-3 py-2" value={subjectId} onChange={(e) => setSubjectId(e.target.value)} required>
-              <option value="">{t("selectSubject")}</option>
-              {subjects.map((s) => (
-                <option key={s.id} value={s.id}>{s.name_uz}</option>
-              ))}
-            </select>
-            <input className="w-full border rounded-lg px-3 py-2" placeholder={t("room")} value={room} onChange={(e) => setRoom(e.target.value)} />
-            <div className="flex gap-2">
-              <button type="submit" className="px-4 py-2 bg-naqsh-primary text-white rounded-lg">{t("save")}</button>
-              <button type="button" onClick={() => setShowForm(false)} className="px-4 py-2 border rounded-lg">{t("cancel")}</button>
-            </div>
-          </form>
+          <Card>
+            <CardBody>
+              <form onSubmit={createGroup} className="space-y-3">
+                <Input placeholder={t("name")} value={name} onChange={(e) => setName(e.target.value)} required />
+                <Select value={subjectId} onChange={(e) => setSubjectId(e.target.value)} required>
+                  <option value="">{t("selectSubject")}</option>
+                  {subjects.map((s) => (
+                    <option key={s.id} value={s.id}>
+                      {s.name_uz}
+                    </option>
+                  ))}
+                </Select>
+                <Input placeholder={t("room")} value={room} onChange={(e) => setRoom(e.target.value)} />
+                <FormActions>
+                  <Button type="button" variant="outline" onClick={() => setShowForm(false)}>
+                    {t("cancel")}
+                  </Button>
+                  <Button type="submit">{t("save")}</Button>
+                </FormActions>
+              </form>
+            </CardBody>
+          </Card>
         )}
+
         {loading ? (
-          <p className="text-gray-400">{t("loading")}</p>
+          <div className="grid gap-4 md:grid-cols-2">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <CardSkeleton key={i} />
+            ))}
+          </div>
+        ) : groups.length === 0 ? (
+          <EmptyState title={t("empty")} />
         ) : (
           <div className="grid gap-4 md:grid-cols-2">
             {groups.map((g) => (
-              <div key={g.id} className="bg-white rounded-xl border p-4 shadow-sm">
-                <h3 className="font-semibold text-naqsh-primary">{g.name}</h3>
-                <p className="text-sm text-gray-600">{g.subject_name_uz} · {g.teacher_name || t("noTeacher")}</p>
-                <p className="text-sm text-gray-500">{t("room")}: {g.room || "—"} · {t("students")}: {g.enrollment_count}</p>
-                <div className="mt-3 flex flex-wrap gap-3">
-                  <PermissionGate permission="groups.update">
-                    <button
-                      type="button"
-                      onClick={() => setAssignGroup(g)}
-                      className="text-sm text-naqsh-primary hover:underline"
-                    >
-                      {g.teacher_name ? t("changeTeacher") : t("assignTeacher")}
-                    </button>
-                  </PermissionGate>
-                  <PermissionGate permission="groups.enroll">
-                    <button
-                      type="button"
-                      onClick={() => setEnrollGroup(g)}
-                      className="text-sm text-naqsh-accent hover:underline"
-                    >
-                      {t("manageStudents")}
-                    </button>
-                  </PermissionGate>
-                </div>
-              </div>
+              <Card key={g.id} hover>
+                <CardBody>
+                  <CardTitle>{g.name}</CardTitle>
+                  <CardDescription>
+                    {g.subject_name_uz} · {g.teacher_name || t("noTeacher")}
+                  </CardDescription>
+                  <p className="text-small text-muted-foreground mt-2">
+                    {t("room")}: {g.room || "—"} · {t("students")}: {g.enrollment_count}
+                  </p>
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    <PermissionGate permission="groups.update">
+                      <Button variant="ghost" size="sm" onClick={() => setAssignGroup(g)}>
+                        {g.teacher_name ? t("changeTeacher") : t("assignTeacher")}
+                      </Button>
+                    </PermissionGate>
+                    <PermissionGate permission="groups.enroll">
+                      <Button variant="ghost" size="sm" onClick={() => setEnrollGroup(g)}>
+                        {t("manageStudents")}
+                      </Button>
+                    </PermissionGate>
+                  </div>
+                </CardBody>
+              </Card>
             ))}
-            {groups.length === 0 && <p className="text-gray-400">{t("empty")}</p>}
           </div>
         )}
-      </div>
+      </PageSection>
+
       {enrollGroup && (
         <EnrollStudentModal
           groupId={enrollGroup.id}

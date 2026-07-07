@@ -1,11 +1,12 @@
 "use client";
 
-import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
+import { AppShell } from "@/components/AppShell";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { ChangePasswordForm } from "@/components/ChangePasswordForm";
+import { Card, CardBody, CardTitle, CardDescription } from "@/components/ui";
 import { useAuth } from "@/contexts/AuthContext";
 import { getApiBaseUrl } from "@/lib/api";
 import { clearAuthCookie } from "@/lib/auth-cookie";
@@ -41,55 +42,42 @@ export function TeacherLayout({ children }: { children: React.ReactNode }) {
     window.location.href = "/";
   };
 
+  const activeItem = NAV.find((item) => isActive(pathname, item.href, "exact" in item && item.exact));
+
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 flex">
-      <aside className="w-56 bg-naqsh-primary text-white flex flex-col shrink-0 min-h-screen">
-        <div className="p-4 border-b border-white/10">
-          <div className="font-bold text-lg">TMB</div>
-          <div className="text-xs text-white/70">{t("subtitle")}</div>
-        </div>
-        <nav className="flex-1 p-3 space-y-1">
-          {NAV.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={`block px-3 py-2 rounded-lg text-sm transition-colors ${
-                isActive(pathname, item.href, "exact" in item && item.exact)
-                  ? "bg-white/20 font-medium"
-                  : "hover:bg-white/10"
-              }`}
-            >
-              {t(`nav.${item.key}`)}
-            </Link>
-          ))}
-        </nav>
-        <div className="p-3 border-t border-white/10">
-          <button
-            type="button"
-            onClick={logout}
-            className="w-full text-left px-3 py-2 text-sm rounded-lg hover:bg-white/10"
-          >
-            {t("logout")}
-          </button>
-        </div>
-      </aside>
-      <div className="flex-1 flex flex-col min-w-0">
-        <header className="bg-white dark:bg-gray-900 border-b dark:border-gray-800 px-6 py-3 flex justify-end items-center gap-2">
+    <AppShell
+      brandSubtitle={t("subtitle")}
+      navItems={NAV.map((item) => ({
+        href: item.href,
+        key: item.key,
+        label: t(`nav.${item.key}`),
+        exact: "exact" in item ? item.exact : undefined,
+      }))}
+      pageTitle={activeItem ? t(`nav.${activeItem.key}`) : t("subtitle")}
+      headerActions={
+        <>
           <ThemeToggle />
           <LanguageSwitcher />
-        </header>
-        <main className="flex-1 p-6 overflow-auto text-gray-900 dark:text-gray-100">
-          {mustChangePassword ? (
-            <div className="max-w-lg mx-auto bg-white dark:bg-gray-900 rounded-xl border dark:border-gray-700 p-6 space-y-4">
-              <h2 className="text-xl font-bold text-naqsh-primary">{t("changePasswordTitle")}</h2>
-              <p className="text-sm text-gray-500">{t("changePasswordHint")}</p>
+        </>
+      }
+      onLogout={logout}
+      logoutLabel={t("logout")}
+    >
+      {mustChangePassword ? (
+        <div className="max-w-md mx-auto animate-slide-up">
+          <Card>
+            <CardBody className="space-y-4">
+              <div>
+                <CardTitle>{t("changePasswordTitle")}</CardTitle>
+                <CardDescription>{t("changePasswordHint")}</CardDescription>
+              </div>
               <ChangePasswordForm onSuccess={() => void refresh()} />
-            </div>
-          ) : (
-            children
-          )}
-        </main>
-      </div>
-    </div>
+            </CardBody>
+          </Card>
+        </div>
+      ) : (
+        children
+      )}
+    </AppShell>
   );
 }

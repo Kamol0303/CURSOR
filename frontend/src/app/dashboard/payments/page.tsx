@@ -3,6 +3,21 @@
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { PermissionGate } from "@/components/PermissionGate";
+import {
+  Badge,
+  Button,
+  DataTable,
+  EmptyState,
+  PageHeader,
+  PageSection,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+  TableSkeleton,
+} from "@/components/ui";
 import { apiFetch } from "@/lib/api";
 
 type Payment = {
@@ -40,53 +55,62 @@ export default function PaymentsPage() {
     load();
   };
 
+  const statusVariant = (status: string) => {
+    if (status === "paid") return "success" as const;
+    if (status === "pending") return "warning" as const;
+    return "default" as const;
+  };
+
   return (
-    
-      <div className="space-y-4">
-        <h2 className="text-xl font-bold text-naqsh-primary">{t("title")}</h2>
-        <p className="text-sm text-gray-500">{t("clickPaymeNote")}</p>
-        {loading ? (
-          <p>{t("loading")}</p>
-        ) : (
-          <div className="bg-white rounded-xl border overflow-hidden">
-            <table className="w-full text-sm">
-              <thead className="bg-gray-50 border-b">
-                <tr>
-                  <th className="text-left p-3">{t("student")}</th>
-                  <th className="text-left p-3">{t("amount")}</th>
-                  <th className="text-left p-3">{t("status")}</th>
-                  <th className="text-left p-3">{t("dueDate")}</th>
-                  <th className="p-3" />
-                </tr>
-              </thead>
-              <tbody>
-                {payments.map((p) => (
-                  <tr key={p.id} className="border-b">
-                    <td className="p-3">{p.student_name}</td>
-                    <td className="p-3">{p.amount.toLocaleString()} {p.currency}</td>
-                    <td className="p-3">{p.status}</td>
-                    <td className="p-3">{p.due_date || "—"}</td>
-                    <td className="p-3">
-                      <PermissionGate permission="payments.update">
-                        {p.status === "pending" && (
-                          <button type="button" className="text-sm text-naqsh-accent" onClick={() => markPaid(p.id)}>
-                            {t("markPaid")}
-                          </button>
-                        )}
-                      </PermissionGate>
-                    </td>
-                  </tr>
-                ))}
-                {payments.length === 0 && (
-                  <tr>
-                    <td colSpan={5} className="p-6 text-center text-gray-400">{t("empty")}</td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </div>
-    
+    <PageSection>
+      <PageHeader title={t("title")} description={t("clickPaymeNote")} />
+
+      {loading ? (
+        <DataTable>
+          <TableSkeleton rows={6} cols={5} />
+        </DataTable>
+      ) : payments.length === 0 ? (
+        <DataTable>
+          <EmptyState title={t("empty")} />
+        </DataTable>
+      ) : (
+        <DataTable>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>{t("student")}</TableHead>
+                <TableHead>{t("amount")}</TableHead>
+                <TableHead>{t("status")}</TableHead>
+                <TableHead>{t("dueDate")}</TableHead>
+                <TableHead className="text-right">{t("markPaid")}</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {payments.map((p) => (
+                <TableRow key={p.id}>
+                  <TableCell className="font-medium">{p.student_name}</TableCell>
+                  <TableCell>
+                    {p.amount.toLocaleString()} {p.currency}
+                  </TableCell>
+                  <TableCell>
+                    <Badge variant={statusVariant(p.status)}>{p.status}</Badge>
+                  </TableCell>
+                  <TableCell>{p.due_date || "—"}</TableCell>
+                  <TableCell className="text-right">
+                    <PermissionGate permission="payments.update">
+                      {p.status === "pending" && (
+                        <Button variant="ghost" size="sm" onClick={() => markPaid(p.id)}>
+                          {t("markPaid")}
+                        </Button>
+                      )}
+                    </PermissionGate>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </DataTable>
+      )}
+    </PageSection>
   );
 }

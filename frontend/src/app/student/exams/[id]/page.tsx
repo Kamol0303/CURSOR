@@ -4,6 +4,15 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
+import {
+  Alert,
+  Badge,
+  Button,
+  Card,
+  CardBody,
+  CardTitle,
+  Spinner,
+} from "@/components/ui";
 import { apiFetch } from "@/lib/api";
 
 type Question = {
@@ -58,73 +67,86 @@ export default function StudentTakeExamPage() {
     }
   };
 
-  if (loading) return <p className="text-gray-500 p-4">{t("loading")}</p>;
-  if (!exam) return <p className="text-red-600 p-4">{t("examNotFound")}</p>;
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background p-4">
+        <Spinner label={t("loading")} className="py-16" />
+      </div>
+    );
+  }
+
+  if (!exam) {
+    return (
+      <div className="min-h-screen bg-background p-4 max-w-lg mx-auto">
+        <Alert variant="danger">{t("examNotFound")}</Alert>
+      </div>
+    );
+  }
 
   if (result) {
     return (
-      <div className="min-h-screen bg-gray-50 p-4 max-w-lg mx-auto">
-        <div className="bg-white rounded-xl border p-6 space-y-3 text-center">
-          <h2 className="text-lg font-bold text-naqsh-primary">{t("examSubmitted")}</h2>
-          <p className="text-2xl font-semibold">
-            {result.score}/{result.max_score}
-          </p>
-          <p className={result.passed ? "text-green-700" : "text-red-600"}>
-            {result.passed ? t("passed") : t("failed")}
-          </p>
-          <button
-            type="button"
-            onClick={() => router.push("/student/dashboard")}
-            className="mt-4 px-4 py-2 bg-naqsh-primary text-white rounded-lg text-sm"
-          >
-            {t("backToDashboard")}
-          </button>
-        </div>
+      <div className="min-h-screen bg-background p-4 max-w-lg mx-auto flex items-center">
+        <Card className="w-full">
+          <CardBody className="text-center space-y-4">
+            <CardTitle>{t("examSubmitted")}</CardTitle>
+            <p className="text-3xl font-semibold text-foreground">
+              {result.score}/{result.max_score}
+            </p>
+            <Badge variant={result.passed ? "success" : "danger"}>
+              {result.passed ? t("passed") : t("failed")}
+            </Badge>
+            <Button type="button" onClick={() => router.push("/student/dashboard")} className="mt-2">
+              {t("backToDashboard")}
+            </Button>
+          </CardBody>
+        </Card>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="bg-naqsh-primary text-white px-4 py-4">
-        <Link href="/student/dashboard" className="text-sm underline">
+    <div className="min-h-screen bg-background">
+      <header className="bg-naqsh-primary text-white px-4 py-5 shadow-sm">
+        <Link href="/student/dashboard" className="text-small text-white/80 hover:text-white transition-colors">
           ← {t("back")}
         </Link>
-        <h1 className="font-bold text-lg mt-1">{exam.title}</h1>
-        <p className="text-xs text-white/70">
+        <h1 className="font-bold text-lg mt-2">{exam.title}</h1>
+        <p className="text-caption text-white/70 mt-0.5">
           {t("passScore")}: {exam.pass_score}% · {exam.duration_minutes} min
         </p>
       </header>
       <form onSubmit={submit} className="p-4 max-w-lg mx-auto space-y-4">
         {exam.questions.map((q, idx) => (
-          <div key={q.id} className="bg-white border rounded-xl p-4">
-            <p className="font-medium text-sm mb-3">
-              {idx + 1}. {q.question_text}
-            </p>
-            <div className="space-y-2">
-              {(q.options_json || []).map((opt) => (
-                <label key={opt} className="flex items-center gap-2 text-sm">
-                  <input
-                    type="radio"
-                    name={q.id}
-                    value={opt}
-                    checked={answers[q.id] === opt}
-                    onChange={() => setAnswers((prev) => ({ ...prev, [q.id]: opt }))}
-                    required
-                  />
-                  {opt}
-                </label>
-              ))}
-            </div>
-          </div>
+          <Card key={q.id}>
+            <CardBody>
+              <p className="font-medium text-small text-foreground mb-4">
+                {idx + 1}. {q.question_text}
+              </p>
+              <div className="space-y-2">
+                {(q.options_json || []).map((opt) => (
+                  <label
+                    key={opt}
+                    className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-small text-foreground cursor-pointer hover:bg-muted transition-colors"
+                  >
+                    <input
+                      type="radio"
+                      name={q.id}
+                      value={opt}
+                      checked={answers[q.id] === opt}
+                      onChange={() => setAnswers((prev) => ({ ...prev, [q.id]: opt }))}
+                      required
+                      className="accent-naqsh-primary"
+                    />
+                    {opt}
+                  </label>
+                ))}
+              </div>
+            </CardBody>
+          </Card>
         ))}
-        <button
-          type="submit"
-          disabled={submitting}
-          className="w-full py-3 bg-naqsh-primary text-white rounded-lg font-medium disabled:opacity-50"
-        >
+        <Button type="submit" loading={submitting} className="w-full" size="lg">
           {submitting ? t("submitting") : t("submitExam")}
-        </button>
+        </Button>
       </form>
     </div>
   );

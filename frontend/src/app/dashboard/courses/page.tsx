@@ -4,8 +4,22 @@ import { useCallback, useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { CourseFormModal, useCourseCenterId } from "@/components/CourseFormModal";
 import { PermissionGate } from "@/components/PermissionGate";
+import {
+  Badge,
+  Button,
+  Card,
+  CardBody,
+  CardDescription,
+  CardTitle,
+  EmptyState,
+  Input,
+  PageHeader,
+  PageSection,
+  CardSkeleton,
+} from "@/components/ui";
 import { apiFetch } from "@/lib/api";
 import { usePermissions } from "@/hooks/usePermissions";
+import { cn } from "@/lib/cn";
 
 type Course = {
   id: string;
@@ -109,156 +123,167 @@ export default function CoursesPage() {
   };
 
   return (
-    <div className="space-y-4">
-      <div className="flex justify-between items-center">
-        <h2 className="text-xl font-bold text-naqsh-primary">{t("title")}</h2>
-        <PermissionGate permission="courses.create">
-          {centerId && (
-            <button
-              type="button"
-              onClick={() => {
-                setEditCourse(null);
-                setShowForm(true);
-              }}
-              className="px-4 py-2 bg-naqsh-primary text-white rounded-lg text-sm font-medium"
-            >
-              {t("add")}
-            </button>
-          )}
-        </PermissionGate>
-      </div>
+    <PageSection>
+      <PageHeader
+        title={t("title")}
+        actions={
+          <PermissionGate permission="courses.create">
+            {centerId && (
+              <Button
+                onClick={() => {
+                  setEditCourse(null);
+                  setShowForm(true);
+                }}
+              >
+                {t("add")}
+              </Button>
+            )}
+          </PermissionGate>
+        }
+      />
 
       {loading ? (
-        <p className="text-gray-400">{t("loading")}</p>
+        <div className="grid gap-4 md:grid-cols-2">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <CardSkeleton key={i} />
+          ))}
+        </div>
+      ) : courses.length === 0 ? (
+        <EmptyState title={t("empty")} />
       ) : (
         <div className="grid gap-4 md:grid-cols-2">
           {courses.map((course) => (
-            <div
+            <Card
               key={course.id}
-              className={`bg-white rounded-xl border p-4 shadow-sm ${
-                selectedCourse?.id === course.id ? "ring-2 ring-naqsh-accent" : ""
-              }`}
+              hover
+              className={cn(selectedCourse?.id === course.id && "ring-2 ring-naqsh-accent")}
             >
-              <button type="button" onClick={() => setSelectedCourse(course)} className="w-full text-left">
-                <h3 className="font-semibold text-naqsh-primary">{course.name}</h3>
-                <p className="text-sm text-gray-600">{course.subject_name_uz}</p>
-                <p className="text-sm text-gray-500">
-                  {t("lessons")}: {course.lesson_count}
-                  {course.duration_weeks ? ` · ${course.duration_weeks} ${t("weeks")}` : ""}
-                  {course.price != null ? ` · ${course.price.toLocaleString()} UZS` : ""}
-                </p>
-                {!course.is_active && (
-                  <span className="text-xs text-gray-400">{t("inactive")}</span>
+              <CardBody>
+                <button type="button" onClick={() => setSelectedCourse(course)} className="w-full text-left">
+                  <CardTitle>{course.name}</CardTitle>
+                  <CardDescription>{course.subject_name_uz}</CardDescription>
+                  <p className="text-small text-muted-foreground mt-2">
+                    {t("lessons")}: {course.lesson_count}
+                    {course.duration_weeks ? ` · ${course.duration_weeks} ${t("weeks")}` : ""}
+                    {course.price != null ? ` · ${course.price.toLocaleString()} UZS` : ""}
+                  </p>
+                  {!course.is_active && (
+                    <Badge variant="default" className="mt-2">
+                      {t("inactive")}
+                    </Badge>
+                  )}
+                </button>
+                {(can("courses.update") || can("courses.delete")) && (
+                  <div className="flex gap-2 mt-3 pt-3 border-t border-border">
+                    {can("courses.update") && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => {
+                          setEditCourse(course);
+                          setShowForm(true);
+                        }}
+                      >
+                        {t("edit")}
+                      </Button>
+                    )}
+                    {can("courses.delete") && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="text-danger hover:text-danger"
+                        onClick={() => deleteCourse(course)}
+                      >
+                        {t("delete")}
+                      </Button>
+                    )}
+                  </div>
                 )}
-              </button>
-              {(can("courses.update") || can("courses.delete")) && (
-                <div className="flex gap-3 mt-2 pt-2 border-t">
-                  {can("courses.update") && (
-                    <button
-                      type="button"
-                      className="text-naqsh-accent text-sm hover:underline"
-                      onClick={() => {
-                        setEditCourse(course);
-                        setShowForm(true);
-                      }}
-                    >
-                      {t("edit")}
-                    </button>
-                  )}
-                  {can("courses.delete") && (
-                    <button
-                      type="button"
-                      className="text-red-600 text-sm hover:underline"
-                      onClick={() => deleteCourse(course)}
-                    >
-                      {t("delete")}
-                    </button>
-                  )}
-                </div>
-              )}
-            </div>
+              </CardBody>
+            </Card>
           ))}
-          {courses.length === 0 && <p className="text-gray-400">{t("empty")}</p>}
         </div>
       )}
 
       {selectedCourse && (
-        <div className="bg-white rounded-xl border p-4 space-y-3">
-          <h3 className="font-semibold text-naqsh-primary">{t("lessonSchedule")}</h3>
-          <PermissionGate permission="courses.update">
-            <form onSubmit={addLesson} className="flex gap-2">
-              <input
-                className="flex-1 border rounded-lg px-3 py-2"
-                placeholder={t("lessonTitle")}
-                value={lessonTitle}
-                onChange={(e) => setLessonTitle(e.target.value)}
-                required
-              />
-              <button type="submit" className="px-4 py-2 bg-naqsh-primary text-white rounded-lg">
-                {t("addLesson")}
-              </button>
-            </form>
-          </PermissionGate>
-          <ul className="space-y-2">
-            {lessons.map((lesson) => (
-              <li key={lesson.id} className="text-sm border rounded-lg px-3 py-2 flex justify-between gap-2">
-                {editingLesson?.id === lesson.id ? (
-                  <div className="flex flex-1 gap-2">
-                    <input
-                      className="flex-1 border rounded px-2 py-1"
-                      value={editLessonTitle}
-                      onChange={(e) => setEditLessonTitle(e.target.value)}
-                    />
-                    <button type="button" onClick={saveLessonEdit} className="text-naqsh-accent text-xs">
-                      {t("save")}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setEditingLesson(null)}
-                      className="text-gray-500 text-xs"
-                    >
-                      {t("cancel")}
-                    </button>
-                  </div>
-                ) : (
-                  <>
-                    <div>
-                      <span className="font-medium">{lesson.title}</span>
-                      {lesson.scheduled_at && (
-                        <span className="text-gray-500 ml-2">
-                          {new Date(lesson.scheduled_at).toLocaleString()}
-                        </span>
-                      )}
-                      {lesson.room && <span className="text-gray-500 ml-2">· {lesson.room}</span>}
+        <Card>
+          <CardBody className="space-y-3">
+            <CardTitle>{t("lessonSchedule")}</CardTitle>
+            <PermissionGate permission="courses.update">
+              <form onSubmit={addLesson} className="flex gap-2">
+                <Input
+                  className="flex-1"
+                  placeholder={t("lessonTitle")}
+                  value={lessonTitle}
+                  onChange={(e) => setLessonTitle(e.target.value)}
+                  required
+                />
+                <Button type="submit">{t("addLesson")}</Button>
+              </form>
+            </PermissionGate>
+            <ul className="space-y-2">
+              {lessons.map((lesson) => (
+                <li
+                  key={lesson.id}
+                  className="text-small border border-border rounded-lg px-3 py-2 flex justify-between gap-2"
+                >
+                  {editingLesson?.id === lesson.id ? (
+                    <div className="flex flex-1 gap-2">
+                      <Input
+                        className="flex-1"
+                        value={editLessonTitle}
+                        onChange={(e) => setEditLessonTitle(e.target.value)}
+                      />
+                      <Button type="button" variant="ghost" size="sm" onClick={saveLessonEdit}>
+                        {t("save")}
+                      </Button>
+                      <Button type="button" variant="ghost" size="sm" onClick={() => setEditingLesson(null)}>
+                        {t("cancel")}
+                      </Button>
                     </div>
-                    {can("courses.update") && (
-                      <div className="flex gap-2 shrink-0">
-                        <button
-                          type="button"
-                          className="text-naqsh-accent text-xs hover:underline"
-                          onClick={() => {
-                            setEditingLesson(lesson);
-                            setEditLessonTitle(lesson.title);
-                          }}
-                        >
-                          {t("edit")}
-                        </button>
-                        <button
-                          type="button"
-                          className="text-red-600 text-xs hover:underline"
-                          onClick={() => deleteLesson(lesson)}
-                        >
-                          {t("delete")}
-                        </button>
+                  ) : (
+                    <>
+                      <div>
+                        <span className="font-medium">{lesson.title}</span>
+                        {lesson.scheduled_at && (
+                          <span className="text-muted-foreground ml-2">
+                            {new Date(lesson.scheduled_at).toLocaleString()}
+                          </span>
+                        )}
+                        {lesson.room && <span className="text-muted-foreground ml-2">· {lesson.room}</span>}
                       </div>
-                    )}
-                  </>
-                )}
-              </li>
-            ))}
-            {lessons.length === 0 && <li className="text-gray-400 text-sm">{t("noLessons")}</li>}
-          </ul>
-        </div>
+                      {can("courses.update") && (
+                        <div className="flex gap-2 shrink-0">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => {
+                              setEditingLesson(lesson);
+                              setEditLessonTitle(lesson.title);
+                            }}
+                          >
+                            {t("edit")}
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="text-danger hover:text-danger"
+                            onClick={() => deleteLesson(lesson)}
+                          >
+                            {t("delete")}
+                          </Button>
+                        </div>
+                      )}
+                    </>
+                  )}
+                </li>
+              ))}
+              {lessons.length === 0 && (
+                <li className="text-muted-foreground text-small">{t("noLessons")}</li>
+              )}
+            </ul>
+          </CardBody>
+        </Card>
       )}
 
       {showForm && centerId && (
@@ -270,6 +295,6 @@ export default function CoursesPage() {
           onSaved={loadCourses}
         />
       )}
-    </div>
+    </PageSection>
   );
 }

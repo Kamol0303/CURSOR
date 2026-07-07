@@ -2,6 +2,14 @@
 
 import { useState } from "react";
 import { useTranslations } from "next-intl";
+import {
+  Alert,
+  Button,
+  FormActions,
+  FormField,
+  Input,
+  Label,
+} from "@/components/ui";
 import { apiFetch } from "@/lib/api";
 
 export function AdminResetPasswordForm() {
@@ -33,35 +41,39 @@ export function AdminResetPasswordForm() {
   };
 
   return (
-    <form onSubmit={submit} className="space-y-3 border-t pt-4 mt-4">
-      <h3 className="font-semibold">{t("adminResetTitle")}</h3>
-      <p className="text-xs text-gray-500">{t("adminResetHint")}</p>
-      <input
-        type="text"
-        className="w-full border rounded-lg px-3 py-2"
-        placeholder={t("targetUsername")}
-        value={username}
-        onChange={(e) => setUsername(e.target.value)}
-        required
-      />
-      <input
-        type="password"
-        className="w-full border rounded-lg px-3 py-2"
-        placeholder={t("newPassword")}
-        value={newPass}
-        onChange={(e) => setNewPass(e.target.value)}
-        required
-        minLength={12}
-      />
-      {error && <p className="text-sm text-red-600">{error}</p>}
-      {message && <p className="text-sm text-green-700">{message}</p>}
-      <button
-        type="submit"
-        disabled={saving}
-        className="px-4 py-2 bg-naqsh-accent text-white rounded-lg text-sm disabled:opacity-50"
-      >
-        {saving ? t("saving") : t("adminResetButton")}
-      </button>
+    <form onSubmit={submit} className="space-y-4 border-t border-border pt-4 mt-4">
+      <h3 className="font-semibold text-foreground">{t("adminResetTitle")}</h3>
+      <p className="text-caption text-muted-foreground">{t("adminResetHint")}</p>
+      <FormField>
+        <Label htmlFor="reset-username">{t("targetUsername")}</Label>
+        <Input
+          id="reset-username"
+          type="text"
+          placeholder={t("targetUsername")}
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+          required
+        />
+      </FormField>
+      <FormField>
+        <Label htmlFor="reset-password">{t("newPassword")}</Label>
+        <Input
+          id="reset-password"
+          type="password"
+          placeholder={t("newPassword")}
+          value={newPass}
+          onChange={(e) => setNewPass(e.target.value)}
+          required
+          minLength={12}
+        />
+      </FormField>
+      {error && <Alert variant="danger">{error}</Alert>}
+      {message && <Alert variant="success">{message}</Alert>}
+      <FormActions className="justify-start pt-0">
+        <Button type="submit" loading={saving} variant="accent">
+          {saving ? t("saving") : t("adminResetButton")}
+        </Button>
+      </FormActions>
     </form>
   );
 }

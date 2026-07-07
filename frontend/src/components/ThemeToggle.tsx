@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
+import { cn } from "@/lib/cn";
 import { applyTheme, resolveTheme, type Theme, THEME_STORAGE_KEY } from "@/lib/theme";
 
 export function ThemeToggle() {
@@ -23,30 +24,32 @@ export function ThemeToggle() {
     applyTheme(next);
   };
 
-  if (!mounted) {
-    return (
-      <button
-        type="button"
-        className="p-2 rounded-lg border border-naqsh-primary/20 text-naqsh-primary opacity-60"
-        aria-label={t("themeToggle")}
-        disabled
-      >
-        ◐
-      </button>
-    );
-  }
-
   const isDark = theme === "dark";
 
   return (
     <button
       type="button"
       onClick={toggleTheme}
-      className="p-2 rounded-lg border border-naqsh-primary/20 text-naqsh-primary hover:bg-naqsh-primary/10 dark:border-white/20 dark:text-naqsh-accent dark:hover:bg-white/10 transition-colors"
-      aria-label={isDark ? t("themeLight") : t("themeDark")}
-      title={isDark ? t("themeLight") : t("themeDark")}
+      disabled={!mounted}
+      className={cn(
+        "p-2 rounded-lg border border-border bg-surface dark:bg-card",
+        "text-foreground-secondary hover:text-foreground hover:bg-muted",
+        "transition-all duration-fast ease-out",
+        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-naqsh-primary/30",
+        !mounted && "opacity-60",
+      )}
+      aria-label={mounted ? (isDark ? t("themeLight") : t("themeDark")) : t("themeToggle")}
+      title={mounted ? (isDark ? t("themeLight") : t("themeDark")) : undefined}
     >
-      {isDark ? "☀️" : "🌙"}
+      {isDark ? (
+        <svg className="h-[18px] w-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+        </svg>
+      ) : (
+        <svg className="h-[18px] w-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+        </svg>
+      )}
     </button>
   );
 }

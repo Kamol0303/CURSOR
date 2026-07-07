@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
 import { apiFetch } from "@/lib/api";
 import { usePermissions } from "@/hooks/usePermissions";
+import { Alert, Button, FormField, Input, Label, Modal } from "@/components/ui";
 
 type Props = {
   groupId: string;
@@ -55,13 +56,6 @@ export function EnrollStudentModal({ groupId, groupName, onClose, onChanged }: P
       setLoading(false);
     }
   }, [groupId]);
-
-  useEffect(() => {
-    document.body.style.overflow = "hidden";
-    return () => {
-      document.body.style.overflow = "";
-    };
-  }, []);
 
   useEffect(() => {
     loadData();
@@ -128,106 +122,106 @@ export function EnrollStudentModal({ groupId, groupName, onClose, onChanged }: P
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-      <div className="bg-white rounded-xl shadow-xl w-full max-w-lg max-h-[90vh] flex flex-col">
-        <div className="p-6 border-b shrink-0">
-          <h3 className="text-lg font-semibold text-naqsh-primary">{t("enrollTitle")}</h3>
-          <p className="text-sm text-gray-600">{groupName}</p>
-        </div>
+    <Modal
+      onClose={onClose}
+      title={t("enrollTitle")}
+      description={groupName}
+      footer={
+        <>
+          <Button type="button" variant="secondary" onClick={onClose}>
+            {t("cancel")}
+          </Button>
+          {canEnroll && (
+            <Button
+              type="button"
+              disabled={saving || loading || selected.size === 0}
+              loading={saving}
+              onClick={enrollSelected}
+            >
+              {saving ? t("enrolling") : t("enrollSelected")}
+            </Button>
+          )}
+        </>
+      }
+    >
+      <div className="space-y-5">
+        {loading ? (
+          <p className="text-muted-foreground">{t("loading")}</p>
+        ) : (
+          <>
+            <section>
+              <h4 className="text-small font-semibold text-foreground-secondary mb-2">
+                {t("currentMembers")} ({members.length})
+              </h4>
+              {members.length === 0 ? (
+                <p className="text-small text-muted-foreground">{t("noMembers")}</p>
+              ) : (
+                <ul className="space-y-0 max-h-36 overflow-y-auto border border-border rounded-lg divide-y divide-border">
+                  {members.map((m) => (
+                    <li key={m.student_id} className="flex items-center justify-between px-3 py-2 text-small">
+                      <span>
+                        {m.full_name}
+                        {m.grade ? <span className="text-muted-foreground"> · {m.grade}</span> : null}
+                      </span>
+                      {canEnroll && (
+                        <button
+                          type="button"
+                          disabled={saving}
+                          onClick={() => unenroll(m.student_id)}
+                          className="text-danger hover:underline text-xs shrink-0 ml-2"
+                        >
+                          {t("unenroll")}
+                        </button>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </section>
 
-        <div className="p-6 overflow-y-auto flex-1 space-y-5">
-          {loading ? (
-            <p className="text-gray-400">{t("loading")}</p>
-          ) : (
-            <>
+            {canEnroll && (
               <section>
-                <h4 className="text-sm font-semibold text-gray-700 mb-2">
-                  {t("currentMembers")} ({members.length})
-                </h4>
-                {members.length === 0 ? (
-                  <p className="text-sm text-gray-400">{t("noMembers")}</p>
-                ) : (
-                  <ul className="space-y-2 max-h-36 overflow-y-auto border rounded-lg divide-y">
-                    {members.map((m) => (
-                      <li key={m.student_id} className="flex items-center justify-between px-3 py-2 text-sm">
-                        <span>
-                          {m.full_name}
-                          {m.grade ? <span className="text-gray-400"> · {m.grade}</span> : null}
-                        </span>
-                        {canEnroll && (
-                          <button
-                            type="button"
-                            disabled={saving}
-                            onClick={() => unenroll(m.student_id)}
-                            className="text-red-600 hover:underline text-xs shrink-0 ml-2"
-                          >
-                            {t("unenroll")}
-                          </button>
-                        )}
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </section>
-
-              {canEnroll && (
-                <section>
-                  <h4 className="text-sm font-semibold text-gray-700 mb-2">{t("addStudents")}</h4>
-                  <input
+                <h4 className="text-small font-semibold text-foreground-secondary mb-2">{t("addStudents")}</h4>
+                <FormField>
+                  <Label className="sr-only">{t("searchStudent")}</Label>
+                  <Input
                     type="search"
-                    className="w-full border rounded-lg px-3 py-2 text-sm mb-2"
                     placeholder={t("searchStudent")}
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
                   />
-                  {availableStudents.length === 0 ? (
-                    <p className="text-sm text-gray-400">{t("noAvailableStudents")}</p>
-                  ) : (
-                    <ul className="space-y-1 max-h-48 overflow-y-auto border rounded-lg p-2">
-                      {availableStudents.map((s) => (
-                        <li key={s.id}>
-                          <label className="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-gray-50 cursor-pointer text-sm">
-                            <input
-                              type="checkbox"
-                              checked={selected.has(s.id)}
-                              onChange={() => toggleStudent(s.id)}
-                              disabled={saving}
-                            />
-                            <span>
-                              {s.full_name}
-                              {s.grade ? <span className="text-gray-400"> ({s.grade})</span> : null}
-                            </span>
-                          </label>
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                  {selected.size > 0 && (
-                    <p className="text-xs text-gray-500 mt-2">{t("selectedCount", { count: selected.size })}</p>
-                  )}
-                </section>
-              )}
-            </>
-          )}
-          {error && <p className="text-sm text-red-600">{error}</p>}
-        </div>
-
-        <div className="p-6 border-t flex gap-2 justify-end shrink-0">
-          <button type="button" onClick={onClose} className="px-4 py-2 rounded-lg border">
-            {t("cancel")}
-          </button>
-          {canEnroll && (
-            <button
-              type="button"
-              disabled={saving || loading || selected.size === 0}
-              onClick={enrollSelected}
-              className="px-4 py-2 rounded-lg bg-naqsh-primary text-white disabled:opacity-50"
-            >
-              {saving ? t("enrolling") : t("enrollSelected")}
-            </button>
-          )}
-        </div>
+                </FormField>
+                {availableStudents.length === 0 ? (
+                  <p className="text-small text-muted-foreground">{t("noAvailableStudents")}</p>
+                ) : (
+                  <ul className="space-y-1 max-h-48 overflow-y-auto border border-border rounded-lg p-2 mt-2">
+                    {availableStudents.map((s) => (
+                      <li key={s.id}>
+                        <Label className="flex items-center gap-2 mb-0 px-2 py-1.5 rounded hover:bg-muted cursor-pointer text-small font-normal">
+                          <input
+                            type="checkbox"
+                            checked={selected.has(s.id)}
+                            onChange={() => toggleStudent(s.id)}
+                            disabled={saving}
+                          />
+                          <span>
+                            {s.full_name}
+                            {s.grade ? <span className="text-muted-foreground"> ({s.grade})</span> : null}
+                          </span>
+                        </Label>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+                {selected.size > 0 && (
+                  <p className="text-xs text-muted-foreground mt-2">{t("selectedCount", { count: selected.size })}</p>
+                )}
+              </section>
+            )}
+          </>
+        )}
+        {error && <Alert variant="danger">{error}</Alert>}
       </div>
-    </div>
+    </Modal>
   );
 }

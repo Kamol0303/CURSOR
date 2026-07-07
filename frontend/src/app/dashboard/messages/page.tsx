@@ -5,6 +5,21 @@ import { useTranslations } from "next-intl";
 import { apiFetch } from "@/lib/api";
 import { MessageRecipientSelect, type RecipientOption } from "@/components/MessageRecipientSelect";
 import { PermissionGate } from "@/components/PermissionGate";
+import {
+  Alert,
+  Button,
+  Card,
+  CardBody,
+  CardDescription,
+  CardTitle,
+  EmptyState,
+  Input,
+  PageHeader,
+  PageSection,
+  Textarea,
+  CardSkeleton,
+} from "@/components/ui";
+import { cn } from "@/lib/cn";
 
 type Message = {
   id: string;
@@ -60,80 +75,87 @@ export default function MessagesPage() {
   };
 
   return (
-    <div className="space-y-4">
-      <div className="flex justify-between items-center">
-        <h2 className="text-xl font-bold text-naqsh-primary">{t("title")}</h2>
-        <div className="flex gap-2 text-sm">
-          <button
-            type="button"
-            onClick={() => setBox("inbox")}
-            className={`px-3 py-1 rounded-lg ${box === "inbox" ? "bg-naqsh-primary text-white" : "border"}`}
-          >
-            {t("inbox")}
-          </button>
-          <button
-            type="button"
-            onClick={() => setBox("sent")}
-            className={`px-3 py-1 rounded-lg ${box === "sent" ? "bg-naqsh-primary text-white" : "border"}`}
-          >
-            {t("sent")}
-          </button>
-        </div>
-      </div>
+    <PageSection>
+      <PageHeader
+        title={t("title")}
+        actions={
+          <div className="flex gap-2">
+            <Button
+              variant={box === "inbox" ? "primary" : "outline"}
+              size="sm"
+              onClick={() => setBox("inbox")}
+            >
+              {t("inbox")}
+            </Button>
+            <Button
+              variant={box === "sent" ? "primary" : "outline"}
+              size="sm"
+              onClick={() => setBox("sent")}
+            >
+              {t("sent")}
+            </Button>
+          </div>
+        }
+      />
 
       <PermissionGate permission="messages.send">
-        <form onSubmit={send} className="bg-white p-4 rounded-xl border space-y-3">
-          <h3 className="font-semibold text-naqsh-primary">{t("compose")}</h3>
-          <p className="text-xs text-gray-500">{t("centerOnlyHint")}</p>
-          <MessageRecipientSelect value={recipient} onChange={setRecipient} />
-          <input
-            className="w-full border rounded-lg px-3 py-2"
-            placeholder={t("subject")}
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            required
-          />
-          <textarea
-            className="w-full border rounded-lg px-3 py-2"
-            rows={3}
-            placeholder={t("body")}
-            value={body}
-            onChange={(e) => setBody(e.target.value)}
-            required
-          />
-          {error && <p className="text-sm text-red-600">{error}</p>}
-          <button
-            type="submit"
-            disabled={!recipient}
-            className="px-4 py-2 bg-naqsh-primary text-white rounded-lg disabled:opacity-50"
-          >
-            {t("send")}
-          </button>
-        </form>
+        <Card>
+          <CardBody>
+            <form onSubmit={send} className="space-y-3">
+              <CardTitle>{t("compose")}</CardTitle>
+              <CardDescription>{t("centerOnlyHint")}</CardDescription>
+              <MessageRecipientSelect value={recipient} onChange={setRecipient} />
+              <Input
+                placeholder={t("subject")}
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                required
+              />
+              <Textarea
+                rows={3}
+                placeholder={t("body")}
+                value={body}
+                onChange={(e) => setBody(e.target.value)}
+                required
+              />
+              {error && <Alert variant="danger">{error}</Alert>}
+              <Button type="submit" disabled={!recipient}>
+                {t("send")}
+              </Button>
+            </form>
+          </CardBody>
+        </Card>
       </PermissionGate>
 
       {loading ? (
-        <p className="text-gray-400">{t("loading")}</p>
+        <div className="space-y-2">
+          {Array.from({ length: 3 }).map((_, i) => (
+            <CardSkeleton key={i} />
+          ))}
+        </div>
+      ) : items.length === 0 ? (
+        <EmptyState title={t("empty")} />
       ) : (
         <div className="space-y-2">
           {items.map((m) => (
-            <div
+            <Card
               key={m.id}
-              className={`bg-white border rounded-xl p-4 ${!m.is_read && box === "inbox" ? "border-naqsh-accent" : ""}`}
+              className={cn(!m.is_read && box === "inbox" && "border-naqsh-accent")}
             >
-              <div className="flex justify-between text-sm mb-1">
-                <span className="font-semibold">{m.title}</span>
-                <span className="text-gray-400">{new Date(m.sent_at).toLocaleString()}</span>
-              </div>
-              <p className="text-sm text-gray-600 mb-2">{m.body}</p>
-              <p className="text-xs text-gray-400">
-                {box === "inbox" ? m.sender_name : m.recipient_name}
-              </p>
-            </div>
+              <CardBody>
+                <div className="flex justify-between text-small mb-1">
+                  <span className="font-semibold">{m.title}</span>
+                  <span className="text-muted-foreground">{new Date(m.sent_at).toLocaleString()}</span>
+                </div>
+                <p className="text-small text-muted-foreground mb-2">{m.body}</p>
+                <p className="text-caption text-muted-foreground">
+                  {box === "inbox" ? m.sender_name : m.recipient_name}
+                </p>
+              </CardBody>
+            </Card>
           ))}
-          {items.length === 0 && <p className="text-gray-400">{t("empty")}</p>}
         </div>
       )}
-    </div>
+    </PageSection>
   );
 }

@@ -2,6 +2,25 @@
 
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
+import {
+  Button,
+  Card,
+  CardBody,
+  DataTable,
+  EmptyState,
+  FormField,
+  Input,
+  Label,
+  PageHeader,
+  PageSection,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+  TableSkeleton,
+} from "@/components/ui";
 import { apiFetch } from "@/lib/api";
 
 type AuditRow = {
@@ -41,80 +60,81 @@ export default function AuditPage() {
   }, []);
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h2 className="text-2xl font-bold text-naqsh-primary">{t("title")}</h2>
-        <p className="text-gray-600 text-sm mt-1">{t("subtitle")}</p>
-      </div>
+    <PageSection>
+      <PageHeader title={t("title")} description={t("subtitle")} />
 
-      <div className="bg-white rounded-xl border p-4 flex flex-wrap gap-3 items-end">
-        <div>
-          <label className="block text-xs font-medium mb-1">{t("filterAction")}</label>
-          <input
-            className="border rounded-lg px-3 py-2 text-sm"
-            value={actionFilter}
-            onChange={(e) => setActionFilter(e.target.value)}
-            placeholder="lesson.generate"
-          />
-        </div>
-        <div>
-          <label className="block text-xs font-medium mb-1">{t("filterResource")}</label>
-          <input
-            className="border rounded-lg px-3 py-2 text-sm"
-            value={resourceFilter}
-            onChange={(e) => setResourceFilter(e.target.value)}
-            placeholder="course"
-          />
-        </div>
-        <button
-          type="button"
-          onClick={load}
-          className="bg-naqsh-primary text-white px-4 py-2 rounded-lg text-sm"
-        >
-          {t("apply")}
-        </button>
-      </div>
+      <Card>
+        <CardBody>
+          <div className="flex flex-wrap gap-3 items-end">
+            <FormField>
+              <Label>{t("filterAction")}</Label>
+              <Input
+                value={actionFilter}
+                onChange={(e) => setActionFilter(e.target.value)}
+                placeholder="lesson.generate"
+              />
+            </FormField>
+            <FormField>
+              <Label>{t("filterResource")}</Label>
+              <Input
+                value={resourceFilter}
+                onChange={(e) => setResourceFilter(e.target.value)}
+                placeholder="course"
+              />
+            </FormField>
+            <Button type="button" onClick={load}>
+              {t("apply")}
+            </Button>
+          </div>
+        </CardBody>
+      </Card>
 
       {loading ? (
-        <p className="text-gray-500">{t("loading")}</p>
+        <DataTable>
+          <TableSkeleton rows={8} cols={5} />
+        </DataTable>
       ) : rows.length === 0 ? (
-        <p className="text-gray-500">{t("empty")}</p>
+        <DataTable>
+          <EmptyState title={t("empty")} />
+        </DataTable>
       ) : (
-        <div className="bg-white rounded-xl border overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead className="bg-gray-50 text-left">
-              <tr>
-                <th className="px-4 py-3">{t("time")}</th>
-                <th className="px-4 py-3">{t("user")}</th>
-                <th className="px-4 py-3">{t("action")}</th>
-                <th className="px-4 py-3">{t("resource")}</th>
-                <th className="px-4 py-3">{t("details")}</th>
-              </tr>
-            </thead>
-            <tbody>
+        <DataTable>
+          <Table className="min-w-[800px]">
+            <TableHeader>
+              <TableRow>
+                <TableHead>{t("time")}</TableHead>
+                <TableHead>{t("user")}</TableHead>
+                <TableHead>{t("action")}</TableHead>
+                <TableHead>{t("resource")}</TableHead>
+                <TableHead>{t("details")}</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
               {rows.map((row) => (
-                <tr key={row.id} className="border-t">
-                  <td className="px-4 py-3 whitespace-nowrap text-xs text-gray-500">
+                <TableRow key={row.id}>
+                  <TableCell className="whitespace-nowrap text-caption text-muted-foreground">
                     {new Date(row.created_at).toLocaleString()}
-                  </td>
-                  <td className="px-4 py-3">
+                  </TableCell>
+                  <TableCell>
                     <div>{row.username || "—"}</div>
-                    <div className="text-xs text-gray-400">{row.user_role}</div>
-                  </td>
-                  <td className="px-4 py-3 font-mono text-xs">{row.action}</td>
-                  <td className="px-4 py-3">
+                    <div className="text-caption text-muted-foreground">{row.user_role}</div>
+                  </TableCell>
+                  <TableCell className="font-mono text-caption">{row.action}</TableCell>
+                  <TableCell>
                     <div>{row.resource_type}</div>
-                    <div className="text-xs text-gray-400 truncate max-w-[120px]">{row.resource_id}</div>
-                  </td>
-                  <td className="px-4 py-3 text-xs text-gray-600 max-w-md truncate">
+                    <div className="text-caption text-muted-foreground truncate max-w-[120px]">
+                      {row.resource_id}
+                    </div>
+                  </TableCell>
+                  <TableCell className="text-caption text-muted-foreground max-w-md truncate">
                     {row.details ? JSON.stringify(row.details) : "—"}
-                  </td>
-                </tr>
+                  </TableCell>
+                </TableRow>
               ))}
-            </tbody>
-          </table>
-        </div>
+            </TableBody>
+          </Table>
+        </DataTable>
       )}
-    </div>
+    </PageSection>
   );
 }

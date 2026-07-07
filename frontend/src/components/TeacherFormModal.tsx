@@ -1,9 +1,19 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { apiFetch } from "@/lib/api";
 import { CredentialsRevealModal } from "@/components/CredentialsRevealModal";
+import {
+  Alert,
+  Button,
+  FormActions,
+  FormField,
+  FormGrid,
+  Input,
+  Label,
+  Modal,
+} from "@/components/ui";
 
 type Teacher = {
   id: string;
@@ -39,13 +49,6 @@ export function TeacherFormModal({ centerId, teacher, onClose, onSaved }: Props)
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [credentials, setCredentials] = useState<Credentials | null>(null);
-
-  useEffect(() => {
-    document.body.style.overflow = "hidden";
-    return () => {
-      document.body.style.overflow = "";
-    };
-  }, []);
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -108,68 +111,55 @@ export function TeacherFormModal({ centerId, teacher, onClose, onSaved }: Props)
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-      <div className="bg-white rounded-xl shadow-xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
-        <form onSubmit={submit} className="p-6 space-y-4">
-          <h3 className="text-lg font-semibold text-naqsh-primary">
-            {isEdit ? t("editTitle") : t("addTitle")}
-          </h3>
-          {!isEdit && <p className="text-xs text-gray-500">{t("credentialsHint")}</p>}
-          <div>
-            <label className="block text-sm font-medium mb-1">{t("name")}</label>
-            <input
-              className="w-full border rounded-lg px-3 py-2"
-              value={fullName}
-              onChange={(e) => setFullName(e.target.value)}
-              required
+    <Modal
+      onClose={onClose}
+      title={isEdit ? t("editTitle") : t("addTitle")}
+      description={!isEdit ? t("credentialsHint") : undefined}
+    >
+      <form onSubmit={submit} className="space-y-4">
+        <FormField>
+          <Label>{t("name")}</Label>
+          <Input value={fullName} onChange={(e) => setFullName(e.target.value)} required />
+        </FormField>
+        <FormGrid>
+          <FormField>
+            <Label>{t("phone")}</Label>
+            <Input
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              placeholder="+998901234567"
             />
-          </div>
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="block text-sm font-medium mb-1">{t("phone")}</label>
-              <input
-                className="w-full border rounded-lg px-3 py-2"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                placeholder="+998901234567"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-1">{t("experience")}</label>
-              <input
-                type="number"
-                min={0}
-                className="w-full border rounded-lg px-3 py-2"
-                value={yearsOfExperience}
-                onChange={(e) => setYearsOfExperience(Number(e.target.value))}
-              />
-            </div>
-          </div>
-          <div>
-            <label className="block text-sm font-medium mb-1">{t("specialization")}</label>
-            <input
-              className="w-full border rounded-lg px-3 py-2"
-              value={specialization}
-              onChange={(e) => setSpecialization(e.target.value)}
+          </FormField>
+          <FormField>
+            <Label>{t("experience")}</Label>
+            <Input
+              type="number"
+              min={0}
+              value={yearsOfExperience}
+              onChange={(e) => setYearsOfExperience(Number(e.target.value))}
             />
-          </div>
-          {isEdit && (
-            <label className="flex items-center gap-2 text-sm">
-              <input type="checkbox" checked={isActive} onChange={(e) => setIsActive(e.target.checked)} />
-              {t("active")}
-            </label>
-          )}
-          {error && <p className="text-sm text-red-600">{error}</p>}
-          <div className="flex gap-2 justify-end pt-2">
-            <button type="button" onClick={onClose} className="px-4 py-2 rounded-lg border">
-              {t("cancel")}
-            </button>
-            <button type="submit" disabled={saving} className="px-4 py-2 rounded-lg bg-naqsh-primary text-white disabled:opacity-50">
-              {saving ? t("saving") : t("save")}
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
+          </FormField>
+        </FormGrid>
+        <FormField>
+          <Label>{t("specialization")}</Label>
+          <Input value={specialization} onChange={(e) => setSpecialization(e.target.value)} />
+        </FormField>
+        {isEdit && (
+          <Label className="flex items-center gap-2 mb-0 cursor-pointer">
+            <input type="checkbox" checked={isActive} onChange={(e) => setIsActive(e.target.checked)} />
+            {t("active")}
+          </Label>
+        )}
+        {error && <Alert variant="danger">{error}</Alert>}
+        <FormActions>
+          <Button type="button" variant="secondary" onClick={onClose}>
+            {t("cancel")}
+          </Button>
+          <Button type="submit" loading={saving}>
+            {saving ? t("saving") : t("save")}
+          </Button>
+        </FormActions>
+      </form>
+    </Modal>
   );
 }

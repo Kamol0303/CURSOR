@@ -1,8 +1,18 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { apiFetch } from "@/lib/api";
+import {
+  Alert,
+  Button,
+  FormActions,
+  FormField,
+  FormGrid,
+  Input,
+  Label,
+  Modal,
+} from "@/components/ui";
 
 type Props = {
   onClose: () => void;
@@ -25,13 +35,6 @@ export function CenterOnboardModal({ onClose, onSaved }: Props) {
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [result, setResult] = useState<OnboardResult | null>(null);
-
-  useEffect(() => {
-    document.body.style.overflow = "hidden";
-    return () => {
-      document.body.style.overflow = "";
-    };
-  }, []);
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -63,104 +66,75 @@ export function CenterOnboardModal({ onClose, onSaved }: Props) {
 
   if (result) {
     return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-        <div className="bg-white rounded-xl shadow-xl w-full max-w-lg p-6 space-y-4">
-          <h3 className="text-lg font-semibold text-naqsh-primary">{t("onboardSuccessTitle")}</h3>
-          <p className="text-sm text-gray-600">{t("onboardSuccessHint")}</p>
-          <dl className="text-sm space-y-2 bg-gray-50 rounded-lg p-4">
-            <div>
-              <dt className="text-gray-500">{t("name")}</dt>
-              <dd className="font-medium">{result.center.name}</dd>
-            </div>
-            <div>
-              <dt className="text-gray-500">{t("onboardDirectorLogin")}</dt>
-              <dd className="font-mono">{result.director_username}</dd>
-            </div>
-            <div>
-              <dt className="text-gray-500">{t("onboardTempPassword")}</dt>
-              <dd className="font-mono break-all text-naqsh-primary">{result.temporary_password}</dd>
-            </div>
-          </dl>
-          <button
-            type="button"
-            onClick={onClose}
-            className="w-full py-2 rounded-lg bg-naqsh-primary text-white"
-          >
-            {t("onboardDone")}
-          </button>
-        </div>
-      </div>
+      <Modal
+        onClose={onClose}
+        title={t("onboardSuccessTitle")}
+        description={t("onboardSuccessHint")}
+      >
+        <dl className="text-small space-y-2 bg-muted rounded-lg p-4">
+          <div>
+            <dt className="text-muted-foreground">{t("name")}</dt>
+            <dd className="font-medium">{result.center.name}</dd>
+          </div>
+          <div>
+            <dt className="text-muted-foreground">{t("onboardDirectorLogin")}</dt>
+            <dd className="font-mono">{result.director_username}</dd>
+          </div>
+          <div>
+            <dt className="text-muted-foreground">{t("onboardTempPassword")}</dt>
+            <dd className="font-mono break-all text-naqsh-primary dark:text-naqsh-accent">
+              {result.temporary_password}
+            </dd>
+          </div>
+        </dl>
+        <Button type="button" onClick={onClose} className="w-full mt-4">
+          {t("onboardDone")}
+        </Button>
+      </Modal>
     );
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-      <div className="bg-white rounded-xl shadow-xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
-        <form onSubmit={submit} className="p-6 space-y-4">
-          <h3 className="text-lg font-semibold text-naqsh-primary">{t("onboardTitle")}</h3>
-          <p className="text-sm text-gray-500">{t("onboardSubtitle")}</p>
-          <div>
-            <label className="block text-sm font-medium mb-1">{t("name")}</label>
-            <input
-              className="w-full border rounded-lg px-3 py-2"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              required
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium mb-1">{t("onboardDirectorLogin")}</label>
-            <input
-              className="w-full border rounded-lg px-3 py-2 font-mono"
-              value={directorUsername}
-              onChange={(e) => setDirectorUsername(e.target.value)}
-              pattern="[a-zA-Z0-9._-]{3,100}"
-              required
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium mb-1">{t("director")}</label>
-            <input
-              className="w-full border rounded-lg px-3 py-2"
-              value={directorFullName}
-              onChange={(e) => setDirectorFullName(e.target.value)}
-              required
-            />
-          </div>
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="block text-sm font-medium mb-1">{t("email")}</label>
-              <input
-                type="email"
-                className="w-full border rounded-lg px-3 py-2"
-                value={directorEmail}
-                onChange={(e) => setDirectorEmail(e.target.value)}
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-1">{t("phone")}</label>
-              <input
-                className="w-full border rounded-lg px-3 py-2"
-                value={directorPhone}
-                onChange={(e) => setDirectorPhone(e.target.value)}
-              />
-            </div>
-          </div>
-          {error && <p className="text-sm text-red-600">{error}</p>}
-          <div className="flex gap-2 justify-end pt-2">
-            <button type="button" onClick={onClose} className="px-4 py-2 rounded-lg border">
-              {t("cancel")}
-            </button>
-            <button
-              type="submit"
-              disabled={saving}
-              className="px-4 py-2 rounded-lg bg-naqsh-primary text-white disabled:opacity-50"
-            >
-              {saving ? t("saving") : t("onboardSubmit")}
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
+    <Modal onClose={onClose} title={t("onboardTitle")} description={t("onboardSubtitle")}>
+      <form onSubmit={submit} className="space-y-4">
+        <FormField>
+          <Label>{t("name")}</Label>
+          <Input value={name} onChange={(e) => setName(e.target.value)} required />
+        </FormField>
+        <FormField>
+          <Label>{t("onboardDirectorLogin")}</Label>
+          <Input
+            className="font-mono"
+            value={directorUsername}
+            onChange={(e) => setDirectorUsername(e.target.value)}
+            pattern="[a-zA-Z0-9._-]{3,100}"
+            required
+          />
+        </FormField>
+        <FormField>
+          <Label>{t("director")}</Label>
+          <Input value={directorFullName} onChange={(e) => setDirectorFullName(e.target.value)} required />
+        </FormField>
+        <FormGrid>
+          <FormField>
+            <Label>{t("email")}</Label>
+            <Input type="email" value={directorEmail} onChange={(e) => setDirectorEmail(e.target.value)} />
+          </FormField>
+          <FormField>
+            <Label>{t("phone")}</Label>
+            <Input value={directorPhone} onChange={(e) => setDirectorPhone(e.target.value)} />
+          </FormField>
+        </FormGrid>
+        {error && <Alert variant="danger">{error}</Alert>}
+        <FormActions>
+          <Button type="button" variant="secondary" onClick={onClose}>
+            {t("cancel")}
+          </Button>
+          <Button type="submit" loading={saving}>
+            {saving ? t("saving") : t("onboardSubmit")}
+          </Button>
+        </FormActions>
+      </form>
+    </Modal>
   );
 }

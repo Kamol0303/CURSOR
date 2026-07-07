@@ -2,7 +2,13 @@
 
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
-
+import {
+  Button,
+  FormField,
+  Input,
+  Label,
+  Spinner,
+} from "@/components/ui";
 import { getApiBaseUrl } from "@/lib/api";
 import { setAuthCookie } from "@/lib/auth-cookie";
 
@@ -90,7 +96,7 @@ export function MfaSetupForm({ setupToken, accessToken, onComplete, onError }: P
   };
 
   if (initLoading) {
-    return <p className="text-sm text-gray-500">{t("mfaSetupLoading")}</p>;
+    return <Spinner label={t("mfaSetupLoading")} className="py-4" />;
   }
 
   if (!setup) {
@@ -100,37 +106,31 @@ export function MfaSetupForm({ setupToken, accessToken, onComplete, onError }: P
   return (
     <form onSubmit={handleConfirm} className="space-y-4">
       <h2 className="font-semibold text-naqsh-primary">{t("mfaSetupTitle")}</h2>
-      <p className="text-sm text-gray-600 dark:text-gray-400">{t("mfaSetupInstructions")}</p>
-      <div className="rounded-lg bg-gray-50 dark:bg-gray-800 p-3 text-sm font-mono break-all">
-        <div className="text-xs text-gray-500 mb-1">{t("mfaSetupSecret")}</div>
+      <p className="text-small text-muted-foreground">{t("mfaSetupInstructions")}</p>
+      <div className="rounded-lg bg-muted p-3 text-small font-mono break-all">
+        <div className="text-caption text-muted-foreground mb-1">{t("mfaSetupSecret")}</div>
         {setup.secret}
       </div>
-      <details className="text-xs text-gray-500">
+      <details className="text-caption text-muted-foreground">
         <summary className="cursor-pointer">{t("mfaSetupAdvanced")}</summary>
         <p className="mt-2 break-all font-mono">{setup.provisioning_uri}</p>
       </details>
-      <div>
-        <label htmlFor="mfa-setup-code" className="block text-sm font-medium mb-1">
-          {t("mfaCode")}
-        </label>
-        <input
+      <FormField>
+        <Label htmlFor="mfa-setup-code">{t("mfaCode")}</Label>
+        <Input
           id="mfa-setup-code"
           type="text"
           inputMode="numeric"
           autoComplete="one-time-code"
           value={code}
           onChange={(e) => setCode(e.target.value)}
-          className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-naqsh-primary/30 focus:border-naqsh-primary outline-none tracking-widest text-center"
+          className="tracking-widest text-center"
           required
         />
-      </div>
-      <button
-        type="submit"
-        disabled={loading}
-        className="w-full py-2.5 bg-naqsh-accent text-white rounded-lg font-medium hover:opacity-90 disabled:opacity-50 transition-colors"
-      >
+      </FormField>
+      <Button type="submit" loading={loading} className="w-full" variant="accent">
         {t("mfaSetupConfirm")}
-      </button>
+      </Button>
     </form>
   );
 }

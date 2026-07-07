@@ -6,6 +6,18 @@ import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { GenerateExamModal } from "@/components/GenerateExamModal";
 import { PermissionGate } from "@/components/PermissionGate";
+import {
+  Badge,
+  Button,
+  Card,
+  CardBody,
+  CardDescription,
+  CardTitle,
+  EmptyState,
+  PageHeader,
+  PageSection,
+  CardSkeleton,
+} from "@/components/ui";
 import { apiFetch } from "@/lib/api";
 
 type Exam = {
@@ -42,49 +54,47 @@ export default function ExamsPage() {
   }, [load]);
 
   return (
-    <div className="space-y-4">
-      <div className="flex justify-between items-center flex-wrap gap-2">
-        <div>
-          <h2 className="text-xl font-bold text-naqsh-primary">{t("title")}</h2>
-          <p className="text-sm text-gray-500">{t("subtitle")}</p>
-        </div>
-        <PermissionGate permission="exams.create">
-          <button
-            type="button"
-            onClick={() => setShowGenerate(true)}
-            disabled={subjects.length === 0}
-            className="px-4 py-2 bg-naqsh-accent text-white rounded-lg text-sm font-medium disabled:opacity-50"
-          >
-            {t("generate")}
-          </button>
-        </PermissionGate>
-      </div>
+    <PageSection>
+      <PageHeader
+        title={t("title")}
+        description={t("subtitle")}
+        actions={
+          <PermissionGate permission="exams.create">
+            <Button variant="accent" onClick={() => setShowGenerate(true)} disabled={subjects.length === 0}>
+              {t("generate")}
+            </Button>
+          </PermissionGate>
+        }
+      />
+
       {loading ? (
-        <p className="text-gray-400">{t("loading")}</p>
+        <div className="grid gap-3 md:grid-cols-2">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <CardSkeleton key={i} />
+          ))}
+        </div>
+      ) : exams.length === 0 ? (
+        <EmptyState title={t("empty")} />
       ) : (
         <div className="grid gap-3 md:grid-cols-2">
           {exams.map((exam) => (
-            <Link
-              key={exam.id}
-              href={`/dashboard/exams/${exam.id}`}
-              className="bg-white border rounded-xl p-4 hover:ring-2 hover:ring-naqsh-accent/40 block"
-            >
-              <h3 className="font-semibold">{exam.title}</h3>
-              <p className="text-sm text-gray-500">
-                {t("questions")}: {exam.question_count} · {t("passScore")}: {exam.pass_score}%
-              </p>
-              <span
-                className={`text-xs px-2 py-0.5 rounded ${
-                  exam.is_published ? "bg-green-100 text-green-800" : "bg-gray-100"
-                }`}
-              >
-                {exam.is_published ? t("published") : t("draft")}
-              </span>
+            <Link key={exam.id} href={`/dashboard/exams/${exam.id}`}>
+              <Card hover className="h-full">
+                <CardBody>
+                  <CardTitle>{exam.title}</CardTitle>
+                  <CardDescription>
+                    {t("questions")}: {exam.question_count} · {t("passScore")}: {exam.pass_score}%
+                  </CardDescription>
+                  <Badge variant={exam.is_published ? "success" : "default"} className="mt-2">
+                    {exam.is_published ? t("published") : t("draft")}
+                  </Badge>
+                </CardBody>
+              </Card>
             </Link>
           ))}
-          {exams.length === 0 && <p className="text-gray-400">{t("empty")}</p>}
         </div>
       )}
+
       {showGenerate && (
         <GenerateExamModal
           subjects={subjects}
@@ -92,6 +102,6 @@ export default function ExamsPage() {
           onGenerated={(examId) => router.push(`/dashboard/exams/${examId}`)}
         />
       )}
-    </div>
+    </PageSection>
   );
 }

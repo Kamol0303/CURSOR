@@ -2,6 +2,27 @@
 
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
+import {
+  Badge,
+  Button,
+  Card,
+  CardBody,
+  DataTable,
+  EmptyState,
+  FormField,
+  FormGrid,
+  Input,
+  Label,
+  PageHeader,
+  PageSection,
+  Select,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui";
 import { apiFetch } from "@/lib/api";
 
 type Group = { id: string; name: string };
@@ -55,69 +76,91 @@ export default function TeacherAttendancePage() {
   const statusFor = (studentId: string) => records.find((r) => r.student_id === studentId)?.status;
 
   return (
-    <div className="space-y-4 max-w-3xl">
-      <h2 className="text-xl font-bold text-naqsh-primary">{t("nav.attendance")}</h2>
-      <div className="flex flex-wrap gap-3">
-        <select
-          className="border rounded-lg px-3 py-2"
-          value={groupId}
-          onChange={(e) => setGroupId(e.target.value)}
-        >
-          {groups.map((g) => (
-            <option key={g.id} value={g.id}>
-              {g.name}
-            </option>
-          ))}
-        </select>
-        <input
-          type="date"
-          className="border rounded-lg px-3 py-2"
-          value={sessionDate}
-          onChange={(e) => setSessionDate(e.target.value)}
-        />
-      </div>
-      <div className="bg-white rounded-xl border overflow-hidden">
-        <table className="w-full text-sm">
-          <thead className="bg-gray-50 border-b">
-            <tr>
-              <th className="text-left p-3">{ta("student")}</th>
-              <th className="text-left p-3">{ta("status")}</th>
-              <th className="p-3">{ta("actions")}</th>
-            </tr>
-          </thead>
-          <tbody>
-            {members.map((s) => (
-              <tr key={s.student_id} className="border-b">
-                <td className="p-3">{s.full_name}</td>
-                <td className="p-3">{statusFor(s.student_id) || "—"}</td>
-                <td className="p-3 space-x-1">
-                  <button
-                    type="button"
-                    className="text-xs px-2 py-1 bg-green-100 rounded"
-                    onClick={() => mark(s.student_id, "present")}
-                  >
-                    {ta("present")}
-                  </button>
-                  <button
-                    type="button"
-                    className="text-xs px-2 py-1 bg-red-100 rounded"
-                    onClick={() => mark(s.student_id, "absent")}
-                  >
-                    {ta("absent")}
-                  </button>
-                </td>
-              </tr>
-            ))}
+    <PageSection className="max-w-3xl">
+      <PageHeader title={t("nav.attendance")} />
+
+      <Card>
+        <CardBody>
+          <FormGrid>
+            <FormField>
+              <Label>{t("nav.groups")}</Label>
+              <Select value={groupId} onChange={(e) => setGroupId(e.target.value)}>
+                {groups.map((g) => (
+                  <option key={g.id} value={g.id}>
+                    {g.name}
+                  </option>
+                ))}
+              </Select>
+            </FormField>
+            <FormField>
+              <Input
+                type="date"
+                aria-label={ta("status")}
+                value={sessionDate}
+                onChange={(e) => setSessionDate(e.target.value)}
+              />
+            </FormField>
+          </FormGrid>
+        </CardBody>
+      </Card>
+
+      <DataTable>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>{ta("student")}</TableHead>
+              <TableHead>{ta("status")}</TableHead>
+              <TableHead className="text-right">{ta("actions")}</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {members.map((s) => {
+              const status = statusFor(s.student_id);
+              return (
+                <TableRow key={s.student_id}>
+                  <TableCell className="font-medium">{s.full_name}</TableCell>
+                  <TableCell>
+                    {status ? (
+                      <Badge variant={status === "present" ? "success" : "danger"}>
+                        {status}
+                      </Badge>
+                    ) : (
+                      "—"
+                    )}
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <div className="flex justify-end gap-2">
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant="outline"
+                        onClick={() => mark(s.student_id, "present")}
+                      >
+                        {ta("present")}
+                      </Button>
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant="danger"
+                        onClick={() => mark(s.student_id, "absent")}
+                      >
+                        {ta("absent")}
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              );
+            })}
             {members.length === 0 && (
-              <tr>
-                <td colSpan={3} className="p-6 text-center text-gray-400">
-                  {t("noStudents")}
-                </td>
-              </tr>
+              <TableRow>
+                <TableCell colSpan={3}>
+                  <EmptyState title={t("noStudents")} className="py-8" />
+                </TableCell>
+              </TableRow>
             )}
-          </tbody>
-        </table>
-      </div>
-    </div>
+          </TableBody>
+        </Table>
+      </DataTable>
+    </PageSection>
   );
 }

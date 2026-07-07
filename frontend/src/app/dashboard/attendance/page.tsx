@@ -5,6 +5,23 @@ import { useTranslations } from "next-intl";
 import { apiFetch } from "@/lib/api";
 import { PermissionGate } from "@/components/PermissionGate";
 import { useAuth } from "@/contexts/AuthContext";
+import {
+  Badge,
+  Button,
+  Card,
+  CardBody,
+  DataTable,
+  PageHeader,
+  PageSection,
+  Select,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+  Input,
+} from "@/components/ui";
 
 type Group = { id: string; name: string };
 type Student = { id: string; full_name: string };
@@ -59,55 +76,88 @@ export default function AttendancePage() {
 
   const statusFor = (studentId: string) => records.find((r) => r.student_id === studentId)?.status;
 
+  const statusVariant = (status: string | undefined) => {
+    if (status === "present") return "success" as const;
+    if (status === "absent") return "danger" as const;
+    return "default" as const;
+  };
+
   return (
-    
-      <div className="space-y-4">
-        <h2 className="text-xl font-bold text-naqsh-primary">{t("title")}</h2>
-        <div className="flex flex-wrap gap-3">
-          <select className="border rounded-lg px-3 py-2" value={groupId} onChange={(e) => setGroupId(e.target.value)}>
-            {groups.map((g) => (
-              <option key={g.id} value={g.id}>{g.name}</option>
-            ))}
-          </select>
-          <input type="date" className="border rounded-lg px-3 py-2" value={sessionDate} onChange={(e) => setSessionDate(e.target.value)} />
-          <PermissionGate permission="attendance.mark">
-            <button type="button" onClick={createQr} className="px-4 py-2 bg-naqsh-accent text-white rounded-lg text-sm">
-              {t("qrSession")}
-            </button>
-          </PermissionGate>
-        </div>
-        {qrPayload && (
-          <div className="bg-white border rounded-xl p-4 text-sm break-all">
-            <p className="font-medium mb-1">{t("qrCode")}</p>
-            <code>{qrPayload}</code>
-          </div>
-        )}
-        <div className="bg-white rounded-xl border overflow-hidden">
-          <table className="w-full text-sm">
-            <thead className="bg-gray-50 border-b">
-              <tr>
-                <th className="text-left p-3">{t("student")}</th>
-                <th className="text-left p-3">{t("status")}</th>
-                {canMark && <th className="p-3">{t("actions")}</th>}
-              </tr>
-            </thead>
-            <tbody>
-              {students.map((s) => (
-                <tr key={s.id} className="border-b">
-                  <td className="p-3">{s.full_name}</td>
-                  <td className="p-3">{statusFor(s.id) || "—"}</td>
-                  {canMark && (
-                    <td className="p-3 space-x-1">
-                      <button type="button" className="text-xs px-2 py-1 bg-green-100 rounded" onClick={() => mark(s.id, "present")}>+</button>
-                      <button type="button" className="text-xs px-2 py-1 bg-red-100 rounded" onClick={() => mark(s.id, "absent")}>−</button>
-                    </td>
-                  )}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+    <PageSection>
+      <PageHeader title={t("title")} />
+
+      <div className="flex flex-wrap gap-3">
+        <Select value={groupId} onChange={(e) => setGroupId(e.target.value)} className="w-auto min-w-[180px]">
+          {groups.map((g) => (
+            <option key={g.id} value={g.id}>
+              {g.name}
+            </option>
+          ))}
+        </Select>
+        <Input
+          type="date"
+          className="w-auto"
+          value={sessionDate}
+          onChange={(e) => setSessionDate(e.target.value)}
+        />
+        <PermissionGate permission="attendance.mark">
+          <Button variant="accent" onClick={createQr}>
+            {t("qrSession")}
+          </Button>
+        </PermissionGate>
       </div>
-    
+
+      {qrPayload && (
+        <Card>
+          <CardBody>
+            <p className="font-medium mb-1 text-small">{t("qrCode")}</p>
+            <code className="text-caption break-all">{qrPayload}</code>
+          </CardBody>
+        </Card>
+      )}
+
+      <DataTable>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>{t("student")}</TableHead>
+              <TableHead>{t("status")}</TableHead>
+              {canMark && <TableHead className="text-right">{t("actions")}</TableHead>}
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {students.map((s) => (
+              <TableRow key={s.id}>
+                <TableCell className="font-medium">{s.full_name}</TableCell>
+                <TableCell>
+                  {statusFor(s.id) ? (
+                    <Badge variant={statusVariant(statusFor(s.id))}>{statusFor(s.id)}</Badge>
+                  ) : (
+                    "—"
+                  )}
+                </TableCell>
+                {canMark && (
+                  <TableCell className="text-right">
+                    <div className="flex justify-end gap-1">
+                      <Button variant="ghost" size="sm" onClick={() => mark(s.id, "present")}>
+                        +
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="text-danger hover:text-danger"
+                        onClick={() => mark(s.id, "absent")}
+                      >
+                        −
+                      </Button>
+                    </div>
+                  </TableCell>
+                )}
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </DataTable>
+    </PageSection>
   );
 }

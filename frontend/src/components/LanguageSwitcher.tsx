@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useLocale } from "next-intl";
+import { cn } from "@/lib/cn";
 
 const LOCALES = [
   { code: "uz", label: "UZ" },
@@ -19,17 +20,23 @@ export function LanguageSwitcher() {
   };
 
   return (
-    <div className="flex items-center gap-1 text-sm font-medium" role="group" aria-label="Language">
+    <div
+      className="flex items-center gap-0.5 p-0.5 rounded-lg bg-muted border border-border"
+      role="group"
+      aria-label="Language"
+    >
       {LOCALES.map(({ code, label }) => (
         <button
           key={code}
           type="button"
           onClick={() => switchLocale(code)}
-          className={`px-2 py-1 rounded transition-colors ${
+          className={cn(
+            "px-2.5 py-1 rounded-md text-caption font-medium transition-all duration-fast",
             locale === code
-              ? "bg-naqsh-primary text-white dark:bg-naqsh-accent dark:text-gray-900"
-              : "text-naqsh-primary hover:bg-naqsh-primary/10 dark:text-naqsh-accent dark:hover:bg-white/10"
-          }`}
+              ? "bg-surface dark:bg-card text-naqsh-primary dark:text-naqsh-accent shadow-sm"
+              : "text-muted-foreground hover:text-foreground",
+          )}
+          aria-pressed={locale === code}
         >
           {label}
         </button>

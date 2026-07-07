@@ -3,6 +3,13 @@
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { ChangePasswordForm } from "@/components/ChangePasswordForm";
+import {
+  Card,
+  CardBody,
+  CardTitle,
+  PageHeader,
+  PageSection,
+} from "@/components/ui";
 import { apiFetch } from "@/lib/api";
 
 type Profile = {
@@ -24,31 +31,41 @@ export default function TeacherProfilePage() {
   }, []);
 
   return (
-    <div className="space-y-6 max-w-lg">
-      <h2 className="text-xl font-bold text-naqsh-primary">{t("nav.profile")}</h2>
+    <PageSection className="max-w-lg">
+      <PageHeader title={t("nav.profile")} />
+
       {profile && (
-        <section className="bg-white rounded-xl border p-4 space-y-2 text-sm">
-          <p>
-            <span className="text-gray-500">{t("profileName")}:</span> {profile.full_name}
-          </p>
-          <p>
-            <span className="text-gray-500">{t("profileLogin")}:</span> {profile.username || "—"}
-          </p>
-          <p>
-            <span className="text-gray-500">{t("profileCenter")}:</span> {profile.center_name}
-          </p>
-          <p>
-            <span className="text-gray-500">{t("profilePhone")}:</span> {profile.phone || "—"}
-          </p>
-          <p>
-            <span className="text-gray-500">{t("profileSpec")}:</span> {profile.specialization || "—"}
-          </p>
-        </section>
+        <Card>
+          <CardBody className="space-y-3 text-small">
+            <div className="flex justify-between gap-4">
+              <span className="text-muted-foreground">{t("profileName")}</span>
+              <span className="text-foreground font-medium text-right">{profile.full_name}</span>
+            </div>
+            <div className="flex justify-between gap-4">
+              <span className="text-muted-foreground">{t("profileLogin")}</span>
+              <span className="text-foreground text-right">{profile.username || "—"}</span>
+            </div>
+            <div className="flex justify-between gap-4">
+              <span className="text-muted-foreground">{t("profileCenter")}</span>
+              <span className="text-foreground text-right">{profile.center_name}</span>
+            </div>
+            <div className="flex justify-between gap-4">
+              <span className="text-muted-foreground">{t("profilePhone")}</span>
+              <span className="text-foreground text-right">{profile.phone || "—"}</span>
+            </div>
+            <div className="flex justify-between gap-4">
+              <span className="text-muted-foreground">{t("profileSpec")}</span>
+              <span className="text-foreground text-right">{profile.specialization || "—"}</span>
+            </div>
+          </CardBody>
+        </Card>
       )}
-      <section className="bg-white rounded-xl border p-4">
-        <h3 className="font-semibold mb-4">{t("changePassword")}</h3>
-        <ChangePasswordForm />
-      </section>
-    </div>
+
+      <Card>
+        <CardBody>
+          <ChangePasswordForm />
+        </CardBody>
+      </Card>
+    </PageSection>
   );
 }

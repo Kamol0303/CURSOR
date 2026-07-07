@@ -3,6 +3,16 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
+import {
+  Badge,
+  Card,
+  CardBody,
+  CardTitle,
+  EmptyState,
+  PageHeader,
+  PageSection,
+  PageSkeleton,
+} from "@/components/ui";
 import { apiFetch } from "@/lib/api";
 
 type Profile = {
@@ -34,56 +44,59 @@ export default function TeacherDashboardPage() {
     );
   }, []);
 
+  if (loading) return <PageSkeleton />;
+
+  const totalStudents = groups.reduce((sum, g) => sum + g.enrollment_count, 0);
+
   return (
-    <div className="space-y-6 max-w-3xl">
-      <div>
-        <h2 className="text-2xl font-bold text-gray-900">{t("welcome")}</h2>
-        {profile && (
-          <p className="text-gray-500 mt-1">
-            {profile.full_name} · {profile.center_name}
-          </p>
-        )}
+    <PageSection className="max-w-3xl">
+      <PageHeader
+        title={t("welcome")}
+        description={
+          profile ? `${profile.full_name} · ${profile.center_name}` : undefined
+        }
+      />
+
+      <div className="grid gap-4 sm:grid-cols-2">
+        <Card>
+          <CardBody>
+            <p className="text-small text-muted-foreground">{t("myGroups")}</p>
+            <p className="text-3xl font-bold text-naqsh-primary mt-1">{groups.length}</p>
+          </CardBody>
+        </Card>
+        <Card>
+          <CardBody>
+            <p className="text-small text-muted-foreground">{t("totalStudents")}</p>
+            <p className="text-3xl font-bold text-naqsh-primary mt-1">{totalStudents}</p>
+          </CardBody>
+        </Card>
       </div>
-      {loading ? (
-        <p className="text-gray-400">{t("loading")}</p>
-      ) : (
-        <>
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div className="bg-white rounded-xl border p-4">
-              <p className="text-sm text-gray-500">{t("myGroups")}</p>
-              <p className="text-3xl font-bold text-naqsh-primary">{groups.length}</p>
-            </div>
-            <div className="bg-white rounded-xl border p-4">
-              <p className="text-sm text-gray-500">{t("totalStudents")}</p>
-              <p className="text-3xl font-bold text-naqsh-primary">
-                {groups.reduce((sum, g) => sum + g.enrollment_count, 0)}
-              </p>
-            </div>
-          </div>
-          <section className="bg-white rounded-xl border p-4">
-            <h3 className="font-semibold text-naqsh-primary mb-3">{t("quickGroups")}</h3>
-            {groups.length === 0 ? (
-              <p className="text-sm text-gray-400">{t("noGroups")}</p>
-            ) : (
-              <ul className="space-y-2">
-                {groups.map((g) => (
-                  <li key={g.id}>
-                    <Link
-                      href={`/teacher/groups/${g.id}`}
-                      className="text-sm text-naqsh-accent hover:underline"
-                    >
+
+      <Card>
+        <CardBody>
+          <CardTitle className="mb-4">{t("quickGroups")}</CardTitle>
+          {groups.length === 0 ? (
+            <EmptyState title={t("noGroups")} className="py-8" />
+          ) : (
+            <ul className="space-y-2">
+              {groups.map((g) => (
+                <li key={g.id}>
+                  <Link
+                    href={`/teacher/groups/${g.id}`}
+                    className="flex items-center justify-between gap-3 rounded-lg px-3 py-2.5 text-small transition-colors hover:bg-muted"
+                  >
+                    <span className="text-foreground font-medium">
                       {g.name}
                       {g.subject_name_uz ? ` · ${g.subject_name_uz}` : ""}
-                      {" "}
-                      ({g.enrollment_count})
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </section>
-        </>
-      )}
-    </div>
+                    </span>
+                    <Badge variant="primary">{g.enrollment_count}</Badge>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          )}
+        </CardBody>
+      </Card>
+    </PageSection>
   );
 }

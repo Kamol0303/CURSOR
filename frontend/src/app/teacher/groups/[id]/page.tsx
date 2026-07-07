@@ -4,6 +4,19 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useTranslations } from "next-intl";
+import {
+  DataTable,
+  EmptyState,
+  PageHeader,
+  PageSection,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+  TableSkeleton,
+} from "@/components/ui";
 import { apiFetch } from "@/lib/api";
 
 type Member = {
@@ -28,35 +41,42 @@ export default function TeacherGroupDetailPage() {
   }, [groupId]);
 
   return (
-    <div className="space-y-4 max-w-3xl">
-      <Link href="/teacher/groups" className="text-sm text-naqsh-accent hover:underline">
+    <PageSection className="max-w-3xl">
+      <Link
+        href="/teacher/groups"
+        className="inline-flex items-center text-small text-muted-foreground hover:text-foreground transition-colors"
+      >
         ← {t("backToGroups")}
       </Link>
-      <h2 className="text-xl font-bold text-naqsh-primary">{t("groupStudents")}</h2>
+
+      <PageHeader title={t("groupStudents")} />
+
       {loading ? (
-        <p className="text-gray-400">{t("loading")}</p>
+        <DataTable>
+          <TableSkeleton rows={5} cols={2} />
+        </DataTable>
       ) : members.length === 0 ? (
-        <p className="text-gray-400">{t("noStudents")}</p>
+        <EmptyState title={t("noStudents")} />
       ) : (
-        <div className="bg-white rounded-xl border overflow-hidden">
-          <table className="w-full text-sm">
-            <thead className="bg-gray-50 border-b">
-              <tr>
-                <th className="text-left p-3">{t("studentName")}</th>
-                <th className="text-left p-3">{t("grade")}</th>
-              </tr>
-            </thead>
-            <tbody>
+        <DataTable>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>{t("studentName")}</TableHead>
+                <TableHead>{t("grade")}</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
               {members.map((m) => (
-                <tr key={m.student_id} className="border-b last:border-0">
-                  <td className="p-3">{m.full_name}</td>
-                  <td className="p-3">{m.grade || "—"}</td>
-                </tr>
+                <TableRow key={m.student_id}>
+                  <TableCell className="font-medium">{m.full_name}</TableCell>
+                  <TableCell>{m.grade || "—"}</TableCell>
+                </TableRow>
               ))}
-            </tbody>
-          </table>
-        </div>
+            </TableBody>
+          </Table>
+        </DataTable>
       )}
-    </div>
+    </PageSection>
   );
 }

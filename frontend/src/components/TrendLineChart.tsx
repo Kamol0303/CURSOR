@@ -1,5 +1,7 @@
 "use client";
 
+import { Card, CardBody, CardDescription, CardTitle, EmptyState } from "@/components/ui";
+
 type Point = { label: string; value: number; is_forecast?: boolean };
 
 export function TrendLineChart({
@@ -15,10 +17,12 @@ export function TrendLineChart({
 }) {
   if (data.length === 0) {
     return (
-      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-        <h3 className="text-lg font-semibold text-naqsh-primary">{title}</h3>
-        <p className="text-gray-400 text-sm mt-8 text-center">—</p>
-      </div>
+      <Card>
+        <CardBody>
+          <CardTitle>{title}</CardTitle>
+          <EmptyState title="—" className="py-8" />
+        </CardBody>
+      </Card>
     );
   }
 
@@ -45,73 +49,73 @@ export function TrendLineChart({
     forecast.length > 1 ? linePath(forecast, firstForecast === -1 ? 0 : firstForecast - 1) : "";
 
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-      <div className="mb-4">
-        <h3 className="text-lg font-semibold text-naqsh-primary">{title}</h3>
-        <p className="text-sm text-gray-500 mt-1">{subtitle}</p>
-      </div>
-      <svg viewBox={`0 0 ${width} ${height}`} className="w-full h-auto" role="img">
-        {[0, 0.25, 0.5, 0.75, 1].map((t) => {
-          const y = pad.top + innerH * (1 - t);
-          const val = Math.round(max * t);
-          return (
-            <g key={t}>
-              <line x1={pad.left} y1={y} x2={width - pad.right} y2={y} stroke="#e5e7eb" />
-              <text x={pad.left - 6} y={y + 4} textAnchor="end" className="fill-gray-400 text-[10px]">
-                {val}
-              </text>
-            </g>
-          );
-        })}
-        {actualPath && (
-          <path d={actualPath} fill="none" stroke="#0d6e4f" strokeWidth={2.5} strokeLinecap="round" />
-        )}
-        {forecastPath && (
-          <path
-            d={forecastPath}
-            fill="none"
-            stroke="#0d6e4f"
-            strokeWidth={2}
-            strokeDasharray="6 4"
-            opacity={0.75}
-          />
-        )}
-        {data.map((p, i) => (
-          <circle
-            key={`${p.label}-${i}`}
-            cx={toX(i)}
-            cy={toY(p.value)}
-            r={p.is_forecast ? 3 : 4}
-            fill={p.is_forecast ? "#fff" : "#0d6e4f"}
-            stroke="#0d6e4f"
-            strokeWidth={2}
-          >
-            <title>
-              {p.label}: {p.value}
-              {p.is_forecast ? ` (${forecastLabel})` : ""}
-            </title>
-          </circle>
-        ))}
-        {data.map((p, i) =>
-          i % Math.ceil(data.length / 6) === 0 || i === data.length - 1 ? (
-            <text
-              key={`lbl-${p.label}`}
-              x={toX(i)}
-              y={height - 8}
-              textAnchor="middle"
-              className="fill-gray-500 text-[9px]"
+    <Card>
+      <CardBody>
+        <CardTitle>{title}</CardTitle>
+        <CardDescription className="mb-4">{subtitle}</CardDescription>
+        <svg viewBox={`0 0 ${width} ${height}`} className="w-full h-auto" role="img">
+          {[0, 0.25, 0.5, 0.75, 1].map((t) => {
+            const y = pad.top + innerH * (1 - t);
+            const val = Math.round(max * t);
+            return (
+              <g key={t}>
+                <line x1={pad.left} y1={y} x2={width - pad.right} y2={y} className="stroke-border" />
+                <text x={pad.left - 6} y={y + 4} textAnchor="end" className="fill-muted-foreground text-[10px]">
+                  {val}
+                </text>
+              </g>
+            );
+          })}
+          {actualPath && (
+            <path d={actualPath} fill="none" stroke="currentColor" className="text-naqsh-primary" strokeWidth={2.5} strokeLinecap="round" />
+          )}
+          {forecastPath && (
+            <path
+              d={forecastPath}
+              fill="none"
+              stroke="currentColor"
+              className="text-naqsh-primary"
+              strokeWidth={2}
+              strokeDasharray="6 4"
+              opacity={0.75}
+            />
+          )}
+          {data.map((p, i) => (
+            <circle
+              key={`${p.label}-${i}`}
+              cx={toX(i)}
+              cy={toY(p.value)}
+              r={p.is_forecast ? 3 : 4}
+              className={p.is_forecast ? "fill-card stroke-naqsh-primary" : "fill-naqsh-primary stroke-naqsh-primary"}
+              strokeWidth={2}
             >
-              {p.label.slice(2)}
-            </text>
-          ) : null,
+              <title>
+                {p.label}: {p.value}
+                {p.is_forecast ? ` (${forecastLabel})` : ""}
+              </title>
+            </circle>
+          ))}
+          {data.map((p, i) =>
+            i % Math.ceil(data.length / 6) === 0 || i === data.length - 1 ? (
+              <text
+                key={`lbl-${p.label}`}
+                x={toX(i)}
+                y={height - 8}
+                textAnchor="middle"
+                className="fill-muted-foreground text-[9px]"
+              >
+                {p.label.slice(2)}
+              </text>
+            ) : null,
+          )}
+        </svg>
+        {firstForecast !== -1 && (
+          <p className="text-caption text-muted-foreground mt-2 flex items-center gap-2">
+            <span className="inline-block w-8 border-t-2 border-dashed border-naqsh-primary" />
+            {forecastLabel}
+          </p>
         )}
-      </svg>
-      {firstForecast !== -1 && (
-        <p className="text-xs text-gray-400 mt-2 flex items-center gap-2">
-          <span className="inline-block w-8 border-t-2 border-dashed border-naqsh-primary" />
-          {forecastLabel}
-        </p>
-      )}
-    </div>
+      </CardBody>
+    </Card>
   );
 }

@@ -4,6 +4,20 @@ import { useCallback, useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { PermissionGate } from "@/components/PermissionGate";
 import { StudentFormModal } from "@/components/StudentFormModal";
+import {
+  Button,
+  DataTable,
+  EmptyState,
+  PageHeader,
+  PageSection,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+  TableSkeleton,
+} from "@/components/ui";
 import { getMe, listCenters, listStudents } from "@/lib/api";
 import { usePermissions } from "@/hooks/usePermissions";
 
@@ -51,75 +65,78 @@ export default function StudentsPage() {
 
   return (
     <>
-      <div className="space-y-4">
-        <div className="flex justify-between items-center">
-          <h2 className="text-xl font-bold text-naqsh-primary">{t("title")}</h2>
-          <PermissionGate permission="students.create">
-            {centerId && (
-              <button
-                type="button"
-                onClick={() => {
-                  setEditStudent(null);
-                  setShowForm(true);
-                }}
-                className="px-4 py-2 bg-naqsh-primary text-white rounded-lg text-sm font-medium"
-              >
-                {t("add")}
-              </button>
-            )}
-          </PermissionGate>
-        </div>
+      <PageSection>
+        <PageHeader
+          title={t("title")}
+          actions={
+            <PermissionGate permission="students.create">
+              {centerId && (
+                <Button
+                  onClick={() => {
+                    setEditStudent(null);
+                    setShowForm(true);
+                  }}
+                >
+                  {t("add")}
+                </Button>
+              )}
+            </PermissionGate>
+          }
+        />
+
         {loading ? (
-          <p className="text-gray-400">{t("loading")}</p>
+          <DataTable>
+            <TableSkeleton rows={6} cols={6} />
+          </DataTable>
+        ) : students.length === 0 ? (
+          <DataTable>
+            <EmptyState title={t("empty")} />
+          </DataTable>
         ) : (
-          <div className="bg-white rounded-xl shadow border overflow-hidden">
-            <table className="w-full text-sm">
-              <thead className="bg-gray-50 border-b">
-                <tr>
-                  <th className="text-left p-3 font-medium">{t("name")}</th>
-                  <th className="text-left p-3 font-medium">{t("grade")}</th>
-                  <th className="text-left p-3 font-medium">{t("school")}</th>
-                  <th className="text-left p-3 font-medium">{t("phone")}</th>
-                  <th className="text-left p-3 font-medium">{t("pinfl")}</th>
-                  {can("students.update") && <th className="p-3" />}
-                </tr>
-              </thead>
-              <tbody>
+          <DataTable>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>{t("name")}</TableHead>
+                  <TableHead>{t("grade")}</TableHead>
+                  <TableHead>{t("school")}</TableHead>
+                  <TableHead>{t("phone")}</TableHead>
+                  <TableHead>{t("pinfl")}</TableHead>
+                  {can("students.update") && <TableHead className="text-right">{t("edit")}</TableHead>}
+                </TableRow>
+              </TableHeader>
+              <TableBody>
                 {students.map((s) => (
-                  <tr key={s.id} className="border-b last:border-0 hover:bg-gray-50">
-                    <td className="p-3">{s.full_name}</td>
-                    <td className="p-3">{s.grade || "—"}</td>
-                    <td className="p-3">{s.school || "—"}</td>
-                    <td className="p-3">{s.phone || "—"}</td>
-                    <td className="p-3 font-mono text-gray-500">{s.jshshir_masked || "—"}</td>
+                  <TableRow key={s.id}>
+                    <TableCell className="font-medium">{s.full_name}</TableCell>
+                    <TableCell>{s.grade || "—"}</TableCell>
+                    <TableCell>{s.school || "—"}</TableCell>
+                    <TableCell>{s.phone || "—"}</TableCell>
+                    <TableCell className="font-mono text-caption text-muted-foreground">
+                      {s.jshshir_masked || "—"}
+                    </TableCell>
                     {can("students.update") && (
-                      <td className="p-3 text-right">
-                        <button
-                          type="button"
-                          className="text-naqsh-accent text-sm hover:underline"
+                      <TableCell className="text-right">
+                        <Button
+                          variant="ghost"
+                          size="sm"
                           onClick={() => {
                             setEditStudent(s);
                             setShowForm(true);
                           }}
                         >
                           {t("edit")}
-                        </button>
-                      </td>
+                        </Button>
+                      </TableCell>
                     )}
-                  </tr>
+                  </TableRow>
                 ))}
-                {students.length === 0 && (
-                  <tr>
-                    <td colSpan={6} className="p-6 text-center text-gray-400">
-                      {t("empty")}
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
+              </TableBody>
+            </Table>
+          </DataTable>
         )}
-      </div>
+      </PageSection>
+
       {showForm && centerId && (
         <StudentFormModal
           centerId={centerId}

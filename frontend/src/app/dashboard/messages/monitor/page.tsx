@@ -2,6 +2,20 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
+import {
+  DataTable,
+  EmptyState,
+  PageHeader,
+  PageSection,
+  Select,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+  TableSkeleton,
+} from "@/components/ui";
 import { apiFetch } from "@/lib/api";
 
 type MonitorMessage = {
@@ -45,62 +59,60 @@ export default function MessagesMonitorPage() {
   }, [load]);
 
   return (
-    <div className="space-y-4">
-      <div>
-        <h2 className="text-xl font-bold text-naqsh-primary">{t("title")}</h2>
-        <p className="text-sm text-gray-500 mt-1">{t("privacyNotice")}</p>
-      </div>
+    <PageSection>
+      <PageHeader title={t("title")} description={t("privacyNotice")} />
 
       <div className="flex flex-wrap gap-3 items-center">
-        <select
-          className="border rounded-lg px-3 py-2 text-sm"
-          value={centerId}
-          onChange={(e) => setCenterId(e.target.value)}
-        >
+        <Select value={centerId} onChange={(e) => setCenterId(e.target.value)} className="w-auto min-w-[200px]">
           <option value="">{t("allCenters")}</option>
           {centers.map((c) => (
             <option key={c.id} value={c.id}>
               {c.name}
             </option>
           ))}
-        </select>
-        <span className="text-xs text-gray-400">{t("readOnly")}</span>
+        </Select>
+        <span className="text-caption text-muted-foreground">{t("readOnly")}</span>
       </div>
 
       {loading ? (
-        <p className="text-gray-400">{t("loading")}</p>
+        <DataTable>
+          <TableSkeleton rows={8} cols={5} />
+        </DataTable>
+      ) : items.length === 0 ? (
+        <DataTable>
+          <EmptyState title={t("empty")} />
+        </DataTable>
       ) : (
-        <div className="bg-white rounded-xl border overflow-hidden">
-          <table className="w-full text-sm">
-            <thead className="bg-gray-50 border-b">
-              <tr>
-                <th className="text-left p-3">{t("center")}</th>
-                <th className="text-left p-3">{t("sender")}</th>
-                <th className="text-left p-3">{t("recipient")}</th>
-                <th className="text-left p-3">{t("subject")}</th>
-                <th className="text-left p-3">{t("sentAt")}</th>
-              </tr>
-            </thead>
-            <tbody>
+        <DataTable>
+          <Table className="min-w-[720px]">
+            <TableHeader>
+              <TableRow>
+                <TableHead>{t("center")}</TableHead>
+                <TableHead>{t("sender")}</TableHead>
+                <TableHead>{t("recipient")}</TableHead>
+                <TableHead>{t("subject")}</TableHead>
+                <TableHead>{t("sentAt")}</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
               {items.map((m) => (
-                <tr key={m.id} className="border-b align-top">
-                  <td className="p-3">{m.center_name}</td>
-                  <td className="p-3">{m.sender_name || "—"}</td>
-                  <td className="p-3">{m.recipient_name || "—"}</td>
-                  <td className="p-3">
+                <TableRow key={m.id} className="align-top">
+                  <TableCell>{m.center_name}</TableCell>
+                  <TableCell>{m.sender_name || "—"}</TableCell>
+                  <TableCell>{m.recipient_name || "—"}</TableCell>
+                  <TableCell>
                     <div className="font-medium">{m.title}</div>
-                    <div className="text-gray-500 text-xs mt-1 line-clamp-2">{m.body}</div>
-                  </td>
-                  <td className="p-3 whitespace-nowrap text-gray-500">
+                    <div className="text-muted-foreground text-caption mt-1 line-clamp-2">{m.body}</div>
+                  </TableCell>
+                  <TableCell className="whitespace-nowrap text-muted-foreground">
                     {new Date(m.sent_at).toLocaleString()}
-                  </td>
-                </tr>
+                  </TableCell>
+                </TableRow>
               ))}
-            </tbody>
-          </table>
-          {items.length === 0 && <p className="p-4 text-gray-400">{t("empty")}</p>}
-        </div>
+            </TableBody>
+          </Table>
+        </DataTable>
       )}
-    </div>
+    </PageSection>
   );
 }

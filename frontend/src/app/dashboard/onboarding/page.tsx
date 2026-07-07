@@ -4,6 +4,21 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { ChangePasswordForm } from "@/components/ChangePasswordForm";
+import {
+  Alert,
+  Button,
+  Card,
+  CardBody,
+  CardTitle,
+  FormField,
+  FormGrid,
+  Input,
+  Label,
+  PageHeader,
+  PageSection,
+  Select,
+  Textarea,
+} from "@/components/ui";
 import { apiFetch } from "@/lib/api";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -73,117 +88,87 @@ export default function OnboardingPage() {
   };
 
   return (
-    <div className="max-w-xl mx-auto space-y-6">
-      <div>
-        <h2 className="text-2xl font-bold text-gray-900">{t("title")}</h2>
-        <p className="text-gray-500 mt-1">{t("subtitle")}</p>
-      </div>
+    <PageSection className="max-w-xl mx-auto">
+      <PageHeader title={t("title")} description={t("subtitle")} />
 
-      <div className="flex gap-2 text-sm">
-        <span className={step === "password" ? "font-semibold text-naqsh-primary" : "text-gray-400"}>
+      <div className="flex gap-2 text-small">
+        <span className={step === "password" ? "font-semibold text-naqsh-primary" : "text-muted-foreground"}>
           1. {t("stepPassword")}
         </span>
-        <span className="text-gray-300">→</span>
-        <span className={step === "profile" ? "font-semibold text-naqsh-primary" : "text-gray-400"}>
+        <span className="text-muted-foreground">→</span>
+        <span className={step === "profile" ? "font-semibold text-naqsh-primary" : "text-muted-foreground"}>
           2. {t("stepProfile")}
         </span>
       </div>
 
       {step === "password" && mustChangePassword && (
-        <div className="bg-white rounded-xl border p-6">
-          <h3 className="font-semibold mb-4">{t("changePasswordTitle")}</h3>
-          <ChangePasswordForm
-            onSuccess={async () => {
-              await refresh();
-              setStep("profile");
-            }}
-          />
-        </div>
+        <Card>
+          <CardBody>
+            <CardTitle className="mb-4">{t("changePasswordTitle")}</CardTitle>
+            <ChangePasswordForm
+              onSuccess={async () => {
+                await refresh();
+                setStep("profile");
+              }}
+            />
+          </CardBody>
+        </Card>
       )}
 
       {step === "profile" && (
-        <form onSubmit={submitProfile} className="bg-white rounded-xl border p-6 space-y-4">
-          <h3 className="font-semibold">{t("profileTitle")}</h3>
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="block text-sm font-medium mb-1">{tc("stir")}</label>
-              <input
-                className="w-full border rounded-lg px-3 py-2 font-mono"
-                value={stir}
-                onChange={(e) => setStir(e.target.value)}
-                pattern="\d{9}"
-                required
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-1">{tc("type")}</label>
-              <select
-                className="w-full border rounded-lg px-3 py-2"
-                value={centerType}
-                onChange={(e) => setCenterType(e.target.value)}
-              >
-                <option value="private">{tc("typePrivate")}</option>
-                <option value="public">{tc("typePublic")}</option>
-              </select>
-            </div>
-          </div>
-          <div>
-            <label className="block text-sm font-medium mb-1">{tc("director")}</label>
-            <input
-              className="w-full border rounded-lg px-3 py-2"
-              value={directorName}
-              onChange={(e) => setDirectorName(e.target.value)}
-              required
-            />
-          </div>
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="block text-sm font-medium mb-1">{tc("phone")}</label>
-              <input
-                className="w-full border rounded-lg px-3 py-2"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                required
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-1">{tc("email")}</label>
-              <input
-                type="email"
-                className="w-full border rounded-lg px-3 py-2"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-            </div>
-          </div>
-          <div>
-            <label className="block text-sm font-medium mb-1">{tc("address")}</label>
-            <textarea
-              className="w-full border rounded-lg px-3 py-2"
-              rows={2}
-              value={address}
-              onChange={(e) => setAddress(e.target.value)}
-              required
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium mb-1">{tc("license")}</label>
-            <input
-              className="w-full border rounded-lg px-3 py-2"
-              value={licenseNumber}
-              onChange={(e) => setLicenseNumber(e.target.value)}
-            />
-          </div>
-          {error && <p className="text-sm text-red-600">{error}</p>}
-          <button
-            type="submit"
-            disabled={saving}
-            className="w-full py-2.5 rounded-lg bg-naqsh-primary text-white disabled:opacity-50"
-          >
-            {saving ? tc("saving") : t("complete")}
-          </button>
-        </form>
+        <Card>
+          <CardBody>
+            <form onSubmit={submitProfile} className="space-y-4">
+              <CardTitle>{t("profileTitle")}</CardTitle>
+              <FormGrid>
+                <FormField>
+                  <Label>{tc("stir")}</Label>
+                  <Input
+                    className="font-mono"
+                    value={stir}
+                    onChange={(e) => setStir(e.target.value)}
+                    pattern="\d{9}"
+                    required
+                  />
+                </FormField>
+                <FormField>
+                  <Label>{tc("type")}</Label>
+                  <Select value={centerType} onChange={(e) => setCenterType(e.target.value)}>
+                    <option value="private">{tc("typePrivate")}</option>
+                    <option value="public">{tc("typePublic")}</option>
+                  </Select>
+                </FormField>
+              </FormGrid>
+              <FormField>
+                <Label>{tc("director")}</Label>
+                <Input value={directorName} onChange={(e) => setDirectorName(e.target.value)} required />
+              </FormField>
+              <FormGrid>
+                <FormField>
+                  <Label>{tc("phone")}</Label>
+                  <Input value={phone} onChange={(e) => setPhone(e.target.value)} required />
+                </FormField>
+                <FormField>
+                  <Label>{tc("email")}</Label>
+                  <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
+                </FormField>
+              </FormGrid>
+              <FormField>
+                <Label>{tc("address")}</Label>
+                <Textarea rows={2} value={address} onChange={(e) => setAddress(e.target.value)} required />
+              </FormField>
+              <FormField>
+                <Label>{tc("license")}</Label>
+                <Input value={licenseNumber} onChange={(e) => setLicenseNumber(e.target.value)} />
+              </FormField>
+              {error && <Alert variant="danger">{error}</Alert>}
+              <Button type="submit" disabled={saving} loading={saving} className="w-full">
+                {saving ? tc("saving") : t("complete")}
+              </Button>
+            </form>
+          </CardBody>
+        </Card>
       )}
-    </div>
+    </PageSection>
   );
 }

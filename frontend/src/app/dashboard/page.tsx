@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { KpiCards } from "@/components/KpiCards";
 import { OperatorDashboard } from "@/components/OperatorDashboard";
 import { StatsChart } from "@/components/StatsChart";
+import { Badge, Card, CardBody, PageSection, PageSkeleton } from "@/components/ui";
 import { getDashboardKpis, getMe } from "@/lib/api";
 
 type DashData = {
@@ -34,32 +35,30 @@ function StaffDashboard() {
       .finally(() => setLoading(false));
   }, []);
 
+  if (loading) return <PageSkeleton />;
+
   return (
-    <div className="space-y-5">
-      <div className="rounded-lg border border-gray-200/80 dark:border-gray-800 bg-white dark:bg-gray-900 px-4 sm:px-5 py-4 shadow-sm">
-        <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-gray-100">{t("welcome")}</h2>
-        {userName && (
-          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-            <span className="inline-flex items-center gap-1.5">
-              <span className="h-2 w-2 rounded-full bg-emerald-500" aria-hidden />
-              {userName}
-            </span>
-          </p>
-        )}
-      </div>
-      {loading ? (
-        <p className="text-gray-400 dark:text-gray-500 text-sm px-1">{t("loading")}</p>
-      ) : (
-        <>
-          <KpiCards kpis={dash?.kpis ?? []} />
-          <div className="grid gap-3 lg:grid-cols-3">
-            <StatsChart title={t("charts.daily")} data={dash?.daily_stats ?? []} />
-            <StatsChart title={t("charts.weekly")} data={dash?.weekly_stats ?? []} />
-            <StatsChart title={t("charts.monthly")} data={dash?.monthly_stats ?? []} />
+    <PageSection>
+      <Card>
+        <CardBody className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+          <div>
+            <h2 className="text-h2 text-foreground">{t("welcome")}</h2>
+            {userName && (
+              <p className="text-small text-muted-foreground mt-1 flex items-center gap-2">
+                <Badge variant="success" dot>{userName}</Badge>
+              </p>
+            )}
           </div>
-        </>
-      )}
-    </div>
+        </CardBody>
+      </Card>
+
+      <KpiCards kpis={dash?.kpis ?? []} />
+      <div className="grid gap-4 lg:grid-cols-3">
+        <StatsChart title={t("charts.daily")} data={dash?.daily_stats ?? []} />
+        <StatsChart title={t("charts.weekly")} data={dash?.weekly_stats ?? []} />
+        <StatsChart title={t("charts.monthly")} data={dash?.monthly_stats ?? []} />
+      </div>
+    </PageSection>
   );
 }
 
@@ -75,7 +74,7 @@ export default function DashboardPage() {
       .finally(() => setLoading(false));
   }, []);
 
-  if (loading) return null;
+  if (loading) return <PageSkeleton />;
 
   if (role === "hokimiyat_operator") {
     return <OperatorDashboard />;

@@ -5,6 +5,17 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { PermissionGate } from "@/components/PermissionGate";
+import {
+  Badge,
+  Button,
+  Card,
+  CardBody,
+  CardTitle,
+  EmptyState,
+  PageHeader,
+  PageSection,
+  PageSkeleton,
+} from "@/components/ui";
 import { apiFetch } from "@/lib/api";
 import { usePermissions } from "@/hooks/usePermissions";
 
@@ -78,77 +89,97 @@ export default function ExamDetailPage() {
     if (res.success) window.location.href = "/dashboard/exams";
   };
 
-  if (loading) return <p className="text-gray-400">{t("loading")}</p>;
-  if (!exam) return <p className="text-red-600">{t("notFound")}</p>;
+  if (loading) {
+    return (
+      <PageSection>
+        <PageSkeleton />
+      </PageSection>
+    );
+  }
+
+  if (!exam) {
+    return (
+      <PageSection>
+        <EmptyState title={t("notFound")} />
+      </PageSection>
+    );
+  }
 
   return (
-    <div className="space-y-4">
-      <div className="flex justify-between items-start gap-4 flex-wrap">
-        <div>
-          <Link href="/dashboard/exams" className="text-sm text-naqsh-accent hover:underline">
-            ← {t("back")}
-          </Link>
-          <h2 className="text-xl font-bold text-naqsh-primary mt-1">{exam.title}</h2>
-          {exam.description && <p className="text-sm text-gray-500">{exam.description}</p>}
-          <p className="text-sm text-gray-500 mt-1">
-            {t("passScore")}: {exam.pass_score}% · {exam.duration_minutes} min
-          </p>
-        </div>
-        <div className="flex gap-2">
-          <PermissionGate permission="exams.update">
-            <button
-              type="button"
-              disabled={saving}
-              onClick={togglePublish}
-              className="px-4 py-2 bg-naqsh-primary text-white rounded-lg text-sm disabled:opacity-50"
-            >
-              {exam.is_published ? t("unpublish") : t("publish")}
-            </button>
-          </PermissionGate>
-          {can("exams.delete") && (
-            <button type="button" onClick={removeExam} className="px-4 py-2 border border-red-300 text-red-600 rounded-lg text-sm">
-              {t("delete")}
-            </button>
-          )}
-        </div>
-      </div>
+    <PageSection>
+      <PageHeader
+        title={exam.title}
+        description={
+          exam.description
+            ? `${exam.description} · ${t("passScore")}: ${exam.pass_score}% · ${exam.duration_minutes} min`
+            : `${t("passScore")}: ${exam.pass_score}% · ${exam.duration_minutes} min`
+        }
+        actions={
+          <div className="flex gap-2 items-center flex-wrap">
+            <Link href="/dashboard/exams">
+              <Button variant="outline" size="sm">
+                ← {t("back")}
+              </Button>
+            </Link>
+            <PermissionGate permission="exams.update">
+              <Button onClick={togglePublish} disabled={saving} loading={saving}>
+                {exam.is_published ? t("unpublish") : t("publish")}
+              </Button>
+            </PermissionGate>
+            {can("exams.delete") && (
+              <Button variant="outline" className="text-danger border-danger/30 hover:bg-danger-bg" onClick={removeExam}>
+                {t("delete")}
+              </Button>
+            )}
+          </div>
+        }
+      />
 
-      <section className="bg-white border rounded-xl p-4 space-y-3">
-        <h3 className="font-semibold text-naqsh-primary">{t("reviewQuestions")}</h3>
-        {exam.questions.map((q, idx) => (
-          <div key={q.id} className="border rounded-lg p-3 text-sm">
-            <p className="font-medium">
-              {idx + 1}. {q.question_text}
-            </p>
-            <ul className="mt-2 space-y-1 text-gray-600">
-              {(q.options_json || []).map((opt) => (
-                <li key={opt} className={opt === q.correct_answer ? "text-green-700 font-medium" : ""}>
-                  {opt}
-                  {opt === q.correct_answer ? ` (${t("correct")})` : ""}
+      <Badge variant={exam.is_published ? "success" : "default"}>
+        {exam.is_published ? t("published") : t("draft")}
+      </Badge>
+
+      <Card>
+        <CardBody className="space-y-3">
+          <CardTitle>{t("reviewQuestions")}</CardTitle>
+          {exam.questions.map((q, idx) => (
+            <div key={q.id} className="border border-border rounded-lg p-3 text-small">
+              <p className="font-medium">
+                {idx + 1}. {q.question_text}
+              </p>
+              <ul className="mt-2 space-y-1 text-muted-foreground">
+                {(q.options_json || []).map((opt) => (
+                  <li key={opt} className={opt === q.correct_answer ? "text-success font-medium" : ""}>
+                    {opt}
+                    {opt === q.correct_answer ? ` (${t("correct")})` : ""}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </CardBody>
+      </Card>
+
+      <Card>
+        <CardBody>
+          <CardTitle className="mb-3">{t("results")}</CardTitle>
+          {results.length === 0 ? (
+            <p className="text-small text-muted-foreground">{t("noResults")}</p>
+          ) : (
+            <ul className="space-y-2 text-small">
+              {results.map((r) => (
+                <li key={r.id} className="flex justify-between border-b border-border pb-1">
+                  <span>{r.student_id.slice(0, 8)}…</span>
+                  <span>
+                    {r.score}/{r.max_score}{" "}
+                    <Badge variant={r.passed ? "success" : "danger"}>{r.passed ? "✓" : "✗"}</Badge>
+                  </span>
                 </li>
               ))}
             </ul>
-          </div>
-        ))}
-      </section>
-
-      <section className="bg-white border rounded-xl p-4">
-        <h3 className="font-semibold text-naqsh-primary mb-2">{t("results")}</h3>
-        {results.length === 0 ? (
-          <p className="text-sm text-gray-400">{t("noResults")}</p>
-        ) : (
-          <ul className="space-y-2 text-sm">
-            {results.map((r) => (
-              <li key={r.id} className="flex justify-between border-b pb-1">
-                <span>{r.student_id.slice(0, 8)}…</span>
-                <span>
-                  {r.score}/{r.max_score} {r.passed ? "✓" : "✗"}
-                </span>
-              </li>
-            ))}
-          </ul>
-        )}
-      </section>
-    </div>
+          )}
+        </CardBody>
+      </Card>
+    </PageSection>
   );
 }

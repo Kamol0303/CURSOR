@@ -2,6 +2,15 @@
 
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
+import {
+  Badge,
+  Button,
+  Card,
+  CardBody,
+  CardTitle,
+  EmptyState,
+  PageSkeleton,
+} from "@/components/ui";
 import { apiFetch, getApiBaseUrl } from "@/lib/api";
 import { clearAuthCookie } from "@/lib/auth-cookie";
 
@@ -55,66 +64,78 @@ export default function StudentDashboardPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="bg-naqsh-primary text-white px-4 py-4 flex justify-between items-center">
+    <div className="min-h-screen bg-background">
+      <header className="bg-naqsh-primary text-white px-4 py-5 flex justify-between items-center shadow-sm">
         <div>
           <h1 className="font-bold text-lg">{t("title")}</h1>
-          <p className="text-xs text-white/70">{profile?.center_name}</p>
+          <p className="text-caption text-white/70 mt-0.5">{profile?.center_name}</p>
         </div>
-        <button type="button" onClick={logout} className="text-sm underline">
+        <Button variant="ghost" size="sm" onClick={logout} className="text-white hover:bg-white/10">
           {t("logout")}
-        </button>
+        </Button>
       </header>
 
-      <main className="p-4 max-w-lg mx-auto space-y-4">
+      <main className="p-4 max-w-lg mx-auto space-y-5">
         {loading ? (
-          <p className="text-gray-500">{t("loading")}</p>
+          <PageSkeleton />
         ) : (
           <>
             {profile && (
-              <section className="bg-white rounded-xl border p-4">
-                <h2 className="font-semibold text-naqsh-primary">{profile.full_name}</h2>
-                <p className="text-sm text-gray-600">
-                  {profile.grade || "—"} · {profile.school || "—"}
-                </p>
-              </section>
+              <Card>
+                <CardBody>
+                  <CardTitle>{profile.full_name}</CardTitle>
+                  <p className="text-small text-muted-foreground mt-1">
+                    {profile.grade || "—"} · {profile.school || "—"}
+                  </p>
+                </CardBody>
+              </Card>
             )}
 
-            <section className="bg-white rounded-xl border p-4">
-              <h3 className="font-semibold mb-2">{t("grades")}</h3>
-              {grades.length === 0 ? (
-                <p className="text-sm text-gray-400">{t("emptyGrades")}</p>
-              ) : (
-                <ul className="space-y-2 text-sm">
-                  {grades.map((g, i) => (
-                    <li key={`${g.subject_name}-${i}`} className="flex justify-between border-b pb-1">
-                      <span>{g.subject_name}</span>
-                      <span className="font-medium">{g.grade_value}</span>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </section>
+            <Card>
+              <CardBody>
+                <CardTitle className="mb-4">{t("grades")}</CardTitle>
+                {grades.length === 0 ? (
+                  <EmptyState title={t("emptyGrades")} className="py-8" />
+                ) : (
+                  <ul className="space-y-2">
+                    {grades.map((g, i) => (
+                      <li
+                        key={`${g.subject_name}-${i}`}
+                        className="flex justify-between items-center border-b border-border pb-2 last:border-0 text-small"
+                      >
+                        <span className="text-foreground">{g.subject_name}</span>
+                        <Badge variant="primary">{g.grade_value}</Badge>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </CardBody>
+            </Card>
 
-            <section className="bg-white rounded-xl border p-4">
-              <h3 className="font-semibold mb-2">{t("exams")}</h3>
-              {exams.length === 0 ? (
-                <p className="text-sm text-gray-400">{t("emptyExams")}</p>
-              ) : (
-                <ul className="space-y-2 text-sm">
-                  {exams.map((e) => (
-                    <li key={e.id} className="border-b pb-1">
-                      <a href={`/student/exams/${e.id}`} className="font-medium text-naqsh-primary hover:underline">
-                        {e.title}
-                      </a>
-                      <div className="text-gray-500">
-                        {t("passScore")}: {e.pass_score}% · {e.duration_minutes} min
-                      </div>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </section>
+            <Card>
+              <CardBody>
+                <CardTitle className="mb-4">{t("exams")}</CardTitle>
+                {exams.length === 0 ? (
+                  <EmptyState title={t("emptyExams")} className="py-8" />
+                ) : (
+                  <ul className="space-y-3">
+                    {exams.map((e) => (
+                      <li key={e.id} className="border-b border-border pb-3 last:border-0">
+                        <a
+                          href={`/student/exams/${e.id}`}
+                          className="font-medium text-naqsh-primary hover:underline"
+                        >
+                          {e.title}
+                        </a>
+                        <p className="text-caption text-muted-foreground mt-1">
+                          {t("passScore")}: {e.pass_score}% · {e.duration_minutes} min
+                        </p>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </CardBody>
+            </Card>
           </>
         )}
       </main>

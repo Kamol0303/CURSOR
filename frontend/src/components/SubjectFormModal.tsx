@@ -1,8 +1,17 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { apiFetch } from "@/lib/api";
+import {
+  Alert,
+  Button,
+  FormActions,
+  FormField,
+  Input,
+  Label,
+  Modal,
+} from "@/components/ui";
 
 type Subject = {
   id: string;
@@ -28,13 +37,6 @@ export function SubjectFormModal({ subject, onClose, onSaved }: Props) {
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
 
-  useEffect(() => {
-    document.body.style.overflow = "hidden";
-    return () => {
-      document.body.style.overflow = "";
-    };
-  }, []);
-
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
@@ -56,63 +58,34 @@ export function SubjectFormModal({ subject, onClose, onSaved }: Props) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-      <div className="bg-white rounded-xl shadow-xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
-        <form onSubmit={submit} className="p-6 space-y-4">
-          <div className="flex justify-between items-center">
-            <h3 className="text-lg font-semibold text-naqsh-primary">
-              {isEdit ? t("editTitle") : t("addTitle")}
-            </h3>
-            <button type="button" onClick={onClose} className="text-gray-400 hover:text-gray-600">
-              ✕
-            </button>
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">{t("nameUz")}</label>
-            <input
-              className="w-full border rounded-lg px-3 py-2 text-sm"
-              value={nameUz}
-              onChange={(e) => setNameUz(e.target.value)}
-              required
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">{t("nameRu")}</label>
-            <input
-              className="w-full border rounded-lg px-3 py-2 text-sm"
-              value={nameRu}
-              onChange={(e) => setNameRu(e.target.value)}
-              required
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">{t("nameEn")}</label>
-            <input
-              className="w-full border rounded-lg px-3 py-2 text-sm"
-              value={nameEn}
-              onChange={(e) => setNameEn(e.target.value)}
-              required
-            />
-          </div>
-          <label className="flex items-center gap-2 text-sm">
-            <input type="checkbox" checked={isActive} onChange={(e) => setIsActive(e.target.checked)} />
-            {t("active")}
-          </label>
-          {error && <p className="text-sm text-red-600">{error}</p>}
-          <div className="flex gap-2 pt-2">
-            <button type="button" onClick={onClose} className="flex-1 px-4 py-2 border rounded-lg text-sm">
-              {t("cancel")}
-            </button>
-            <button
-              type="submit"
-              disabled={saving}
-              className="flex-1 px-4 py-2 bg-naqsh-primary text-white rounded-lg text-sm disabled:opacity-50"
-            >
-              {saving ? t("saving") : t("save")}
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
+    <Modal onClose={onClose} title={isEdit ? t("editTitle") : t("addTitle")}>
+      <form onSubmit={submit} className="space-y-4">
+        <FormField>
+          <Label>{t("nameUz")}</Label>
+          <Input value={nameUz} onChange={(e) => setNameUz(e.target.value)} required />
+        </FormField>
+        <FormField>
+          <Label>{t("nameRu")}</Label>
+          <Input value={nameRu} onChange={(e) => setNameRu(e.target.value)} required />
+        </FormField>
+        <FormField>
+          <Label>{t("nameEn")}</Label>
+          <Input value={nameEn} onChange={(e) => setNameEn(e.target.value)} required />
+        </FormField>
+        <Label className="flex items-center gap-2 mb-0 cursor-pointer">
+          <input type="checkbox" checked={isActive} onChange={(e) => setIsActive(e.target.checked)} />
+          {t("active")}
+        </Label>
+        {error && <Alert variant="danger">{error}</Alert>}
+        <FormActions>
+          <Button type="button" variant="secondary" onClick={onClose} className="flex-1 sm:flex-none">
+            {t("cancel")}
+          </Button>
+          <Button type="submit" loading={saving} className="flex-1 sm:flex-none">
+            {saving ? t("saving") : t("save")}
+          </Button>
+        </FormActions>
+      </form>
+    </Modal>
   );
 }

@@ -2,6 +2,20 @@
 
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
+import {
+  Badge,
+  DataTable,
+  EmptyState,
+  PageHeader,
+  PageSection,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+  TableSkeleton,
+} from "@/components/ui";
 import { apiFetch } from "@/lib/api";
 
 type Rating = {
@@ -26,49 +40,54 @@ export default function RatingsPage() {
   }, []);
 
   return (
-    
-      <div className="space-y-4">
-        <h2 className="text-xl font-bold text-naqsh-primary">{t("title")}</h2>
-        {loading ? (
-          <p className="text-gray-400">{t("loading")}</p>
-        ) : (
-          <div className="bg-white rounded-xl shadow border overflow-hidden">
-            <table className="w-full text-sm">
-              <thead className="bg-gray-50 border-b">
-                <tr>
-                  <th className="text-left p-3">{t("rank")}</th>
-                  <th className="text-left p-3">{t("center")}</th>
-                  <th className="text-left p-3">{t("score")}</th>
-                  <th className="text-left p-3">{t("change")}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {ratings.map((r) => (
-                  <tr key={r.rank} className="border-b hover:bg-gray-50">
-                    <td className="p-3">
-                      {r.rank <= 3 ? ["🥇", "🥈", "🥉"][r.rank - 1] : r.rank}
-                    </td>
-                    <td className="p-3">{r.center_name}</td>
-                    <td className="p-3 font-medium">{r.total_score.toFixed(1)}</td>
-                    <td className="p-3">
-                      {r.rank_change != null
-                        ? r.rank_change > 0
-                          ? `↑${r.rank_change}`
-                          : r.rank_change < 0
-                            ? `↓${Math.abs(r.rank_change)}`
-                            : "—"
-                        : "—"}
-                      {r.flagged_anomaly && (
-                        <span className="ml-2 text-xs text-amber-600">{t("flagged")}</span>
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </div>
-    
+    <PageSection>
+      <PageHeader title={t("title")} />
+
+      {loading ? (
+        <DataTable>
+          <TableSkeleton rows={8} cols={4} />
+        </DataTable>
+      ) : ratings.length === 0 ? (
+        <DataTable>
+          <EmptyState title={t("empty", { defaultValue: "No ratings found" })} />
+        </DataTable>
+      ) : (
+        <DataTable>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>{t("rank")}</TableHead>
+                <TableHead>{t("center")}</TableHead>
+                <TableHead>{t("score")}</TableHead>
+                <TableHead>{t("change")}</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {ratings.map((r) => (
+                <TableRow key={r.rank}>
+                  <TableCell>{r.rank <= 3 ? ["🥇", "🥈", "🥉"][r.rank - 1] : r.rank}</TableCell>
+                  <TableCell className="font-medium">{r.center_name}</TableCell>
+                  <TableCell className="font-semibold">{r.total_score.toFixed(1)}</TableCell>
+                  <TableCell>
+                    {r.rank_change != null
+                      ? r.rank_change > 0
+                        ? `↑${r.rank_change}`
+                        : r.rank_change < 0
+                          ? `↓${Math.abs(r.rank_change)}`
+                          : "—"
+                      : "—"}
+                    {r.flagged_anomaly && (
+                      <Badge variant="warning" className="ml-2">
+                        {t("flagged")}
+                      </Badge>
+                    )}
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </DataTable>
+      )}
+    </PageSection>
   );
 }

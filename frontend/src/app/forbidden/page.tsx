@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
+import { Button, Card, CardBody } from "@/components/ui";
 import { getRoleFromToken, homePathForRole } from "@/lib/auth-cookie";
 
 export default function ForbiddenPage() {
@@ -17,18 +18,17 @@ export default function ForbiddenPage() {
   }, []);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 p-6">
-      <div className="text-center max-w-md">
-        <p className="text-5xl font-bold text-naqsh-primary">403</p>
-        <h1 className="text-xl font-semibold text-gray-900 mt-4">{t("title")}</h1>
-        <p className="text-gray-600 mt-2">{t("message")}</p>
-        <Link
-          href={home}
-          className="inline-block mt-8 px-5 py-2.5 bg-naqsh-primary text-white rounded-lg text-sm font-medium hover:bg-naqsh-primary/90"
-        >
-          {t("goHome")}
-        </Link>
-      </div>
+    <div className="min-h-screen flex items-center justify-center bg-background p-6">
+      <Card className="max-w-md w-full">
+        <CardBody className="text-center py-10">
+          <p className="text-5xl font-bold text-naqsh-primary">403</p>
+          <h1 className="text-h3 text-foreground mt-4">{t("title")}</h1>
+          <p className="text-small text-muted-foreground mt-2">{t("message")}</p>
+          <Link href={home}>
+            <Button className="mt-8">{t("goHome")}</Button>
+          </Link>
+        </CardBody>
+      </Card>
     </div>
   );
 }

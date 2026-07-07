@@ -3,6 +3,18 @@
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { apiFetch } from "@/lib/api";
+import {
+  Alert,
+  Button,
+  FormActions,
+  FormField,
+  FormGrid,
+  Input,
+  Label,
+  Modal,
+  Select,
+  Textarea,
+} from "@/components/ui";
 
 type Center = {
   id: string;
@@ -49,13 +61,6 @@ export function CenterFormModal({ center, onClose, onSaved }: Props) {
   const [mahallaId, setMahallaId] = useState(center?.mahalla_id || "");
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
-
-  useEffect(() => {
-    document.body.style.overflow = "hidden";
-    return () => {
-      document.body.style.overflow = "";
-    };
-  }, []);
 
   useEffect(() => {
     apiFetch<Region[]>("/regions").then((res) => {
@@ -120,143 +125,113 @@ export function CenterFormModal({ center, onClose, onSaved }: Props) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-      <div className="bg-white rounded-xl shadow-xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
-        <form onSubmit={submit} className="p-6 space-y-4">
-          <h3 className="text-lg font-semibold text-naqsh-primary">
-            {isEdit ? t("editTitle") : t("addTitle")}
-          </h3>
-          <div>
-            <label className="block text-sm font-medium mb-1">{t("name")}</label>
-            <input
-              className="w-full border rounded-lg px-3 py-2"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              required
+    <Modal onClose={onClose} title={isEdit ? t("editTitle") : t("addTitle")}>
+      <form onSubmit={submit} className="space-y-4">
+        <FormField>
+          <Label>{t("name")}</Label>
+          <Input value={name} onChange={(e) => setName(e.target.value)} required />
+        </FormField>
+        <FormGrid>
+          <FormField>
+            <Label>{t("stir")}</Label>
+            <Input
+              className="font-mono"
+              value={stir}
+              onChange={(e) => setStir(e.target.value)}
+              pattern="\d{9}"
+              placeholder="9 raqam"
             />
-          </div>
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="block text-sm font-medium mb-1">{t("stir")}</label>
-              <input
-                className="w-full border rounded-lg px-3 py-2 font-mono"
-                value={stir}
-                onChange={(e) => setStir(e.target.value)}
-                pattern="\d{9}"
-                placeholder="9 raqam"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-1">{t("type")}</label>
-              <select
-                className="w-full border rounded-lg px-3 py-2"
-                value={centerType}
-                onChange={(e) => setCenterType(e.target.value)}
-              >
-                <option value="private">{t("typePrivate")}</option>
-                <option value="public">{t("typePublic")}</option>
-              </select>
-            </div>
-          </div>
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="block text-sm font-medium mb-1">{t("region")}</label>
-              <select
-                className="w-full border rounded-lg px-3 py-2"
-                value={regionId}
-                onChange={(e) => {
-                  setRegionId(e.target.value);
-                  setMahallaId("");
-                }}
-              >
-                <option value="">{t("selectRegion")}</option>
-                {regions.map((r) => (
-                  <option key={r.id} value={r.id}>
-                    {r.name_uz}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-1">{t("mahalla")}</label>
-              <select
-                className="w-full border rounded-lg px-3 py-2"
-                value={mahallaId}
-                onChange={(e) => setMahallaId(e.target.value)}
-                disabled={!regionId}
-              >
-                <option value="">{t("selectMahalla")}</option>
-                {mahallas.map((m) => (
-                  <option key={m.id} value={m.id}>
-                    {m.name_uz}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
-          <div>
-            <label className="block text-sm font-medium mb-1">{t("director")}</label>
-            <input
-              className="w-full border rounded-lg px-3 py-2"
-              value={directorName}
-              onChange={(e) => setDirectorName(e.target.value)}
+          </FormField>
+          <FormField>
+            <Label>{t("type")}</Label>
+            <Select value={centerType} onChange={(e) => setCenterType(e.target.value)}>
+              <option value="private">{t("typePrivate")}</option>
+              <option value="public">{t("typePublic")}</option>
+            </Select>
+          </FormField>
+        </FormGrid>
+        <FormGrid>
+          <FormField>
+            <Label>{t("region")}</Label>
+            <Select
+              value={regionId}
+              onChange={(e) => {
+                setRegionId(e.target.value);
+                setMahallaId("");
+              }}
+            >
+              <option value="">{t("selectRegion")}</option>
+              {regions.map((r) => (
+                <option key={r.id} value={r.id}>
+                  {r.name_uz}
+                </option>
+              ))}
+            </Select>
+          </FormField>
+          <FormField>
+            <Label>{t("mahalla")}</Label>
+            <Select
+              value={mahallaId}
+              onChange={(e) => setMahallaId(e.target.value)}
+              disabled={!regionId}
+            >
+              <option value="">{t("selectMahalla")}</option>
+              {mahallas.map((m) => (
+                <option key={m.id} value={m.id}>
+                  {m.name_uz}
+                </option>
+              ))}
+            </Select>
+          </FormField>
+        </FormGrid>
+        <FormField>
+          <Label>{t("director")}</Label>
+          <Input value={directorName} onChange={(e) => setDirectorName(e.target.value)} />
+        </FormField>
+        <FormGrid>
+          <FormField>
+            <Label>{t("phone")}</Label>
+            <Input value={phone} onChange={(e) => setPhone(e.target.value)} />
+          </FormField>
+          <FormField>
+            <Label>{t("email")}</Label>
+            <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
+          </FormField>
+        </FormGrid>
+        <FormField>
+          <Label>{t("address")}</Label>
+          <Textarea rows={2} value={address} onChange={(e) => setAddress(e.target.value)} />
+        </FormField>
+        <FormGrid>
+          <FormField>
+            <Label>{t("license")}</Label>
+            <Input value={licenseNumber} onChange={(e) => setLicenseNumber(e.target.value)} />
+          </FormField>
+          <FormField>
+            <Label>{t("licenseExpiry")}</Label>
+            <Input
+              type="date"
+              value={licenseExpiry}
+              onChange={(e) => setLicenseExpiry(e.target.value)}
             />
-          </div>
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="block text-sm font-medium mb-1">{t("phone")}</label>
-              <input className="w-full border rounded-lg px-3 py-2" value={phone} onChange={(e) => setPhone(e.target.value)} />
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-1">{t("email")}</label>
-              <input
-                type="email"
-                className="w-full border rounded-lg px-3 py-2"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-            </div>
-          </div>
-          <div>
-            <label className="block text-sm font-medium mb-1">{t("address")}</label>
-            <textarea className="w-full border rounded-lg px-3 py-2" rows={2} value={address} onChange={(e) => setAddress(e.target.value)} />
-          </div>
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="block text-sm font-medium mb-1">{t("license")}</label>
-              <input
-                className="w-full border rounded-lg px-3 py-2"
-                value={licenseNumber}
-                onChange={(e) => setLicenseNumber(e.target.value)}
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-1">{t("licenseExpiry")}</label>
-              <input
-                type="date"
-                className="w-full border rounded-lg px-3 py-2"
-                value={licenseExpiry}
-                onChange={(e) => setLicenseExpiry(e.target.value)}
-              />
-            </div>
-          </div>
-          {isEdit && (
-            <label className="flex items-center gap-2 text-sm">
-              <input type="checkbox" checked={isActive} onChange={(e) => setIsActive(e.target.checked)} />
-              {t("active")}
-            </label>
-          )}
-          {error && <p className="text-sm text-red-600">{error}</p>}
-          <div className="flex gap-2 justify-end pt-2">
-            <button type="button" onClick={onClose} className="px-4 py-2 rounded-lg border">
-              {t("cancel")}
-            </button>
-            <button type="submit" disabled={saving} className="px-4 py-2 rounded-lg bg-naqsh-primary text-white disabled:opacity-50">
-              {saving ? t("saving") : t("save")}
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
+          </FormField>
+        </FormGrid>
+        {isEdit && (
+          <Label className="flex items-center gap-2 mb-0 cursor-pointer">
+            <input type="checkbox" checked={isActive} onChange={(e) => setIsActive(e.target.checked)} />
+            {t("active")}
+          </Label>
+        )}
+        {error && <Alert variant="danger">{error}</Alert>}
+        <FormActions>
+          <Button type="button" variant="secondary" onClick={onClose}>
+            {t("cancel")}
+          </Button>
+          <Button type="submit" loading={saving}>
+            {saving ? t("saving") : t("save")}
+          </Button>
+        </FormActions>
+      </form>
+    </Modal>
   );
 }

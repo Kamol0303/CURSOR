@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { CenterCertificatesChart } from "@/components/CenterCertificatesChart";
 import { OperatorKpiCards } from "@/components/OperatorKpiCards";
 import { TrendLineChart } from "@/components/TrendLineChart";
+import { Alert, PageHeader, PageSection, PageSkeleton } from "@/components/ui";
 import { getMe, getOperatorSummary } from "@/lib/api";
 
 type OperatorData = {
@@ -43,17 +44,16 @@ export function OperatorDashboard() {
       .finally(() => setLoading(false));
   }, []);
 
-  return (
-    <div className="space-y-8">
-      <div>
-        <h2 className="text-2xl font-bold text-gray-900">{t("welcome")}</h2>
-        {userName && <p className="text-gray-500 mt-1">{userName}</p>}
-        <p className="text-sm text-gray-400 mt-2 max-w-2xl">{t("subtitle")}</p>
-      </div>
+  if (loading) return <PageSkeleton />;
 
-      {loading ? (
-        <p className="text-gray-400">{t("loading")}</p>
-      ) : data ? (
+  return (
+    <PageSection>
+      <PageHeader
+        title={t("welcome")}
+        description={userName ? `${userName} · ${t("subtitle")}` : t("subtitle")}
+      />
+
+      {data ? (
         <>
           <OperatorKpiCards data={data} />
           <div className="grid gap-6 lg:grid-cols-2">
@@ -81,8 +81,8 @@ export function OperatorDashboard() {
           />
         </>
       ) : (
-        <p className="text-red-500">{t("error")}</p>
+        <Alert variant="danger">{t("error")}</Alert>
       )}
-    </div>
+    </PageSection>
   );
 }

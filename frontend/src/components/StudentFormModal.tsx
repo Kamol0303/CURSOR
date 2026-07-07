@@ -1,8 +1,19 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { apiFetch, uploadFile } from "@/lib/api";
+import {
+  Alert,
+  Button,
+  FormActions,
+  FormField,
+  FormGrid,
+  Input,
+  Label,
+  Modal,
+  Textarea,
+} from "@/components/ui";
 
 type Props = {
   centerId: string;
@@ -27,13 +38,6 @@ export function StudentFormModal({ centerId, student, onClose, onSaved }: Props)
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [parentSmsSent, setParentSmsSent] = useState(false);
-
-  useEffect(() => {
-    document.body.style.overflow = "hidden";
-    return () => {
-      document.body.style.overflow = "";
-    };
-  }, []);
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -102,120 +106,105 @@ export function StudentFormModal({ centerId, student, onClose, onSaved }: Props)
 
   if (parentSmsSent) {
     return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-        <div className="bg-white rounded-xl shadow-xl w-full max-w-md p-6 space-y-4">
-          <h3 className="text-lg font-semibold text-naqsh-primary">{t("parentSmsTitle")}</h3>
-          <p className="text-sm text-gray-600">{t("parentSmsSent")}</p>
-          <button type="button" onClick={onClose} className="w-full px-4 py-2 bg-naqsh-primary text-white rounded-lg">
-            OK
-          </button>
-        </div>
-      </div>
+      <Modal onClose={onClose} title={t("parentSmsTitle")} description={t("parentSmsSent")} size="sm">
+        <Button type="button" onClick={onClose} className="w-full">
+          OK
+        </Button>
+      </Modal>
     );
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-      <div className="bg-white rounded-xl shadow-xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
-        <form onSubmit={submit} className="p-6 space-y-4">
-          <h3 className="text-lg font-semibold text-naqsh-primary">
-            {isEdit ? t("editTitle") : t("addTitle")}
-          </h3>
-          <div>
-            <label className="block text-sm font-medium mb-1">{t("name")}</label>
-            <input
-              className="w-full border rounded-lg px-3 py-2"
-              value={fullName}
-              onChange={(e) => setFullName(e.target.value)}
-              required
-            />
-          </div>
-          {!isEdit && (
-            <>
-              <label className="flex items-center gap-2 text-sm">
-                <input
-                  type="checkbox"
-                  checked={noPassport}
-                  onChange={(e) => {
-                    setNoPassport(e.target.checked);
-                    if (e.target.checked) setJshshir("");
-                  }}
+    <Modal onClose={onClose} title={isEdit ? t("editTitle") : t("addTitle")}>
+      <form onSubmit={submit} className="space-y-4">
+        <FormField>
+          <Label>{t("name")}</Label>
+          <Input value={fullName} onChange={(e) => setFullName(e.target.value)} required />
+        </FormField>
+        {!isEdit && (
+          <>
+            <Label className="flex items-center gap-2 mb-0 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={noPassport}
+                onChange={(e) => {
+                  setNoPassport(e.target.checked);
+                  if (e.target.checked) setJshshir("");
+                }}
+              />
+              {t("noPassport")}
+            </Label>
+            {!noPassport ? (
+              <FormField>
+                <Label>{t("pinfl")}</Label>
+                <Input
+                  className="font-mono"
+                  value={jshshir}
+                  onChange={(e) => setJshshir(e.target.value)}
+                  pattern="\d{14}"
+                  placeholder="14 raqam"
                 />
-                {t("noPassport")}
-              </label>
-              {!noPassport ? (
-                <div>
-                  <label className="block text-sm font-medium mb-1">{t("pinfl")}</label>
-                  <input
-                    className="w-full border rounded-lg px-3 py-2 font-mono"
-                    value={jshshir}
-                    onChange={(e) => setJshshir(e.target.value)}
-                    pattern="\d{14}"
-                    placeholder="14 raqam"
-                  />
-                </div>
-              ) : (
-                <div>
-                  <label className="block text-sm font-medium mb-1">{t("photo")}</label>
-                  <input
-                    type="file"
-                    accept=".jpg,.jpeg,.png,image/jpeg,image/png"
-                    className="w-full border rounded-lg px-3 py-2 text-sm"
-                    onChange={(e) => setPhotoFile(e.target.files?.[0] || null)}
-                    required
-                  />
-                  <p className="text-xs text-gray-500 mt-1">{t("photoHint")}</p>
-                </div>
-              )}
-            </>
-          )}
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="block text-sm font-medium mb-1">{t("phone")}</label>
-              <input className="w-full border rounded-lg px-3 py-2" value={phone} onChange={(e) => setPhone(e.target.value)} />
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-1">{t("grade")}</label>
-              <input className="w-full border rounded-lg px-3 py-2" value={grade} onChange={(e) => setGrade(e.target.value)} />
-            </div>
-          </div>
-          <div>
-            <label className="block text-sm font-medium mb-1">{t("school")}</label>
-            <input className="w-full border rounded-lg px-3 py-2" value={school} onChange={(e) => setSchool(e.target.value)} />
-          </div>
-          <div>
-            <label className="block text-sm font-medium mb-1">{t("address")}</label>
-            <textarea className="w-full border rounded-lg px-3 py-2" rows={2} value={address} onChange={(e) => setAddress(e.target.value)} />
-          </div>
-          {!isEdit && (
-            <>
-              <div>
-                <label className="block text-sm font-medium mb-1">{t("guardianName")}</label>
-                <input className="w-full border rounded-lg px-3 py-2" value={guardianName} onChange={(e) => setGuardianName(e.target.value)} />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">{t("guardianPhone")}</label>
-                <input
-                  className="w-full border rounded-lg px-3 py-2"
-                  value={guardianPhone}
-                  onChange={(e) => setGuardianPhone(e.target.value)}
-                  placeholder="+998901234567"
+              </FormField>
+            ) : (
+              <FormField>
+                <Label>{t("photo")}</Label>
+                <Input
+                  type="file"
+                  accept=".jpg,.jpeg,.png,image/jpeg,image/png"
+                  className="h-auto py-2"
+                  onChange={(e) => setPhotoFile(e.target.files?.[0] || null)}
+                  required
                 />
-                <p className="text-xs text-gray-500 mt-1">{t("guardianPhoneHint")}</p>
-              </div>
-            </>
-          )}
-          {error && <p className="text-sm text-red-600">{error}</p>}
-          <div className="flex gap-2 justify-end pt-2">
-            <button type="button" onClick={onClose} className="px-4 py-2 rounded-lg border">
-              {t("cancel")}
-            </button>
-            <button type="submit" disabled={saving} className="px-4 py-2 rounded-lg bg-naqsh-primary text-white disabled:opacity-50">
-              {saving ? t("saving") : t("save")}
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
+                <p className="text-xs text-muted-foreground mt-1">{t("photoHint")}</p>
+              </FormField>
+            )}
+          </>
+        )}
+        <FormGrid>
+          <FormField>
+            <Label>{t("phone")}</Label>
+            <Input value={phone} onChange={(e) => setPhone(e.target.value)} />
+          </FormField>
+          <FormField>
+            <Label>{t("grade")}</Label>
+            <Input value={grade} onChange={(e) => setGrade(e.target.value)} />
+          </FormField>
+        </FormGrid>
+        <FormField>
+          <Label>{t("school")}</Label>
+          <Input value={school} onChange={(e) => setSchool(e.target.value)} />
+        </FormField>
+        <FormField>
+          <Label>{t("address")}</Label>
+          <Textarea rows={2} value={address} onChange={(e) => setAddress(e.target.value)} />
+        </FormField>
+        {!isEdit && (
+          <>
+            <FormField>
+              <Label>{t("guardianName")}</Label>
+              <Input value={guardianName} onChange={(e) => setGuardianName(e.target.value)} />
+            </FormField>
+            <FormField>
+              <Label>{t("guardianPhone")}</Label>
+              <Input
+                value={guardianPhone}
+                onChange={(e) => setGuardianPhone(e.target.value)}
+                placeholder="+998901234567"
+              />
+              <p className="text-xs text-muted-foreground mt-1">{t("guardianPhoneHint")}</p>
+            </FormField>
+          </>
+        )}
+        {error && <Alert variant="danger">{error}</Alert>}
+        <FormActions>
+          <Button type="button" variant="secondary" onClick={onClose}>
+            {t("cancel")}
+          </Button>
+          <Button type="submit" loading={saving}>
+            {saving ? t("saving") : t("save")}
+          </Button>
+        </FormActions>
+      </form>
+    </Modal>
   );
 }

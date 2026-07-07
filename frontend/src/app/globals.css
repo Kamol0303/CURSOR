@@ -2,30 +2,176 @@
 @import "tailwindcss/components";
 @import "tailwindcss/utilities";
 
+/* ─── Design tokens ─────────────────────────────────────────────── */
 :root {
+  /* Brand (naqsh) */
   --color-naqsh-primary: #1b4d3e;
   --color-naqsh-accent: #c8932a;
   --color-naqsh-terracotta: #a6552e;
   --color-naqsh-line: rgba(27, 77, 62, 0.12);
   --color-naqsh-line-dark: rgba(200, 147, 42, 0.18);
+
+  /* Semantic — light */
+  --color-background: #f8f9fa;
+  --color-surface: #ffffff;
+  --color-card: #ffffff;
+  --color-muted: #f1f3f5;
+  --color-muted-fg: #6b7280;
+  --color-border: rgba(0, 0, 0, 0.08);
+  --color-border-strong: rgba(0, 0, 0, 0.12);
+  --color-foreground: #111827;
+  --color-foreground-secondary: #4b5563;
+
+  --color-success: #059669;
+  --color-success-bg: #ecfdf5;
+  --color-warning: #d97706;
+  --color-warning-bg: #fffbeb;
+  --color-danger: #dc2626;
+  --color-danger-bg: #fef2f2;
+  --color-info: #0284c7;
+  --color-info-bg: #f0f9ff;
+
+  --color-hover: rgba(27, 77, 62, 0.06);
+  --color-focus: rgba(27, 77, 62, 0.25);
+  --color-disabled: #9ca3af;
+
+  /* Elevation */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 2px 4px rgba(0, 0, 0, 0.04), 0 4px 12px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 4px 8px rgba(0, 0, 0, 0.04), 0 8px 24px rgba(0, 0, 0, 0.08);
+  --shadow-xl: 0 8px 16px rgba(0, 0, 0, 0.06), 0 16px 48px rgba(0, 0, 0, 0.1);
+
+  /* Motion */
+  --duration-fast: 150ms;
+  --duration-normal: 200ms;
+  --duration-slow: 300ms;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.45, 0, 0.55, 1);
+
+  /* Radius */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --radius-2xl: 24px;
 }
 
-body {
-  color: #1a1a1a;
-  background: #fafafa;
+.dark {
+  --color-background: #0a0f0d;
+  --color-surface: #111916;
+  --color-card: #151d19;
+  --color-muted: #1a2420;
+  --color-muted-fg: #9ca3af;
+  --color-border: rgba(255, 255, 255, 0.08);
+  --color-border-strong: rgba(255, 255, 255, 0.12);
+  --color-foreground: #f3f4f6;
+  --color-foreground-secondary: #9ca3af;
+
+  --color-success-bg: rgba(5, 150, 105, 0.12);
+  --color-warning-bg: rgba(217, 119, 6, 0.12);
+  --color-danger-bg: rgba(220, 38, 38, 0.12);
+  --color-info-bg: rgba(2, 132, 199, 0.12);
+
+  --color-hover: rgba(255, 255, 255, 0.06);
+  --color-focus: rgba(200, 147, 42, 0.35);
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.2), 0 1px 3px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 2px 4px rgba(0, 0, 0, 0.2), 0 4px 12px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 4px 8px rgba(0, 0, 0, 0.25), 0 8px 24px rgba(0, 0, 0, 0.35);
+  --shadow-xl: 0 8px 16px rgba(0, 0, 0, 0.3), 0 16px 48px rgba(0, 0, 0, 0.4);
 }
 
-.dark body {
-  color: #e8ece9;
-  background: #0f1412;
+/* ─── Base ──────────────────────────────────────────────────────── */
+@layer base {
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    color: var(--color-foreground);
+    background: var(--color-background);
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+
+  *:focus-visible {
+    outline: 2px solid var(--color-focus);
+    outline-offset: 2px;
+  }
+
+  ::selection {
+    background: rgba(27, 77, 62, 0.2);
+    color: inherit;
+  }
+
+  .dark ::selection {
+    background: rgba(200, 147, 42, 0.25);
+  }
 }
 
+/* ─── Girih background pattern ──────────────────────────────────── */
 .girih-bg {
-  background-color: #fafafa;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cdefs%3E%3Cpattern id='girih' width='100' height='100' patternUnits='userSpaceOnUse'%3E%3Cpath d='M50 0 L50 25 M50 75 L50 100 M0 50 L25 50 M75 50 L100 50 M14.6 14.6 L35.4 35.4 M64.6 64.6 L85.4 85.4 M85.4 14.6 L64.6 35.4 M35.4 64.6 L14.6 85.4 M50 25 L64.6 35.4 L75 50 L64.6 64.6 L50 75 L35.4 64.6 L25 50 L35.4 35.4 Z' fill='none' stroke='rgba(27,77,62,0.06)' stroke-width='1.5'/%3E%3C/pattern%3E%3C/defs%3E%3Crect width='100%25' height='100%25' fill='url(%23girih)'/%3E%3C/svg%3E");
+  background-color: var(--color-background);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cdefs%3E%3Cpattern id='girih' width='100' height='100' patternUnits='userSpaceOnUse'%3E%3Cpath d='M50 0 L50 25 M50 75 L50 100 M0 50 L25 50 M75 50 L100 50 M14.6 14.6 L35.4 35.4 M64.6 64.6 L85.4 85.4 M85.4 14.6 L64.6 35.4 M35.4 64.6 L14.6 85.4 M50 25 L64.6 35.4 L75 50 L64.6 64.6 L50 75 L35.4 64.6 L25 50 L35.4 35.4 Z' fill='none' stroke='rgba(27,77,62,0.05)' stroke-width='1.5'/%3E%3C/pattern%3E%3C/defs%3E%3Crect width='100%25' height='100%25' fill='url(%23girih)'/%3E%3C/svg%3E");
 }
 
 .dark .girih-bg {
-  background-color: #0f1412;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cdefs%3E%3Cpattern id='girih' width='100' height='100' patternUnits='userSpaceOnUse'%3E%3Cpath d='M50 0 L50 25 M50 75 L50 100 M0 50 L25 50 M75 50 L100 50 M14.6 14.6 L35.4 35.4 M64.6 64.6 L85.4 85.4 M85.4 14.6 L64.6 35.4 M35.4 64.6 L14.6 85.4 M50 25 L64.6 35.4 L75 50 L64.6 64.6 L50 75 L35.4 64.6 L25 50 L35.4 35.4 Z' fill='none' stroke='rgba(200,147,42,0.08)' stroke-width='1.5'/%3E%3C/pattern%3E%3C/defs%3E%3Crect width='100%25' height='100%25' fill='url(%23girih)'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cdefs%3E%3Cpattern id='girih' width='100' height='100' patternUnits='userSpaceOnUse'%3E%3Cpath d='M50 0 L50 25 M50 75 L50 100 M0 50 L25 50 M75 50 L100 50 M14.6 14.6 L35.4 35.4 M64.6 64.6 L85.4 85.4 M85.4 14.6 L64.6 35.4 M35.4 64.6 L14.6 85.4 M50 25 L64.6 35.4 L75 50 L64.6 64.6 L50 75 L35.4 64.6 L25 50 L35.4 35.4 Z' fill='none' stroke='rgba(200,147,42,0.07)' stroke-width='1.5'/%3E%3C/pattern%3E%3C/defs%3E%3Crect width='100%25' height='100%25' fill='url(%23girih)'/%3E%3C/svg%3E");
+}
+
+/* ─── Animations ────────────────────────────────────────────────── */
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slide-up {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slide-down {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes scale-in {
+  from { opacity: 0; transform: scale(0.96); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.animate-fade-in {
+  animation: fade-in var(--duration-normal) var(--ease-out) both;
+}
+
+.animate-slide-up {
+  animation: slide-up var(--duration-slow) var(--ease-out) both;
+}
+
+.animate-scale-in {
+  animation: scale-in var(--duration-slow) var(--ease-out) both;
+}
+
+/* ─── Scrollbar ─────────────────────────────────────────────────── */
+@layer utilities {
+  .scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-border-strong) transparent;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background: var(--color-border-strong);
+    border-radius: 999px;
+  }
 }

@@ -3,6 +3,15 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
 import { apiFetch, uploadFile } from "@/lib/api";
+import {
+  Alert,
+  Button,
+  FormActions,
+  FormField,
+  Input,
+  Label,
+  Modal,
+} from "@/components/ui";
 
 type StudentOption = {
   id: string;
@@ -42,13 +51,6 @@ export function AddCertificateModal({ centerId, onClose, onSaved }: Props) {
         })),
       );
     }
-  }, []);
-
-  useEffect(() => {
-    document.body.style.overflow = "hidden";
-    return () => {
-      document.body.style.overflow = "";
-    };
   }, []);
 
   useEffect(() => {
@@ -126,105 +128,75 @@ export function AddCertificateModal({ centerId, onClose, onSaved }: Props) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-      <div className="bg-white rounded-xl shadow-xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
-        <form onSubmit={submit} className="p-6 space-y-4">
-          <div className="flex justify-between items-center">
-            <h3 className="text-lg font-semibold text-naqsh-primary">{t("addTitle")}</h3>
-            <button type="button" onClick={onClose} className="text-gray-400 hover:text-gray-600">
-              ✕
-            </button>
-          </div>
+    <Modal onClose={onClose} title={t("addTitle")}>
+      <form onSubmit={submit} className="space-y-4">
+        <FormField>
+          <Label>{t("student")}</Label>
+          <Input
+            type="text"
+            value={search}
+            onChange={(e) => {
+              setSearch(e.target.value);
+              setSelectedStudent(null);
+            }}
+            placeholder={t("studentSearch")}
+          />
+          {loadingStudents ? (
+            <p className="text-xs text-muted-foreground mt-1">{t("loadingStudents")}</p>
+          ) : (
+            <ul className="mt-2 max-h-32 overflow-y-auto border border-border rounded-lg divide-y divide-border">
+              {filteredStudents.map((s) => (
+                <li key={s.id}>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSelectedStudent(s);
+                      setSearch(s.full_name);
+                    }}
+                    className={`w-full text-left px-3 py-2 text-small hover:bg-muted transition-colors ${
+                      selectedStudent?.id === s.id ? "bg-muted font-medium" : ""
+                    }`}
+                  >
+                    {s.full_name}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
+        </FormField>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">{t("student")}</label>
-            <input
-              type="text"
-              value={search}
-              onChange={(e) => {
-                setSearch(e.target.value);
-                setSelectedStudent(null);
-              }}
-              placeholder={t("studentSearch")}
-              className="w-full border rounded-lg px-3 py-2 text-sm"
-            />
-            {loadingStudents ? (
-              <p className="text-xs text-gray-400 mt-1">{t("loadingStudents")}</p>
-            ) : (
-              <ul className="mt-2 max-h-32 overflow-y-auto border rounded-lg divide-y">
-                {filteredStudents.map((s) => (
-                  <li key={s.id}>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setSelectedStudent(s);
-                        setSearch(s.full_name);
-                      }}
-                      className={`w-full text-left px-3 py-2 text-sm hover:bg-amber-50 ${
-                        selectedStudent?.id === s.id ? "bg-amber-50 font-medium" : ""
-                      }`}
-                    >
-                      {s.full_name}
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
+        <FormField>
+          <Label>{t("certTitle")}</Label>
+          <Input type="text" value={title} onChange={(e) => setTitle(e.target.value)} required />
+        </FormField>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">{t("certTitle")}</label>
-            <input
-              type="text"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              required
-              className="w-full border rounded-lg px-3 py-2 text-sm"
-            />
-          </div>
+        <FormField>
+          <Label>{t("issueDate")}</Label>
+          <Input type="date" value={issueDate} onChange={(e) => setIssueDate(e.target.value)} required />
+        </FormField>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">{t("issueDate")}</label>
-            <input
-              type="date"
-              value={issueDate}
-              onChange={(e) => setIssueDate(e.target.value)}
-              required
-              className="w-full border rounded-lg px-3 py-2 text-sm"
-            />
-          </div>
+        <FormField>
+          <Label>{t("file")}</Label>
+          <Input
+            type="file"
+            accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png"
+            className="h-auto py-2"
+            onChange={onFileChange}
+          />
+          <p className="text-xs text-muted-foreground mt-1">{t("fileHint")}</p>
+        </FormField>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">{t("file")}</label>
-            <input
-              type="file"
-              accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png"
-              onChange={onFileChange}
-              className="w-full text-sm"
-            />
-            <p className="text-xs text-gray-400 mt-1">{t("fileHint")}</p>
-          </div>
+        {error && <Alert variant="danger">{error}</Alert>}
 
-          {error && <p className="text-sm text-red-600">{error}</p>}
-
-          <div className="flex gap-2 pt-2">
-            <button
-              type="button"
-              onClick={onClose}
-              className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-sm"
-            >
-              {t("cancel")}
-            </button>
-            <button
-              type="submit"
-              disabled={saving}
-              className="flex-1 px-4 py-2 bg-naqsh-primary text-white rounded-lg text-sm disabled:opacity-50"
-            >
-              {saving ? t("saving") : t("save")}
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
+        <FormActions>
+          <Button type="button" variant="secondary" onClick={onClose} className="flex-1 sm:flex-none">
+            {t("cancel")}
+          </Button>
+          <Button type="submit" loading={saving} className="flex-1 sm:flex-none">
+            {saving ? t("saving") : t("save")}
+          </Button>
+        </FormActions>
+      </form>
+    </Modal>
   );
 }

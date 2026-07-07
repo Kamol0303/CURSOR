@@ -4,6 +4,17 @@ import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import {
+  Alert,
+  Button,
+  Card,
+  CardBody,
+  CardDescription,
+  CardTitle,
+  FormField,
+  Input,
+  Label,
+} from "@/components/ui";
 import { apiFetch } from "@/lib/api";
 
 type VerifyResult = {
@@ -49,62 +60,65 @@ export default function VerifyPage({ certNumber }: { certNumber?: string }) {
         <LanguageSwitcher />
       </header>
       <main className="flex-1 flex items-center justify-center p-4">
-        <div className="w-full max-w-lg bg-white/95 dark:bg-gray-900/95 rounded-2xl shadow-xl border border-naqsh-primary/10 dark:border-white/10 p-8">
-          <h1 className="text-xl font-bold text-naqsh-primary dark:text-naqsh-accent mb-2">{t("title")}</h1>
-          <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">{t("subtitle")}</p>
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              if (number.trim()) verify(number.trim());
-            }}
-            className="space-y-4"
-          >
-            <input
-              type="text"
-              value={number}
-              onChange={(e) => setNumber(e.target.value)}
-              placeholder={t("placeholder")}
-              className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-naqsh-primary/30 outline-none"
-            />
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full py-2.5 bg-naqsh-primary text-white rounded-lg font-medium disabled:opacity-50"
+        <Card className="w-full max-w-lg shadow-xl bg-card/95 backdrop-blur-sm">
+          <CardBody className="p-8">
+            <CardTitle className="text-h3 text-naqsh-primary dark:text-naqsh-accent">
+              {t("title")}
+            </CardTitle>
+            <CardDescription className="mb-6">{t("subtitle")}</CardDescription>
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                if (number.trim()) verify(number.trim());
+              }}
+              className="space-y-4"
             >
-              {loading ? t("checking") : t("check")}
-            </button>
-          </form>
-          {result && (
-            <div
-              className={`mt-6 p-4 rounded-lg border ${
-                result.valid ? "bg-green-50 border-green-200" : "bg-red-50 border-red-200"
-              }`}
-            >
-              <p className="font-semibold">{result.valid ? t("valid") : t("invalid")}</p>
-              {result.holder_name && (
-                <dl className="mt-3 space-y-1 text-sm">
-                  <div>
-                    <dt className="text-gray-500">{t("holder")}</dt>
-                    <dd>{result.holder_name}</dd>
-                  </div>
-                  <div>
-                    <dt className="text-gray-500">{t("course")}</dt>
-                    <dd>{result.course_name}</dd>
-                  </div>
-                  <div>
-                    <dt className="text-gray-500">{t("center")}</dt>
-                    <dd>{result.center_name}</dd>
-                  </div>
-                  <div>
-                    <dt className="text-gray-500">{t("date")}</dt>
-                    <dd>{result.issue_date}</dd>
-                  </div>
-                </dl>
-              )}
-            </div>
-          )}
-          {error && <p className="mt-4 text-sm text-red-600">{error}</p>}
-        </div>
+              <FormField>
+                <Label htmlFor="cert-number">{t("placeholder")}</Label>
+                <Input
+                  id="cert-number"
+                  type="text"
+                  value={number}
+                  onChange={(e) => setNumber(e.target.value)}
+                  placeholder={t("placeholder")}
+                />
+              </FormField>
+              <Button type="submit" loading={loading} className="w-full">
+                {loading ? t("checking") : t("check")}
+              </Button>
+            </form>
+            {result && (
+              <Alert variant={result.valid ? "success" : "danger"} className="mt-6">
+                <p className="font-semibold">{result.valid ? t("valid") : t("invalid")}</p>
+                {result.holder_name && (
+                  <dl className="mt-3 space-y-2 text-small">
+                    <div>
+                      <dt className="text-muted-foreground">{t("holder")}</dt>
+                      <dd className="text-foreground">{result.holder_name}</dd>
+                    </div>
+                    <div>
+                      <dt className="text-muted-foreground">{t("course")}</dt>
+                      <dd className="text-foreground">{result.course_name}</dd>
+                    </div>
+                    <div>
+                      <dt className="text-muted-foreground">{t("center")}</dt>
+                      <dd className="text-foreground">{result.center_name}</dd>
+                    </div>
+                    <div>
+                      <dt className="text-muted-foreground">{t("date")}</dt>
+                      <dd className="text-foreground">{result.issue_date}</dd>
+                    </div>
+                  </dl>
+                )}
+              </Alert>
+            )}
+            {error && (
+              <Alert variant="danger" className="mt-4">
+                {error}
+              </Alert>
+            )}
+          </CardBody>
+        </Card>
       </main>
     </div>
   );

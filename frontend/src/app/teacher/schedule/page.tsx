@@ -2,6 +2,16 @@
 
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
+import {
+  Card,
+  CardBody,
+  CardDescription,
+  CardTitle,
+  EmptyState,
+  PageHeader,
+  PageSection,
+  PageSkeleton,
+} from "@/components/ui";
 import { apiFetch } from "@/lib/api";
 
 type ScheduleItem = {
@@ -25,28 +35,31 @@ export default function TeacherSchedulePage() {
       .finally(() => setLoading(false));
   }, []);
 
+  if (loading) return <PageSkeleton />;
+
   return (
-    <div className="space-y-4 max-w-3xl">
-      <h2 className="text-xl font-bold text-naqsh-primary">{t("nav.schedule")}</h2>
-      {loading ? (
-        <p className="text-gray-400">{t("loading")}</p>
-      ) : items.length === 0 ? (
-        <p className="text-gray-400">{t("noSchedule")}</p>
+    <PageSection className="max-w-3xl">
+      <PageHeader title={t("nav.schedule")} />
+
+      {items.length === 0 ? (
+        <EmptyState title={t("noSchedule")} />
       ) : (
-        <div className="space-y-3">
+        <div className="space-y-4">
           {items.map((item) => (
-            <div key={item.group_id} className="bg-white rounded-xl border p-4">
-              <h3 className="font-semibold text-naqsh-primary">{item.group_name}</h3>
-              <p className="text-sm text-gray-600">
-                {item.subject_name || "—"} · {t("room")}: {item.room || "—"}
-              </p>
-              <pre className="mt-2 text-xs bg-gray-50 rounded-lg p-3 overflow-x-auto">
-                {JSON.stringify(item.schedule, null, 2)}
-              </pre>
-            </div>
+            <Card key={item.group_id}>
+              <CardBody>
+                <CardTitle>{item.group_name}</CardTitle>
+                <CardDescription>
+                  {item.subject_name || "—"} · {t("room")}: {item.room || "—"}
+                </CardDescription>
+                <pre className="mt-4 text-caption bg-muted rounded-lg p-4 overflow-x-auto text-muted-foreground">
+                  {JSON.stringify(item.schedule, null, 2)}
+                </pre>
+              </CardBody>
+            </Card>
           ))}
         </div>
       )}
-    </div>
+    </PageSection>
   );
 }

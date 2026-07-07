@@ -7,6 +7,16 @@ import { ChangePasswordForm } from "@/components/ChangePasswordForm";
 import { AdminResetPasswordForm } from "@/components/AdminResetPasswordForm";
 import { IssueCredentialsForm } from "@/components/IssueCredentialsForm";
 import { PermissionGate } from "@/components/PermissionGate";
+import {
+  Alert,
+  Badge,
+  Button,
+  Card,
+  CardBody,
+  CardTitle,
+  PageHeader,
+  PageSection,
+} from "@/components/ui";
 import { getApiBaseUrl, getToken } from "@/lib/api";
 
 export default function SecurityPage() {
@@ -56,103 +66,93 @@ export default function SecurityPage() {
   };
 
   return (
-    <div className="max-w-lg space-y-6">
-      <div>
-        <h2 className="text-2xl font-bold text-gray-900">{t("title")}</h2>
-        <p className="text-gray-500 mt-1">{t("subtitle")}</p>
-      </div>
+    <PageSection className="max-w-lg">
+      <PageHeader title={t("title")} description={t("subtitle")} />
 
-      <div className="bg-white rounded-xl border p-6 space-y-4">
-        <ChangePasswordForm />
-      </div>
+      <Card>
+        <CardBody>
+          <ChangePasswordForm />
+        </CardBody>
+      </Card>
 
       <PermissionGate permission="users.password_reset">
-        <div className="bg-white rounded-xl border p-6">
-          <AdminResetPasswordForm />
-        </div>
+        <Card>
+          <CardBody>
+            <AdminResetPasswordForm />
+          </CardBody>
+        </Card>
       </PermissionGate>
 
       <PermissionGate permission="security.credentials.issue">
-        <div className="bg-white rounded-xl border p-6">
-          <IssueCredentialsForm />
-        </div>
+        <Card>
+          <CardBody>
+            <IssueCredentialsForm />
+          </CardBody>
+        </Card>
       </PermissionGate>
 
-      <div className="bg-white rounded-xl border p-6 space-y-4">
-        <div className="flex justify-between items-center">
-          <div>
-            <h3 className="font-semibold">{t("mfaLabel")}</h3>
-            <p className="text-sm text-gray-500">
-              {mfaEnabled ? t("mfaEnabled") : t("mfaDisabled")}
-              {mfaRequired && ` · ${t("mfaRequired")}`}
-            </p>
+      <Card>
+        <CardBody className="space-y-4">
+          <div className="flex justify-between items-center">
+            <div>
+              <CardTitle>{t("mfaLabel")}</CardTitle>
+              <p className="text-small text-muted-foreground mt-0.5">
+                {mfaEnabled ? t("mfaEnabled") : t("mfaDisabled")}
+                {mfaRequired && ` · ${t("mfaRequired")}`}
+              </p>
+            </div>
+            <Badge variant={mfaEnabled ? "success" : "warning"}>
+              {mfaEnabled ? t("statusOn") : t("statusOff")}
+            </Badge>
           </div>
-          <span
-            className={`px-2 py-1 rounded text-xs font-medium ${
-              mfaEnabled ? "bg-green-100 text-green-800" : "bg-amber-100 text-amber-800"
-            }`}
-          >
-            {mfaEnabled ? t("statusOn") : t("statusOff")}
-          </span>
-        </div>
 
-        {!mfaEnabled && !showSetup && (
-          <button
-            type="button"
-            onClick={() => {
-              setShowSetup(true);
-              setError(null);
-              setMessage(null);
-            }}
-            className="px-4 py-2 bg-naqsh-primary text-white rounded-lg text-sm font-medium hover:bg-naqsh-primary/90"
-          >
-            {t("enableMfa")}
-          </button>
-        )}
-
-        {showSetup && !mfaEnabled && (
-          <MfaSetupForm
-            accessToken={getToken() || undefined}
-            onComplete={() => {
-              setMfaEnabled(true);
-              setShowSetup(false);
-              setMessage(t("mfaEnabledSuccess"));
-            }}
-            onError={(code) => setError(t(`errors.${code}` as "errors.MFA_INVALID"))}
-          />
-        )}
-
-        {mfaEnabled && (
-          <div className="space-y-2 pt-2 border-t">
-            <p className="text-sm text-gray-600">{t("backupCodesHint")}</p>
-            <button
-              type="button"
-              onClick={regenerateBackupCodes}
-              disabled={regenerating}
-              className="px-4 py-2 border rounded-lg text-sm hover:bg-gray-50 disabled:opacity-50"
+          {!mfaEnabled && !showSetup && (
+            <Button
+              onClick={() => {
+                setShowSetup(true);
+                setError(null);
+                setMessage(null);
+              }}
             >
-              {regenerating ? t("backupCodesRegenerating") : t("regenerateBackupCodes")}
-            </button>
-            {backupCodes && (
-              <div className="rounded-lg bg-amber-50 border border-amber-200 p-3">
-                <p className="text-xs font-semibold text-amber-900 mb-2">{t("backupCodesOnce")}</p>
-                <ul className="font-mono text-sm space-y-1">
-                  {backupCodes.map((code) => (
-                    <li key={code}>{code}</li>
-                  ))}
-                </ul>
-              </div>
-            )}
-          </div>
-        )}
+              {t("enableMfa")}
+            </Button>
+          )}
 
-        {message && <p className="text-sm text-green-700">{message}</p>}
-        {error && (
-          <p className="text-sm text-red-600" role="alert">
-            {error}
-          </p>
-        )}
-      </div>
-    </div>
+          {showSetup && !mfaEnabled && (
+            <MfaSetupForm
+              accessToken={getToken() || undefined}
+              onComplete={() => {
+                setMfaEnabled(true);
+                setShowSetup(false);
+                setMessage(t("mfaEnabledSuccess"));
+              }}
+              onError={(code) => setError(t(`errors.${code}` as "errors.MFA_INVALID"))}
+            />
+          )}
+
+          {mfaEnabled && (
+            <div className="space-y-2 pt-2 border-t border-border">
+              <p className="text-small text-muted-foreground">{t("backupCodesHint")}</p>
+              <Button variant="outline" onClick={regenerateBackupCodes} disabled={regenerating} loading={regenerating}>
+                {regenerating ? t("backupCodesRegenerating") : t("regenerateBackupCodes")}
+              </Button>
+              {backupCodes && (
+                <Alert variant="warning">
+                  <p className="text-caption font-semibold mb-2">{t("backupCodesOnce")}</p>
+                  <ul className="font-mono text-small space-y-1">
+                    {backupCodes.map((code) => (
+                      <li key={code}>{code}</li>
+                    ))}
+                  </ul>
+                </Alert>
+              )}
+            </div>
+          )}
+
+          {message && <Alert variant="success">{message}</Alert>}
+          {error && <Alert variant="danger">{error}</Alert>}
+        </CardBody>
+      </Card>
+    </PageSection>
   );
 }

@@ -3,6 +3,16 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
+import {
+  Card,
+  CardBody,
+  CardDescription,
+  CardTitle,
+  EmptyState,
+  PageHeader,
+  PageSection,
+  PageSkeleton,
+} from "@/components/ui";
 import { apiFetch } from "@/lib/api";
 
 type Group = {
@@ -28,30 +38,31 @@ export default function TeacherGroupsPage() {
       .finally(() => setLoading(false));
   }, []);
 
+  if (loading) return <PageSkeleton />;
+
   return (
-    <div className="space-y-4 max-w-3xl">
-      <h2 className="text-xl font-bold text-naqsh-primary">{t("nav.groups")}</h2>
-      {loading ? (
-        <p className="text-gray-400">{t("loading")}</p>
-      ) : groups.length === 0 ? (
-        <p className="text-gray-400">{t("noGroups")}</p>
+    <PageSection className="max-w-3xl">
+      <PageHeader title={t("nav.groups")} />
+
+      {groups.length === 0 ? (
+        <EmptyState title={t("noGroups")} />
       ) : (
         <div className="grid gap-4 md:grid-cols-2">
           {groups.map((g) => (
-            <Link
-              key={g.id}
-              href={`/teacher/groups/${g.id}`}
-              className="bg-white rounded-xl border p-4 shadow-sm hover:border-naqsh-primary/30 transition-colors"
-            >
-              <h3 className="font-semibold text-naqsh-primary">{g.name}</h3>
-              <p className="text-sm text-gray-600">{g.subject_name_uz || "—"}</p>
-              <p className="text-sm text-gray-500 mt-1">
-                {t("room")}: {g.room || "—"} · {t("students")}: {g.enrollment_count}
-              </p>
+            <Link key={g.id} href={`/teacher/groups/${g.id}`}>
+              <Card hover className="h-full">
+                <CardBody>
+                  <CardTitle>{g.name}</CardTitle>
+                  <CardDescription>{g.subject_name_uz || "—"}</CardDescription>
+                  <p className="text-small text-muted-foreground mt-3">
+                    {t("room")}: {g.room || "—"} · {t("students")}: {g.enrollment_count}
+                  </p>
+                </CardBody>
+              </Card>
             </Link>
           ))}
         </div>
       )}
-    </div>
+    </PageSection>
   );
 }

@@ -3,6 +3,17 @@
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
+import {
+  Alert,
+  Button,
+  Card,
+  CardBody,
+  CardDescription,
+  CardTitle,
+  FormField,
+  Input,
+  Label,
+} from "@/components/ui";
 import { apiFetch } from "@/lib/api";
 
 export function ParentLoginForm() {
@@ -45,63 +56,80 @@ export function ParentLoginForm() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
-      <div className="w-full max-w-md bg-white rounded-2xl shadow-lg p-8 border">
-        <h1 className="text-2xl font-bold text-naqsh-primary mb-1">{t("title")}</h1>
-        <p className="text-sm text-gray-600 mb-6">{t("subtitle")}</p>
+    <div className="min-h-screen flex items-center justify-center bg-background p-4">
+      <Card className="w-full max-w-md shadow-lg">
+        <CardBody className="p-8">
+          <CardTitle className="text-h2 text-naqsh-primary">{t("title")}</CardTitle>
+          <CardDescription className="mb-6">{t("subtitle")}</CardDescription>
 
-        {step === "phone" ? (
-          <div className="space-y-4">
-            <label className="block text-sm font-medium text-gray-700">{t("phone")}</label>
-            <input
-              type="tel"
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              className="w-full border rounded-lg px-3 py-2"
-              placeholder="+998901234567"
-            />
-            <button
-              type="button"
-              onClick={requestOtp}
-              disabled={loading || phone.length < 13}
-              className="w-full bg-naqsh-primary text-white py-2 rounded-lg hover:opacity-90 disabled:opacity-50"
-            >
-              {loading ? t("sending") : t("sendOtp")}
-            </button>
-          </div>
-        ) : (
-          <div className="space-y-4">
-            <label className="block text-sm font-medium text-gray-700">{t("otp")}</label>
-            <input
-              type="text"
-              value={otp}
-              onChange={(e) => setOtp(e.target.value)}
-              className="w-full border rounded-lg px-3 py-2 tracking-widest"
-              placeholder="123456"
-              maxLength={6}
-            />
-            <button
-              type="button"
-              onClick={verifyOtp}
-              disabled={loading || otp.length < 4}
-              className="w-full bg-naqsh-primary text-white py-2 rounded-lg hover:opacity-90 disabled:opacity-50"
-            >
-              {loading ? t("verifying") : t("verify")}
-            </button>
-            <button type="button" onClick={() => setStep("phone")} className="text-sm text-gray-500 hover:underline">
-              {t("changePhone")}
-            </button>
-          </div>
-        )}
+          {step === "phone" ? (
+            <div className="space-y-4">
+              <FormField>
+                <Label>{t("phone")}</Label>
+                <Input
+                  type="tel"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  placeholder="+998901234567"
+                />
+              </FormField>
+              <Button
+                type="button"
+                onClick={requestOtp}
+                loading={loading}
+                disabled={phone.length < 13}
+                className="w-full"
+              >
+                {loading ? t("sending") : t("sendOtp")}
+              </Button>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              <FormField>
+                <Label>{t("otp")}</Label>
+                <Input
+                  type="text"
+                  value={otp}
+                  onChange={(e) => setOtp(e.target.value)}
+                  className="tracking-widest"
+                  placeholder="123456"
+                  maxLength={6}
+                />
+              </FormField>
+              <Button
+                type="button"
+                onClick={verifyOtp}
+                loading={loading}
+                disabled={otp.length < 4}
+                className="w-full"
+              >
+                {loading ? t("verifying") : t("verify")}
+              </Button>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => setStep("phone")}
+                className="w-full"
+              >
+                {t("changePhone")}
+              </Button>
+            </div>
+          )}
 
-        {error && <p className="mt-4 text-sm text-red-600">{error}</p>}
+          {error && (
+            <Alert variant="danger" className="mt-4">
+              {error}
+            </Alert>
+          )}
 
-        <p className="mt-6 text-center text-sm text-gray-500">
-          <Link href="/" className="text-naqsh-accent hover:underline">
-            {t("staffLogin")}
-          </Link>
-        </p>
-      </div>
+          <p className="mt-6 text-center text-small text-muted-foreground">
+            <Link href="/" className="text-naqsh-accent hover:underline">
+              {t("staffLogin")}
+            </Link>
+          </p>
+        </CardBody>
+      </Card>
     </div>
   );
 }

@@ -2,6 +2,14 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
+import {
+  Alert,
+  Button,
+  FormField,
+  Input,
+  Label,
+  Spinner,
+} from "@/components/ui";
 import { apiFetch } from "@/lib/api";
 
 type CredentialTarget = {
@@ -61,34 +69,37 @@ export function IssueCredentialsForm() {
   };
 
   return (
-    <div className="space-y-3 border-t pt-4 mt-4">
-      <h3 className="font-semibold">{t("issueCredentialsTitle")}</h3>
-      <p className="text-xs text-gray-500">{t("issueCredentialsHint")}</p>
+    <div className="space-y-4 border-t border-border pt-4 mt-4">
+      <h3 className="font-semibold text-foreground">{t("issueCredentialsTitle")}</h3>
+      <p className="text-caption text-muted-foreground">{t("issueCredentialsHint")}</p>
 
-      <input
-        type="text"
-        className="w-full border rounded-lg px-3 py-2"
-        placeholder={t("searchUser")}
-        value={search}
-        onChange={(e) => {
-          setSearch(e.target.value);
-          setSelected(null);
-        }}
-      />
+      <FormField>
+        <Label htmlFor="credential-search">{t("searchUser")}</Label>
+        <Input
+          id="credential-search"
+          type="text"
+          placeholder={t("searchUser")}
+          value={search}
+          onChange={(e) => {
+            setSearch(e.target.value);
+            setSelected(null);
+          }}
+        />
+      </FormField>
 
-      {loading && <p className="text-xs text-gray-400">{t("searching")}</p>}
+      {loading && <Spinner label={t("searching")} className="py-2 justify-start" />}
 
       {!selected && targets.length > 0 && (
-        <ul className="border rounded-lg divide-y max-h-48 overflow-y-auto">
+        <ul className="border border-border rounded-lg divide-y divide-border max-h-48 overflow-y-auto">
           {targets.map((target) => (
             <li key={target.id}>
               <button
                 type="button"
-                className="w-full text-left px-3 py-2 text-sm hover:bg-gray-50"
+                className="w-full text-left px-3 py-2.5 text-small hover:bg-muted transition-colors"
                 onClick={() => setSelected(target)}
               >
-                <span className="font-medium">{target.display_name}</span>
-                <span className="text-gray-500 ml-2 text-xs">
+                <span className="font-medium text-foreground">{target.display_name}</span>
+                <span className="text-muted-foreground ml-2 text-caption">
                   {t(`roles.${target.role}` as "roles.teacher")}
                 </span>
               </button>
@@ -98,40 +109,35 @@ export function IssueCredentialsForm() {
       )}
 
       {selected && (
-        <div className="rounded-lg bg-blue-50 border border-blue-200 p-3 text-sm flex justify-between items-center">
+        <Alert variant="info" className="flex justify-between items-center">
           <span>
             {selected.display_name} ({t(`roles.${selected.role}` as "roles.teacher")})
           </span>
-          <button type="button" className="text-xs text-blue-700 underline" onClick={() => setSelected(null)}>
+          <Button type="button" variant="ghost" size="sm" onClick={() => setSelected(null)}>
             {t("clearSelection")}
-          </button>
-        </div>
+          </Button>
+        </Alert>
       )}
 
-      {error && <p className="text-sm text-red-600">{error}</p>}
+      {error && <Alert variant="danger">{error}</Alert>}
 
       {issued && (
-        <div className="rounded-lg bg-amber-50 border border-amber-200 p-3 space-y-2">
-          <p className="text-xs font-semibold text-amber-900">{t("credentialsOnce")}</p>
-          <p className="text-sm">
-            <span className="text-gray-600">{t("issuedLogin")}: </span>
+        <Alert variant="warning">
+          <p className="text-caption font-semibold">{t("credentialsOnce")}</p>
+          <p className="text-small mt-2">
+            <span className="text-muted-foreground">{t("issuedLogin")}: </span>
             <code className="font-mono">{issued.login}</code>
           </p>
-          <p className="text-sm">
-            <span className="text-gray-600">{t("issuedPassword")}: </span>
+          <p className="text-small mt-1">
+            <span className="text-muted-foreground">{t("issuedPassword")}: </span>
             <code className="font-mono">{issued.temporary_password}</code>
           </p>
-        </div>
+        </Alert>
       )}
 
-      <button
-        type="button"
-        disabled={!selected || issuing}
-        onClick={() => void issue()}
-        className="px-4 py-2 bg-naqsh-primary text-white rounded-lg text-sm disabled:opacity-50"
-      >
+      <Button type="button" disabled={!selected} loading={issuing} onClick={() => void issue()}>
         {issuing ? t("saving") : t("issueCredentialsButton")}
-      </button>
+      </Button>
     </div>
   );
 }

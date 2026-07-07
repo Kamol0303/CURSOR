@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { apiFetch } from "@/lib/api";
+import { Alert, Button, FormField, Input, Label, Modal } from "@/components/ui";
 
 type TeacherOption = {
   id: string;
@@ -45,13 +46,6 @@ export function AssignTeacherModal({ groupId, groupName, currentTeacherName, onC
   }, []);
 
   useEffect(() => {
-    document.body.style.overflow = "hidden";
-    return () => {
-      document.body.style.overflow = "";
-    };
-  }, []);
-
-  useEffect(() => {
     const timer = setTimeout(() => {
       void loadTeachers(search);
     }, 250);
@@ -77,25 +71,36 @@ export function AssignTeacherModal({ groupId, groupName, currentTeacherName, onC
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-      <div className="bg-white rounded-xl shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto">
-        <div className="p-4 border-b flex justify-between items-start">
-          <div>
-            <h3 className="font-semibold text-naqsh-primary">{t("assignTeacherTitle")}</h3>
-            <p className="text-sm text-gray-500">{groupName}</p>
-            {currentTeacherName && (
-              <p className="text-xs text-gray-400 mt-1">{t("currentTeacher", { name: currentTeacherName })}</p>
-            )}
-          </div>
-          <button type="button" onClick={onClose} className="text-gray-400 hover:text-gray-600">
-            ×
-          </button>
-        </div>
-
-        <div className="p-4 space-y-3">
-          <input
+    <Modal
+      onClose={onClose}
+      title={t("assignTeacherTitle")}
+      description={
+        <>
+          <span>{groupName}</span>
+          {currentTeacherName && (
+            <span className="block text-xs text-muted-foreground mt-1">
+              {t("currentTeacher", { name: currentTeacherName })}
+            </span>
+          )}
+        </>
+      }
+      size="sm"
+      footer={
+        <>
+          <Button type="button" variant="secondary" onClick={onClose}>
+            {t("cancel")}
+          </Button>
+          <Button type="button" disabled={!selected || saving} loading={saving} onClick={() => void assign()}>
+            {saving ? t("assigning") : t("assignTeacher")}
+          </Button>
+        </>
+      }
+    >
+      <div className="space-y-3">
+        <FormField>
+          <Label className="sr-only">{t("searchTeacher")}</Label>
+          <Input
             type="text"
-            className="w-full border rounded-lg px-3 py-2"
             placeholder={t("searchTeacher")}
             value={search}
             onChange={(e) => {
@@ -103,54 +108,44 @@ export function AssignTeacherModal({ groupId, groupName, currentTeacherName, onC
               setSelected(null);
             }}
           />
+        </FormField>
 
-          {loading && <p className="text-xs text-gray-400">{t("searching")}</p>}
+        {loading && <p className="text-xs text-muted-foreground">{t("searching")}</p>}
 
-          {!selected && teachers.length > 0 && (
-            <ul className="border rounded-lg divide-y max-h-48 overflow-y-auto">
-              {teachers.map((teacher) => (
-                <li key={teacher.id}>
-                  <button
-                    type="button"
-                    className="w-full text-left px-3 py-2 text-sm hover:bg-gray-50"
-                    onClick={() => setSelected(teacher)}
-                  >
-                    <span className="font-medium">{teacher.full_name}</span>
-                    {teacher.specialization && (
-                      <span className="text-gray-500 ml-2 text-xs">{teacher.specialization}</span>
-                    )}
-                  </button>
-                </li>
-              ))}
-            </ul>
-          )}
+        {!selected && teachers.length > 0 && (
+          <ul className="border border-border rounded-lg divide-y divide-border max-h-48 overflow-y-auto">
+            {teachers.map((teacher) => (
+              <li key={teacher.id}>
+                <button
+                  type="button"
+                  className="w-full text-left px-3 py-2 text-small hover:bg-muted transition-colors"
+                  onClick={() => setSelected(teacher)}
+                >
+                  <span className="font-medium">{teacher.full_name}</span>
+                  {teacher.specialization && (
+                    <span className="text-muted-foreground ml-2 text-xs">{teacher.specialization}</span>
+                  )}
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
 
-          {selected && (
-            <div className="rounded-lg bg-blue-50 border border-blue-200 p-3 text-sm flex justify-between items-center">
-              <span>{selected.full_name}</span>
-              <button type="button" className="text-xs text-blue-700 underline" onClick={() => setSelected(null)}>
-                {t("clearSelection")}
-              </button>
-            </div>
-          )}
+        {selected && (
+          <Alert variant="info" className="flex justify-between items-center">
+            <span>{selected.full_name}</span>
+            <button
+              type="button"
+              className="text-xs underline shrink-0 ml-2"
+              onClick={() => setSelected(null)}
+            >
+              {t("clearSelection")}
+            </button>
+          </Alert>
+        )}
 
-          {error && <p className="text-sm text-red-600">{error}</p>}
-        </div>
-
-        <div className="p-4 border-t flex gap-2 justify-end">
-          <button type="button" onClick={onClose} className="px-4 py-2 border rounded-lg text-sm">
-            {t("cancel")}
-          </button>
-          <button
-            type="button"
-            disabled={!selected || saving}
-            onClick={() => void assign()}
-            className="px-4 py-2 bg-naqsh-primary text-white rounded-lg text-sm disabled:opacity-50"
-          >
-            {saving ? t("assigning") : t("assignTeacher")}
-          </button>
-        </div>
+        {error && <Alert variant="danger">{error}</Alert>}
       </div>
-    </div>
+    </Modal>
   );
 }

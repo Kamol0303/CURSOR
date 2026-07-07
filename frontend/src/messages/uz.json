@@ -124,6 +124,13 @@
           "three": { "text": "Hisobotlar tez tayyorlanadi, vaqt tejaymiz.", "author": "— Administrator" }
         }
       },
+      "creator": {
+        "ariaLabel": "Platforma yaratuvchisi",
+        "label": "Platformani yaratdi",
+        "name": "Kamolbek",
+        "linkAria": "Bog'lanish",
+        "linkHref": "https://t.me/"
+      },
       "cta": {
         "eyebrow": "5 000+ foydalanuvchi ishonchi",
         "title": "Ta'lim monitoringi va aqlli boshqaruv",

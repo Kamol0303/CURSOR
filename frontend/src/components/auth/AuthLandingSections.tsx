@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { AuthArrowButton } from "@/components/AuthButton";
+import { AuthCreator } from "@/components/auth/AuthCreator";
 import { TmbLogo } from "@/components/TmbLogo";
 
 const PARTNER_LABELS = ["Toyloq tumani", "Samarqand", "Markazlar", "O'quvchilar", "O'qituvchilar", "Monitoring"];
@@ -196,6 +197,8 @@ export function AuthLandingSections() {
           </div>
         </div>
       </section>
+
+      <AuthCreator />
 
       <section className="aeline-cta">
         <div className="aeline-container aeline-cta__inner">

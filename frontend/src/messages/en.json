@@ -104,6 +104,13 @@
           "three": { "text": "Reports are ready quickly — we save time.", "author": "— Administrator" }
         }
       },
+      "creator": {
+        "ariaLabel": "Platform creator",
+        "label": "Created the platform",
+        "name": "Kamolbek",
+        "linkAria": "Get in touch",
+        "linkHref": "https://t.me/"
+      },
       "cta": {
         "eyebrow": "Trusted by 5,000+ users",
         "title": "Education monitoring and smart management",

@@ -10,7 +10,7 @@ from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.academics import LessonMaterial
-from app.models.education import Group, Subject
+from app.models.education import Group, Subject, TeacherSubject
 from app.models.identity import User
 from app.schemas.lesson_materials import LessonGenerateRequest, LessonMaterialResponse
 from app.services import llm_service
@@ -41,29 +41,51 @@ def material_to_response(material: LessonMaterial, *, subject_name: str | None =
     )
 
 
+async def _teacher_assigned_subject_ids(db: AsyncSession, teacher) -> set[UUID]:
+    group_ids = (
+        await db.execute(
+            select(Group.subject_id).where(
+                Group.center_id == teacher.center_id,
+                Group.teacher_id == teacher.id,
+                Group.deleted_at.is_(None),
+            )
+        )
+    ).scalars().all()
+    assigned_ids = (
+        await db.execute(select(TeacherSubject.subject_id).where(TeacherSubject.teacher_id == teacher.id))
+    ).scalars().all()
+    return set(group_ids) | set(assigned_ids)
+
+
+async def _teacher_can_use_subject(db: AsyncSession, teacher, subject_id: UUID) -> bool:
+    assigned = await _teacher_assigned_subject_ids(db, teacher)
+    return subject_id in assigned
+
+
 async def list_teacher_subjects(db: AsyncSession, user: User) -> list[dict]:
     teacher = await get_linked_teacher(db, user)
+    assigned_ids = await _teacher_assigned_subject_ids(db, teacher)
+    if not assigned_ids:
+        return []
+
     result = await db.execute(
-        select(Group.subject_id, Subject.name_uz, Subject.name_ru, Subject.name_en)
-        .join(Subject, Subject.id == Group.subject_id)
-        .where(Group.center_id == teacher.center_id, Group.teacher_id == teacher.id, Group.deleted_at.is_(None))
-        .distinct()
+        select(Subject.id, Subject.name_uz, Subject.name_ru, Subject.name_en).where(
+            Subject.id.in_(assigned_ids),
+            Subject.deleted_at.is_(None),
+            Subject.is_active.is_(True),
+        )
     )
     subjects: list[dict] = []
-    seen: set[str] = set()
     for row in result.all():
-        sid = str(row.subject_id)
-        if sid in seen:
-            continue
-        seen.add(sid)
         subjects.append(
             {
-                "id": sid,
+                "id": str(row.id),
                 "name_uz": row.name_uz,
                 "name_ru": row.name_ru,
                 "name_en": row.name_en,
             }
         )
+    subjects.sort(key=lambda s: s["name_uz"])
     return subjects
 
 
@@ -110,6 +132,9 @@ async def generate_lesson_material(
     ).scalar_one_or_none()
     if not subject:
         raise HTTPException(status_code=404, detail={"code": "SUBJECT_NOT_FOUND"})
+
+    if not await _teacher_can_use_subject(db, teacher, body.subject_id):
+        raise HTTPException(status_code=403, detail={"code": "SUBJECT_NOT_ASSIGNED"})
 
     if body.group_id:
         group = (
@@ -191,6 +216,9 @@ async def start_lesson_material(
     ).scalar_one_or_none()
     if not material:
         raise HTTPException(status_code=404, detail={"code": "NOT_FOUND"})
+
+    if material.status != "draft":
+        raise HTTPException(status_code=422, detail={"code": "LESSON_ALREADY_STARTED"})
 
     material.status = "started"
     material.started_at = datetime.now(timezone.utc)

@@ -130,6 +130,7 @@ ROLE_PERMISSIONS: dict[str, list[str]] = {
         "files.read",
         "certificates.create",
         "certificates.read",
+        "reports.generate",
     ],
     "teacher": [
         "teacher.portal",

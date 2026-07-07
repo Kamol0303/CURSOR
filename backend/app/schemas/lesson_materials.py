@@ -13,7 +13,7 @@ class LessonGenerateRequest(BaseModel):
     topic: str = Field(min_length=2, max_length=500)
     content_type: str = Field(pattern="^(presentation|game)$")
     group_id: UUID | None = None
-    locale: str | None = None
+    locale: str | None = Field(default=None, pattern="^(uz|ru|en)$")
 
 
 class LessonMaterialResponse(BaseModel):

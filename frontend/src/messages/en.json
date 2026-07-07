@@ -542,7 +542,18 @@
     "cancel": "Cancel",
     "save": "Save",
     "saving": "Saving...",
-    "download": "Download"
+    "download": "Download",
+    "downloadError": "Failed to download file",
+    "exportPdf": "Ratings PDF",
+    "exportExcel": "Ratings Excel",
+    "exporting": "Downloading...",
+    "exportErrors": {
+      "FORBIDDEN": "You do not have permission to download this report",
+      "NETWORK_ERROR": "Network error. Please try again",
+      "INVALID_RESPONSE": "Server returned an invalid response",
+      "HTTP_ERROR": "Failed to download report",
+      "UNKNOWN": "Failed to download report"
+    }
   },
   "verify": {
     "title": "Certificate verification",
@@ -631,6 +642,8 @@
     "generate": "Generate with AI",
     "generating": "Generating...",
     "generateError": "Generation failed. Check API key configuration.",
+    "noSubjects": "No subjects are assigned to you. Ask your center manager to assign subjects or groups.",
+    "noSubjectsShort": "No subjects",
     "startLesson": "Start lesson",
     "starting": "Starting...",
     "started": "Lesson started",
@@ -638,7 +651,17 @@
     "round": "Round",
     "hint": "Hint",
     "answer": "Answer",
-    "recent": "Recent materials"
+    "recent": "Recent materials",
+    "errors": {
+      "SUBJECT_NOT_ASSIGNED": "This subject is not assigned to you",
+      "SUBJECT_NOT_FOUND": "Subject not found",
+      "GROUP_NOT_FOUND": "Group not found",
+      "GROUP_SUBJECT_MISMATCH": "Group and subject do not match",
+      "LESSON_ALREADY_STARTED": "Lesson has already been started",
+      "FORBIDDEN": "Access denied",
+      "NETWORK_ERROR": "Network error",
+      "UNKNOWN": "An error occurred"
+    }
   },
   "audit": {
     "title": "Change log",

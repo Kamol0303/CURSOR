@@ -542,7 +542,18 @@
     "cancel": "Bekor qilish",
     "save": "Saqlash",
     "saving": "Saqlanmoqda...",
-    "download": "Yuklab olish"
+    "download": "Yuklab olish",
+    "downloadError": "Faylni yuklab bo'lmadi",
+    "exportPdf": "Reyting PDF",
+    "exportExcel": "Reyting Excel",
+    "exporting": "Yuklanmoqda...",
+    "exportErrors": {
+      "FORBIDDEN": "Hisobot yuklab olish uchun ruxsat yo'q",
+      "NETWORK_ERROR": "Tarmoq xatosi. Qayta urinib ko'ring",
+      "INVALID_RESPONSE": "Server noto'g'ri javob qaytardi",
+      "HTTP_ERROR": "Hisobot yuklab bo'lmadi",
+      "UNKNOWN": "Hisobot yuklab bo'lmadi"
+    }
   },
   "verify": {
     "title": "Sertifikatni tekshirish",
@@ -631,6 +642,8 @@
     "generate": "AI bilan yaratish",
     "generating": "Yaratilmoqda...",
     "generateError": "Yaratishda xato. API kalitini tekshiring.",
+    "noSubjects": "Sizga biriktirilgan fanlar topilmadi. Markaz menejeridan fan yoki guruh biriktirishni so'rang.",
+    "noSubjectsShort": "Fanlar yo'q",
     "startLesson": "Darsni boshlash",
     "starting": "Boshlanmoqda...",
     "started": "Dars boshlangan",
@@ -638,7 +651,17 @@
     "round": "Raund",
     "hint": "Maslahat",
     "answer": "Javob",
-    "recent": "So'nggi materiallar"
+    "recent": "So'nggi materiallar",
+    "errors": {
+      "SUBJECT_NOT_ASSIGNED": "Bu fan sizga biriktirilmagan",
+      "SUBJECT_NOT_FOUND": "Fan topilmadi",
+      "GROUP_NOT_FOUND": "Guruh topilmadi",
+      "GROUP_SUBJECT_MISMATCH": "Guruh va fan mos kelmaydi",
+      "LESSON_ALREADY_STARTED": "Dars allaqachon boshlangan",
+      "FORBIDDEN": "Ruxsat yo'q",
+      "NETWORK_ERROR": "Tarmoq xatosi",
+      "UNKNOWN": "Xatolik yuz berdi"
+    }
   },
   "audit": {
     "title": "O'zgarishlar jurnali",

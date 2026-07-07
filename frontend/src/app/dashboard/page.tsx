@@ -1,7 +1,9 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
+import { DigitalClock } from "@/components/DigitalClock";
 import { KpiCards } from "@/components/KpiCards";
 import { OperatorDashboard } from "@/components/OperatorDashboard";
 import { StatsChart } from "@/components/StatsChart";
@@ -36,16 +38,19 @@ function StaffDashboard() {
 
   return (
     <div className="space-y-5">
-      <div className="rounded-lg border border-gray-200/80 dark:border-gray-800 bg-white dark:bg-gray-900 px-4 sm:px-5 py-4 shadow-sm">
-        <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-gray-100">{t("welcome")}</h2>
-        {userName && (
-          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-            <span className="inline-flex items-center gap-1.5">
-              <span className="h-2 w-2 rounded-full bg-emerald-500" aria-hidden />
-              {userName}
-            </span>
-          </p>
-        )}
+      <div className="grid gap-4 lg:grid-cols-[1fr_minmax(280px,380px)]">
+        <div className="rounded-lg border border-gray-200/80 dark:border-gray-800 bg-white dark:bg-gray-900 px-4 sm:px-5 py-4 shadow-sm flex flex-col justify-center">
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-gray-100">{t("welcome")}</h2>
+          {userName && (
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+              <span className="inline-flex items-center gap-1.5">
+                <span className="h-2 w-2 rounded-full bg-emerald-500" aria-hidden />
+                {userName}
+              </span>
+            </p>
+          )}
+        </div>
+        <DigitalClock />
       </div>
       {loading ? (
         <p className="text-gray-400 dark:text-gray-500 text-sm px-1">{t("loading")}</p>

@@ -663,6 +663,17 @@
       "UNKNOWN": "An error occurred"
     }
   },
+  "clock": {
+    "title": "Digital clock",
+    "subtitle": "12/24 hour · Local time",
+    "hour12": "12 hr",
+    "hour24": "24 hr",
+    "formatToggle": "Time format",
+    "am": "AM",
+    "pm": "PM",
+    "autoUpdate": "Updates every second",
+    "localTime": "Local time"
+  },
   "audit": {
     "title": "Change log",
     "subtitle": "Who changed what and when",

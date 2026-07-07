@@ -5,6 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { useTranslations } from "next-intl";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { DigitalClock } from "@/components/DigitalClock";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { NotificationBell } from "@/components/NotificationBell";
 import { TmbLogo } from "@/components/TmbLogo";
@@ -104,6 +105,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
             <p className="text-xs text-gray-500 dark:text-gray-400 hidden sm:block">{t("platform")}</p>
           </div>
           <div className="flex items-center gap-2 shrink-0">
+            <DigitalClock variant="compact" />
             <NotificationBell />
             <ThemeToggle />
             <LanguageSwitcher />

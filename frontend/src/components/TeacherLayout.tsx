@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { DigitalClock } from "@/components/DigitalClock";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { ChangePasswordForm } from "@/components/ChangePasswordForm";
 import { useAuth } from "@/contexts/AuthContext";
@@ -74,9 +75,12 @@ export function TeacherLayout({ children }: { children: React.ReactNode }) {
         </div>
       </aside>
       <div className="flex-1 flex flex-col min-w-0">
-        <header className="bg-white dark:bg-gray-900 border-b dark:border-gray-800 px-6 py-3 flex justify-end items-center gap-2">
-          <ThemeToggle />
-          <LanguageSwitcher />
+        <header className="bg-white dark:bg-gray-900 border-b dark:border-gray-800 px-6 py-3 flex justify-between items-center gap-4">
+          <DigitalClock variant="compact" className="sm:flex" />
+          <div className="flex items-center gap-2 shrink-0">
+            <ThemeToggle />
+            <LanguageSwitcher />
+          </div>
         </header>
         <main className="flex-1 p-6 overflow-auto text-gray-900 dark:text-gray-100">
           {mustChangePassword ? (

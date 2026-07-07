@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
+import { DigitalClock } from "@/components/DigitalClock";
 import { apiFetch } from "@/lib/api";
 
 type Profile = {
@@ -35,14 +36,17 @@ export default function TeacherDashboardPage() {
   }, []);
 
   return (
-    <div className="space-y-6 max-w-3xl">
-      <div>
-        <h2 className="text-2xl font-bold text-gray-900">{t("welcome")}</h2>
-        {profile && (
-          <p className="text-gray-500 mt-1">
-            {profile.full_name} · {profile.center_name}
-          </p>
-        )}
+    <div className="space-y-6 max-w-4xl">
+      <div className="grid gap-4 lg:grid-cols-[1fr_minmax(260px,340px)]">
+        <div>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">{t("welcome")}</h2>
+          {profile && (
+            <p className="text-gray-500 dark:text-gray-400 mt-1">
+              {profile.full_name} · {profile.center_name}
+            </p>
+          )}
+        </div>
+        <DigitalClock />
       </div>
       {loading ? (
         <p className="text-gray-400">{t("loading")}</p>

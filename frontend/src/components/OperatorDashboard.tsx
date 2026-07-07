@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { CenterCertificatesChart } from "@/components/CenterCertificatesChart";
+import { DigitalClock } from "@/components/DigitalClock";
 import { OperatorKpiCards } from "@/components/OperatorKpiCards";
 import { TrendLineChart } from "@/components/TrendLineChart";
 import { getMe, getOperatorSummary } from "@/lib/api";
@@ -45,10 +46,13 @@ export function OperatorDashboard() {
 
   return (
     <div className="space-y-8">
-      <div>
-        <h2 className="text-2xl font-bold text-gray-900">{t("welcome")}</h2>
-        {userName && <p className="text-gray-500 mt-1">{userName}</p>}
-        <p className="text-sm text-gray-400 mt-2 max-w-2xl">{t("subtitle")}</p>
+      <div className="grid gap-4 lg:grid-cols-[1fr_minmax(260px,340px)]">
+        <div>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">{t("welcome")}</h2>
+          {userName && <p className="text-gray-500 dark:text-gray-400 mt-1">{userName}</p>}
+          <p className="text-sm text-gray-400 dark:text-gray-500 mt-2 max-w-2xl">{t("subtitle")}</p>
+        </div>
+        <DigitalClock />
       </div>
 
       {loading ? (

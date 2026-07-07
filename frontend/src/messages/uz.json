@@ -663,6 +663,17 @@
       "UNKNOWN": "Xatolik yuz berdi"
     }
   },
+  "clock": {
+    "title": "Raqamli soat",
+    "subtitle": "12/24 soat · Mahalliy vaqt",
+    "hour12": "12 soat",
+    "hour24": "24 soat",
+    "formatToggle": "Vaqt formati",
+    "am": "TO",
+    "pm": "TK",
+    "autoUpdate": "Har soniyada yangilanadi",
+    "localTime": "Mahalliy vaqt"
+  },
   "audit": {
     "title": "O'zgarishlar jurnali",
     "subtitle": "Kim, qachon va nima o'zgartirgani",

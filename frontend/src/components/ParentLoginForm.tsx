@@ -54,8 +54,8 @@ export function ParentLoginForm() {
       heroSubtitle={t("subtitle")}
     >
       <div className="text-left">
-        <h2 className="auth-agentflow-card__title">{t("title")}</h2>
-        <p className="auth-agentflow-card__hint">{t("subtitle")}</p>
+        <h2 className="aeline-login-card__title">{t("title")}</h2>
+        <p className="aeline-login-card__hint">{t("subtitle")}</p>
 
         {step === "phone" ? (
           <div className="flex flex-col">
@@ -69,7 +69,7 @@ export function ParentLoginForm() {
               variant="light"
             />
             {error && (
-              <p className="auth-agentflow-alert auth-agentflow-alert--error mt-4" role="alert">
+              <p className="aeline-alert aeline-alert--error mt-4" role="alert">
                 {error}
               </p>
             )}
@@ -92,7 +92,7 @@ export function ParentLoginForm() {
               className="[&_input]:tracking-[0.35em] [&_input]:text-center"
             />
             {error && (
-              <p className="auth-agentflow-alert auth-agentflow-alert--error mt-4" role="alert">
+              <p className="aeline-alert aeline-alert--error mt-4" role="alert">
                 {error}
               </p>
             )}

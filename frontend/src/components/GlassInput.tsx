@@ -32,7 +32,7 @@ export function GlassInput({
 
   if (variant === "light") {
     return (
-      <div className={`auth-af-input ${className}`}>
+      <div className={`aeline-input ${className}`}>
         <input
           id={id}
           type={type}

@@ -146,8 +146,8 @@ export function LoginForm() {
     >
       {step === "login" ? (
         <form onSubmit={handleLogin} className="text-left flex flex-col">
-          <h2 className="auth-agentflow-card__title">{t("login")}</h2>
-          <p className="auth-agentflow-card__hint">{t("loginHint")}</p>
+          <h2 className="aeline-login-card__title">{t("login")}</h2>
+          <p className="aeline-login-card__hint">{t("loginHint")}</p>
 
           <GlassInput
             label={t("username")}
@@ -189,11 +189,11 @@ export function LoginForm() {
           </div>
 
           {showForgotHint && (
-            <p className="auth-agentflow-alert auth-agentflow-alert--info -mt-2 mb-4">{t("forgotPasswordHint")}</p>
+            <p className="aeline-alert aeline-alert--info -mt-2 mb-4">{t("forgotPasswordHint")}</p>
           )}
 
           {error && (
-            <p className="auth-agentflow-alert auth-agentflow-alert--error" role="alert">
+            <p className="aeline-alert aeline-alert--error" role="alert">
               {error}
             </p>
           )}
@@ -217,15 +217,15 @@ export function LoginForm() {
             onError={(code) => handleError(code)}
           />
           {error && (
-            <p className="auth-agentflow-alert auth-agentflow-alert--error mt-3" role="alert">
+            <p className="aeline-alert aeline-alert--error mt-3" role="alert">
               {error}
             </p>
           )}
         </div>
       ) : (
         <form onSubmit={handleMfa} className="text-left flex flex-col">
-          <h2 className="auth-agentflow-card__title">{t("mfaTitle")}</h2>
-          <p className="auth-agentflow-card__hint">{t("mfaCode")}</p>
+          <h2 className="aeline-login-card__title">{t("mfaTitle")}</h2>
+          <p className="aeline-login-card__hint">{t("mfaCode")}</p>
           <GlassInput
             label={t("mfaCode")}
             value={mfaCode}
@@ -237,7 +237,7 @@ export function LoginForm() {
             className="[&_input]:tracking-[0.3em] [&_input]:text-center [&_input]:text-lg"
           />
           {error && (
-            <p className="auth-agentflow-alert auth-agentflow-alert--error mt-4" role="alert">
+            <p className="aeline-alert aeline-alert--error mt-4" role="alert">
               {error}
             </p>
           )}

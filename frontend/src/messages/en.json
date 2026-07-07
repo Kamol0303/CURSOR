@@ -41,6 +41,86 @@
       "modules": "Modules",
       "security": "Security",
       "monitoring": "Monitoring"
+    },
+    "landing": {
+      "nav": { "about": "About", "services": "Services", "pricing": "Plans", "login": "Sign in" },
+      "hero": {
+        "title": "Education monitoring",
+        "titleAccent": "and the future of management",
+        "subtitle": "A data-driven platform for Toyloq district centers: monitoring, secure access, and automated reporting.",
+        "demo": "Learn more",
+        "cta": "Get started",
+        "rating": "Trusted by 12+ centers"
+      },
+      "about": {
+        "tag": "About us",
+        "title": "Modern education monitoring for the district",
+        "statCenters": "Centers",
+        "statCentersDesc": "All learning centers across the district in one platform.",
+        "statCommitment": "Transparency",
+        "quote": "TMB made tracking attendance and outcomes much easier.",
+        "statStudents": "Students",
+        "statStudentsDesc": "Thousands of records analyzed every month.",
+        "statModules": "Modules"
+      },
+      "services": {
+        "tag": "Services",
+        "title": "Full monitoring and management ecosystem",
+        "desc": "From daily oversight to strategic decisions — all in one place.",
+        "cta": "Get started",
+        "items": {
+          "one": { "title": "Attendance monitoring", "desc": "Real-time stats for groups, lessons, and teachers." },
+          "two": { "title": "Grades and exams", "desc": "Scores, certificates, and transparent results for parents." },
+          "three": { "title": "Analytics and reports", "desc": "PDF/Excel export, audit log, and admin dashboard." }
+        }
+      },
+      "expertise": {
+        "tag": "Expertise",
+        "title": "Where people and technology meet",
+        "desc": "TMB simplifies complex workflows — decisions become faster and clearer.",
+        "items": {
+          "attendance": { "title": "Attendance automation", "desc": "Lesson start rules and teacher assignment validation." },
+          "analytics": { "title": "Data analytics", "desc": "Visual dashboards for centers, payments, and students." }
+        }
+      },
+      "pricing": {
+        "tag": "Pricing",
+        "title": "Plans for every stage of growth",
+        "desc": "From a single center to district-wide monitoring.",
+        "cta": "Sign in",
+        "plans": {
+          "starter": { "name": "Center", "desc": "Core modules for one learning center.", "price": "Free pilot", "features": ["Attendance & groups", "Teacher portal", "Basic reports"] },
+          "growth": { "name": "District", "desc": "Multiple centers with admin oversight.", "price": "Regional plan", "features": ["RBAC & audit", "Analytics dashboard", "Parent portal", "MFA security"] },
+          "enterprise": { "name": "Enterprise", "desc": "Full integration and custom setup.", "price": "Custom pricing", "features": ["API integration", "24/7 monitoring", "Custom reports", "Priority support"] }
+        }
+      },
+      "testimonials": {
+        "tag": "Testimonials",
+        "title": "What do users say?",
+        "desc": "Experiences from directors and teachers.",
+        "items": {
+          "one": { "text": "Seeing attendance and grades in one place is very convenient.", "author": "— Center director" },
+          "two": { "text": "The parent portal noticeably improved communication.", "author": "— Teacher" },
+          "three": { "text": "Reports are ready quickly — we save time.", "author": "— Administrator" }
+        }
+      },
+      "cta": {
+        "eyebrow": "Trusted by 5,000+ users",
+        "title": "Education monitoring and smart management",
+        "desc": "TMB connects centers, teachers, and parents in one digital environment.",
+        "button": "Sign in to TMB"
+      },
+      "footer": {
+        "desc": "Monitoring and management platform for Toyloq district learning centers.",
+        "platform": "Platform",
+        "staff": "Staff login",
+        "parent": "Parent portal",
+        "verify": "Verify certificate",
+        "region": "Region",
+        "monitoring": "Education monitoring",
+        "copyright": "© TMB — Education Monitoring Database",
+        "regionLabel": "Toyloq district · Samarkand"
+      }
     }
   },
   "security": {

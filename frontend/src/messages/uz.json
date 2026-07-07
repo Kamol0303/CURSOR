@@ -41,6 +41,106 @@
       "modules": "Modullar",
       "security": "Xavfsizlik",
       "monitoring": "Monitoring"
+    },
+    "landing": {
+      "nav": {
+        "about": "Biz haqimizda",
+        "services": "Xizmatlar",
+        "pricing": "Imkoniyatlar",
+        "login": "Kirish"
+      },
+      "hero": {
+        "title": "Ta'lim monitoringi",
+        "titleAccent": "va boshqaruv kelajagi",
+        "subtitle": "Toyloq tumani markazlari uchun ma'lumotga asoslangan monitoring, xavfsiz kirish va avtomatlashtirilgan hisobotlar.",
+        "demo": "Batafsil",
+        "cta": "Boshlash",
+        "rating": "12+ markaz ishonch bildiradi"
+      },
+      "about": {
+        "tag": "Biz haqimizda",
+        "title": "Toyloq tumani uchun zamonaviy ta'lim monitoringi",
+        "statCenters": "Markazlar",
+        "statCentersDesc": "Tuman bo'ylab barcha o'quv markazlari yagona platformada.",
+        "statCommitment": "Shaffoflik",
+        "quote": "TMB yordamida davomat va natijalarni kuzatish ancha osonlashdi.",
+        "statStudents": "O'quvchilar",
+        "statStudentsDesc": "Har oy minglab yozuvlar tahlil qilinadi.",
+        "statModules": "Modullar"
+      },
+      "services": {
+        "tag": "Xizmatlar",
+        "title": "To'liq monitoring va boshqaruv ekotizimi",
+        "desc": "Bugungi nazoratdan tortib, ertangi strategik qarorlargacha — barchasi bir joyda.",
+        "cta": "Boshlash",
+        "items": {
+          "one": { "title": "Davomat monitoringi", "desc": "Guruhlar, darslar va o'qituvchilar bo'yicha real vaqt statistikasi." },
+          "two": { "title": "Baholash va imtihonlar", "desc": "Ballar, sertifikatlar va ota-onalar uchun shaffof natijalar." },
+          "three": { "title": "Analitika va hisobotlar", "desc": "PDF/Excel eksport, audit jurnali va boshqaruv paneli." }
+        }
+      },
+      "expertise": {
+        "tag": "Imkoniyatlar",
+        "title": "Inson va texnologiya uyg'unligi",
+        "desc": "TMB murakkab jarayonlarni soddalashtiradi — qarorlar tezroq va aniqroq bo'ladi.",
+        "items": {
+          "attendance": { "title": "Davomat avtomatlashtirish", "desc": "Dars boshlash, guruh va o'qituvchi biriktirish qoidalari bilan." },
+          "analytics": { "title": "Ma'lumotlar tahlili", "desc": "Markazlar, to'lovlar va o'quvchilar bo'yicha vizual dashboardlar." }
+        }
+      },
+      "pricing": {
+        "tag": "Tariflar",
+        "title": "Har bir bosqich uchun mos yechim",
+        "desc": "Bitta markazdan tortib tuman miqyosidagi monitoringgacha.",
+        "cta": "Kirish",
+        "plans": {
+          "starter": {
+            "name": "Markaz",
+            "desc": "Bitta o'quv markazi uchun asosiy modullar.",
+            "price": "Bepul pilot",
+            "features": ["Davomat va guruhlar", "O'qituvchi kabineti", "Asosiy hisobotlar"]
+          },
+          "growth": {
+            "name": "Tuman",
+            "desc": "Bir nechta markaz va admin nazorati.",
+            "price": "Mintaqa rejasi",
+            "features": ["RBAC va audit", "Analitika paneli", "Ota-ona portali", "MFA xavfsizligi"]
+          },
+          "enterprise": {
+            "name": "Kengaytirilgan",
+            "desc": "To'liq integratsiya va maxsus sozlamalar.",
+            "price": "Kelishuv asosida",
+            "features": ["API integratsiya", "24/7 monitoring", "Maxsus hisobotlar", "Prioritet qo'llab-quvvatlash"]
+          }
+        }
+      },
+      "testimonials": {
+        "tag": "Fikrlar",
+        "title": "Foydalanuvchilar nima deydi?",
+        "desc": "Direktorlar va o'qituvchilarning tajribasi.",
+        "items": {
+          "one": { "text": "Davomat va baholarni bir joyda ko'rish juda qulay bo'ldi.", "author": "— Markaz direktori" },
+          "two": { "text": "Ota-onalar portali aloqani sezilarli yaxshiladi.", "author": "— O'qituvchi" },
+          "three": { "text": "Hisobotlar tez tayyorlanadi, vaqt tejaymiz.", "author": "— Administrator" }
+        }
+      },
+      "cta": {
+        "eyebrow": "5 000+ foydalanuvchi ishonchi",
+        "title": "Ta'lim monitoringi va aqlli boshqaruv",
+        "desc": "TMB markazlar, o'qituvchilar va ota-onalar uchun yagona raqamli muhit yaratadi.",
+        "button": "Tizimga kirish"
+      },
+      "footer": {
+        "desc": "Toyloq tumani ta'lim markazlari uchun monitoring va boshqaruv platformasi.",
+        "platform": "Platforma",
+        "staff": "Xodimlar kirishi",
+        "parent": "Ota-ona portali",
+        "verify": "Sertifikat tekshirish",
+        "region": "Hudud",
+        "monitoring": "Ta'lim monitoringi",
+        "copyright": "© TMB — Ta'lim Monitoring Bazasi",
+        "regionLabel": "Toyloq tumani · Samarqand"
+      }
     }
   },
   "security": {

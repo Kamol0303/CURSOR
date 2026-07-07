@@ -1,28 +1,50 @@
 "use client";
 
+import Link from "next/link";
+
 type AuthButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
-  variant?: "primary" | "secondary";
+  variant?: "dark" | "secondary" | "lime";
   fullWidth?: boolean;
 };
 
 export function AuthButton({
-  variant = "primary",
+  variant = "dark",
   fullWidth = true,
   className = "",
   children,
   type = "button",
   ...props
 }: AuthButtonProps) {
-  const wrapClass =
-    variant === "primary" ? "auth-af-btn-border is-primary" : "auth-af-btn-border is-secondary";
-
   return (
-    <span className={`${wrapClass} ${fullWidth ? "auth-af-btn-border--block" : ""} ${className}`}>
-      <button type={type} className={`auth-af-btn ${variant === "primary" ? "is-primary" : "is-secondary"}`} {...props}>
-        <span className="auth-af-btn__label">{children}</span>
-        <span className="auth-af-btn-glow auth-af-btn-glow--inner" aria-hidden />
-      </button>
-      <span className="auth-af-btn-glow auth-af-btn-glow--outer" aria-hidden />
-    </span>
+    <button
+      type={type}
+      className={`aeline-btn aeline-btn--${variant} ${fullWidth ? "aeline-btn--block" : ""} ${className}`}
+      {...props}
+    >
+      <span>{children}</span>
+    </button>
+  );
+}
+
+type AuthArrowButtonProps = {
+  href: string;
+  children: React.ReactNode;
+  variant?: "dark" | "lime";
+  className?: string;
+};
+
+export function AuthArrowButton({ href, children, variant = "dark", className = "" }: AuthArrowButtonProps) {
+  return (
+    <Link href={href} className={`aeline-btn-arrow aeline-btn-arrow--${variant} ${className}`}>
+      <span className="aeline-btn-arrow__text">{children}</span>
+      <span className="aeline-btn-arrow__icon" aria-hidden>
+        <svg viewBox="0 0 20 20" fill="none">
+          <path
+            d="M13.046 8.13L5.873 15.3 4.695 14.13 11.867 6.95H5.546V5.29H14.712v9.17h-1.666V8.13Z"
+            fill="currentColor"
+          />
+        </svg>
+      </span>
+    </Link>
   );
 }

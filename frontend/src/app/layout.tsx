@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Chakra_Petch, IBM_Plex_Sans } from "next/font/google";
+import { Chakra_Petch, IBM_Plex_Sans, Plus_Jakarta_Sans } from "next/font/google";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages } from "next-intl/server";
 import { ServiceWorkerRegister } from "@/components/ServiceWorkerRegister";
@@ -19,6 +19,13 @@ const chakraPetch = Chakra_Petch({
   style: ["normal", "italic"],
   display: "swap",
   variable: "--font-chakra",
+});
+
+const plusJakarta = Plus_Jakarta_Sans({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  display: "swap",
+  variable: "--font-display",
 });
 
 export const metadata: Metadata = {
@@ -41,7 +48,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const messages = await getMessages();
 
   return (
-    <html lang={locale} suppressHydrationWarning className={`${ibmPlexSans.variable} ${chakraPetch.variable}`}>
+    <html lang={locale} suppressHydrationWarning className={`${ibmPlexSans.variable} ${chakraPetch.variable} ${plusJakarta.variable}`}>
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
       </head>

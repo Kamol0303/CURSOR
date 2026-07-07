@@ -104,7 +104,7 @@ export function MfaSetupForm({ setupToken, accessToken, variant = "default", onC
 
   return (
     <form onSubmit={handleConfirm} className="space-y-4">
-      <h2 className={`font-semibold text-center ${isLight ? "auth-agentflow-card__title !mb-0" : "text-naqsh-primary"}`}>
+      <h2 className={`font-semibold text-center ${isLight ? "aeline-login-card__title !mb-0" : "text-naqsh-primary"}`}>
         {t("mfaSetupTitle")}
       </h2>
       <p className={`text-sm text-center ${isLight ? "text-slate-500" : "text-gray-600 dark:text-gray-400"}`}>

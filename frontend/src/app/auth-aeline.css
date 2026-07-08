@@ -425,6 +425,58 @@
   color: var(--aeline-text);
 }
 
+.aeline-split-login__control-wrap {
+  position: relative;
+}
+
+.aeline-split-login__group--password .aeline-split-login__control {
+  padding-right: 2.5rem;
+}
+
+.aeline-input--password input {
+  padding-right: 2.5rem;
+}
+
+.aeline-input-toggle {
+  position: absolute;
+  right: 0.35rem;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border: none;
+  background: transparent;
+  color: #64748b;
+  cursor: pointer;
+  border-radius: 0.25rem;
+}
+
+.aeline-input-toggle:hover {
+  color: var(--aeline-text);
+}
+
+.aeline-split-login__control-wrap .aeline-input-toggle {
+  top: auto;
+  bottom: 0.15rem;
+  transform: none;
+}
+
+.aeline-split-login__otp-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.75rem 1.25rem;
+  margin-top: 0.75rem;
+}
+
+.aeline-split-login__resend-timer {
+  font-size: 0.8rem;
+  color: var(--aeline-muted);
+}
+
 .aeline-split-login__control {
   width: 100%;
   border: 1px solid #d1d5db;

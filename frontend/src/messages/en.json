@@ -9,6 +9,8 @@
     "rememberMe": "Remember me",
     "forgotPassword": "Forgot password?",
     "forgotPasswordHint": "Contact your center director or system administrator. Only an admin can reset passwords.",
+    "showPassword": "Show password",
+    "hidePassword": "Hide password",
     "parentPortal": "Parent portal",
     "splitWelcomeTitle": "Welcome back!",
     "splitWelcomeSubtitle": "Modern monitoring platform for Toyloq district learning centers",
@@ -633,6 +635,13 @@
     "message": "You do not have permission to view this page.",
     "goHome": "Back to home"
   },
+  "notFoundPage": {
+    "title": "Page not found",
+    "message": "The page you requested does not exist or has been moved.",
+    "staffLogin": "Staff login",
+    "parentLogin": "Parent portal",
+    "verify": "Verify certificate"
+  },
   "ratings": {
     "title": "Center ratings",
     "loading": "Loading...",
@@ -824,6 +833,8 @@
     "verify": "Sign in",
     "verifying": "Verifying...",
     "changePhone": "Change phone number",
+    "resendOtp": "Resend code",
+    "resendIn": "Resend in {seconds}s",
     "staffLogin": "Staff login",
     "loading": "Loading...",
     "logout": "Sign out",
@@ -833,6 +844,7 @@
     "noCertificates": "No certificates",
     "download": "Download",
     "errors": {
+      "PHONE_INVALID": "Phone must be in +998 XX XXX XX XX format",
       "PHONE_NOT_REGISTERED": "Phone not registered",
       "OTP_INVALID": "Invalid code",
       "OTP_EXPIRED": "Code expired",

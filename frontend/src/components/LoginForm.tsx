@@ -166,6 +166,7 @@ export function LoginForm() {
             id="password"
             className="mt-4"
             variant="split"
+            passwordToggle
           />
 
           <div className="aeline-split-login__meta">

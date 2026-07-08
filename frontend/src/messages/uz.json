@@ -9,6 +9,8 @@
     "rememberMe": "Meni eslab qol",
     "forgotPassword": "Parolni unutdingizmi?",
     "forgotPasswordHint": "Markaz direktori yoki tizim administratoriga murojaat qiling. Parolni faqat admin tiklay oladi.",
+    "showPassword": "Parolni ko'rsatish",
+    "hidePassword": "Parolni yashirish",
     "parentPortal": "Ota-ona portali",
     "splitWelcomeTitle": "Xush kelibsiz!",
     "splitWelcomeSubtitle": "Toyloq tumani ta'lim markazlari uchun zamonaviy monitoring platformasi",
@@ -653,6 +655,13 @@
     "message": "Sizda ushbu sahifani ko'rish uchun ruxsat yo'q.",
     "goHome": "Bosh sahifaga qaytish"
   },
+  "notFoundPage": {
+    "title": "Sahifa topilmadi",
+    "message": "So'ralgan manzil mavjud emas yoki ko'chirilgan.",
+    "staffLogin": "Xodimlar kirishi",
+    "parentLogin": "Ota-ona portali",
+    "verify": "Sertifikat tekshirish"
+  },
   "ratings": {
     "title": "Markazlar reytingi",
     "loading": "Yuklanmoqda...",
@@ -844,6 +853,8 @@
     "verify": "Kirish",
     "verifying": "Tekshirilmoqda...",
     "changePhone": "Raqamni o'zgartirish",
+    "resendOtp": "Kodni qayta yuborish",
+    "resendIn": "Qayta yuborish: {seconds} s",
     "staffLogin": "Xodimlar uchun kirish",
     "loading": "Yuklanmoqda...",
     "logout": "Chiqish",
@@ -853,6 +864,7 @@
     "noCertificates": "Sertifikatlar yo'q",
     "download": "Yuklab olish",
     "errors": {
+      "PHONE_INVALID": "Telefon raqam +998 XX XXX XX XX formatida bo'lishi kerak",
       "PHONE_NOT_REGISTERED": "Telefon raqam ro'yxatda yo'q",
       "OTP_INVALID": "Noto'g'ri kod",
       "OTP_EXPIRED": "Kod muddati tugagan",
